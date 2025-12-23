@@ -173,7 +173,7 @@
         /* ============================================ */
         .header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
 
@@ -238,9 +238,90 @@
 
         .tagline {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 300;
             letter-spacing: 0.05em;
+        }
+
+        /* ============================================ */
+        /* PESTAÑAS */
+        /* ============================================ */
+        .tabs {
+            display: flex;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab:hover::before {
+            opacity: 1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15));
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: tabGlow 2s infinite;
+        }
+
+        @keyframes tabGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* ============================================ */
+        /* CONTENIDO DE PESTAÑAS */
+        /* ============================================ */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         /* ============================================ */
@@ -698,6 +779,12 @@
         .med-select-btn:hover {
             background: rgba(0, 245, 255, 0.2);
             transform: scale(1.05);
+        }
+
+        .med-select-btn.selected {
+            background: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            color: var(--bg-dark);
         }
 
         .med-delete {
@@ -1212,6 +1299,13 @@
                 font-size: 0.75rem;
                 padding: 0.4rem;
             }
+            .tabs {
+                margin-bottom: 1rem;
+            }
+            .tab {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
         }
 
         /* ============================================ */
@@ -1266,127 +1360,145 @@
             <p class="tagline">Sistema inteligente de medicación</p>
         </header>
 
-        <!-- TARJETA PARA AGREGAR NUEVA MEDICACIÓN -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">✨</div>
-                <h2 class="card-title">Nueva medicación</h2>
-            </div>
+        <!-- PESTAÑAS -->
+        <div class="tabs">
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">
+                <span>✨</span>
+                <span>Nuevo</span>
+            </button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">
+                <span>💊</span>
+                <span>Mis Medicamentos</span>
+            </button>
+        </div>
 
-            <div class="form-group">
-                <label class="form-label">Medicamento</label>
-                <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Paciente</label>
-                <input type="text" id="paciente" class="form-input" placeholder="Ej: María García" autocomplete="off">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Cantidad</label>
-                <div class="qty-row">
-                    <button class="qty-btn" id="menos">−</button>
-                    <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
-                    <button class="qty-btn" id="mas">+</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Hora</label>
-                <input type="time" id="hora" class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Foto (opcional)</label>
-                <div class="photo-zone" id="photoZone">
-                    <div class="photo-zone-icon">📷</div>
-                    <div class="photo-zone-text">Toca para capturar</div>
-                    <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
-                </div>
-                <img class="photo-preview" id="photoPreview" src="" alt="Preview">
-            </div>
-
-            <div class="btn-group">
-                <button class="btn btn-primary btn-full" id="addBtn">
-                    <span>⚡</span>
-                    <span>Agregar</span>
-                </button>
-                <button class="btn btn-secondary" id="addHoraBtn">
-                    <span>+</span>
-                    <span>Hora</span>
-                </button>
-            </div>
-
-            <!-- CONFIGURACIÓN DE ALERTAS -->
-            <div class="settings">
-                <div class="settings-toggle" id="settingsToggle">
-                    <div class="settings-label">
-                        <span>⚙️</span>
-                        <span>Configuración de alertas</span>
-                    </div>
-                    <span class="settings-arrow" id="settingsArrow">▼</span>
+        <!-- CONTENIDO PESTAÑA NUEVO -->
+        <div class="tab-content active" id="tabContentNuevo">
+            <!-- TARJETA PARA AGREGAR NUEVA MEDICACIÓN -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <h2 class="card-title">Nueva medicación</h2>
                 </div>
 
-                <div class="settings-panel" id="settingsPanel">
-                    <div class="switch-row">
-                        <span class="switch-text">Sonido de alarma</span>
-                        <label class="switch">
-                            <input type="checkbox" id="sonidoOn" checked>
-                            <span class="switch-slider"></span>
-                        </label>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
+                </div>
 
-                    <div class="switch-row">
-                        <span class="switch-text">Recordatorio por voz</span>
-                        <label class="switch">
-                            <input type="checkbox" id="vozOn" checked>
-                            <span class="switch-slider"></span>
-                        </label>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: María García" autocomplete="off">
+                </div>
 
-                    <div class="volume-row">
-                        <div class="volume-header">
-                            <span class="volume-label">Volumen</span>
-                            <span class="volume-value" id="volValue">70%</span>
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="menos">−</button>
+                        <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="mas">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto (opcional)</label>
+                    <div class="photo-zone" id="photoZone">
+                        <div class="photo-zone-icon">📷</div>
+                        <div class="photo-zone-text">Toca para capturar</div>
+                        <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
+                    </div>
+                    <img class="photo-preview" id="photoPreview" src="" alt="Preview">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-full" id="addBtn">
+                        <span>⚡</span>
+                        <span>Agregar</span>
+                    </button>
+                </div>
+
+                <!-- CONFIGURACIÓN DE ALERTAS -->
+                <div class="settings">
+                    <div class="settings-toggle" id="settingsToggle">
+                        <div class="settings-label">
+                            <span>⚙️</span>
+                            <span>Configuración de alertas</span>
                         </div>
-                        <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7">
+                        <span class="settings-arrow" id="settingsArrow">▼</span>
                     </div>
 
-                    <div class="btn-group" style="margin-top: 1rem;">
-                        <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
-                        <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                    <div class="settings-panel" id="settingsPanel">
+                        <div class="switch-row">
+                            <span class="switch-text">Sonido de alarma</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sonidoOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span class="switch-text">Recordatorio por voz</span>
+                            <label class="switch">
+                                <input type="checkbox" id="vozOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="volume-row">
+                            <div class="volume-header">
+                                <span class="volume-label">Volumen</span>
+                                <span class="volume-value" id="volValue">70%</span>
+                            </div>
+                            <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
+                            <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- LISTA DE MEDICAMENTOS -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">💊</div>
-                <h2 class="card-title">Mis medicamentos</h2>
+        <!-- CONTENIDO PESTAÑA MEDICAMENTOS -->
+        <div class="tab-content" id="tabContentMedicamentos">
+            <!-- LISTA DE MEDICAMENTOS -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💊</div>
+                    <h2 class="card-title">Mis medicamentos</h2>
+                </div>
+
+                <ul class="med-list" id="lista"></ul>
+
+                <div class="empty" id="empty">
+                    <div class="empty-icon">💊</div>
+                    <h3 class="empty-title">Sin medicamentos</h3>
+                    <p class="empty-text">Agrega tu primera medicación en la pestaña "Nuevo"</p>
+                </div>
+
+                <!-- ACCIONES PARA MEDICAMENTOS -->
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" id="addHoraBtn">
+                        <span>+</span>
+                        <span>Agregar Hora</span>
+                    </button>
+                    <button class="btn btn-secondary" id="calBtn">
+                        <span>📅</span>
+                        <span>Historial</span>
+                    </button>
+                    <button class="btn btn-secondary" id="testBtn">
+                        <span>🧪</span>
+                        <span>Probar</span>
+                    </button>
+                </div>
             </div>
-
-            <ul class="med-list" id="lista"></ul>
-
-            <div class="empty" id="empty">
-                <div class="empty-icon">💊</div>
-                <h3 class="empty-title">Sin medicamentos</h3>
-                <p class="empty-text">Agrega tu primera medicación</p>
-            </div>
-        </div>
-
-        <!-- ACCIONES RÁPIDAS -->
-        <div class="btn-group">
-            <button class="btn btn-secondary" id="calBtn">
-                <span>📅</span>
-                <span>Historial</span>
-            </button>
-            <button class="btn btn-secondary" id="testBtn">
-                <span>🧪</span>
-                <span>Probar</span>
-            </button>
         </div>
     </div>
 
@@ -1419,7 +1531,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE (SIN BOTÓN "PROBAR ALERTA") -->
+    <!-- MODAL DE DETALLE -->
     <div class="modal-bg" id="detailModal">
         <div class="modal">
             <div class="modal-header">
@@ -1476,6 +1588,7 @@
         let seleccionadoId = null;
         let detalleId = null;
         let modoEdicionActivo = false;
+        let pestañaActual = 'nuevo'; // 'nuevo' o 'medicamentos'
 
         // Funciones auxiliares
         const $ = id => document.getElementById(id);
@@ -1497,6 +1610,43 @@
         const alertModal = $('alertModal');
         const detailModal = $('detailModal');
         const calModal = $('calModal');
+
+        // ============================================
+        // SISTEMA DE PESTAÑAS
+        // ============================================
+        function cambiarPestaña(nombrePestaña) {
+            pestañaActual = nombrePestaña;
+            
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar la pestaña seleccionada
+            $(`tabContent${nombrePestaña.charAt(0).toUpperCase() + nombrePestaña.slice(1)}`).classList.add('active');
+            
+            // Actualizar botones de pestañas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === nombrePestaña) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Si cambiamos a la pestaña de medicamentos, renderizar la lista
+            if (nombrePestaña === 'medicamentos') {
+                render();
+            }
+            
+            // Si cambiamos a otra pestaña, salir del modo edición si está activo
+            if (nombrePestaña !== 'medicamentos' && modoEdicionActivo) {
+                toggleModoEdicion();
+            }
+        }
+
+        // Event listeners para pestañas
+        $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
+        $('tabMedicamentos').onclick = () => cambiarPestaña('medicamentos');
 
         // ============================================
         // CONFIGURACIÓN DE ENTRADA DE TEXTO
@@ -1599,9 +1749,15 @@
         }
 
         // ============================================
-        // SISTEMA DE MODO EDICIÓN
+        // SISTEMA DE MODO EDICIÓN (TOGGLE FIXED)
         // ============================================
         function toggleModoEdicion() {
+            // Solo permitir modo edición en pestaña de medicamentos
+            if (pestañaActual !== 'medicamentos') {
+                showToast('⚠️ Cambia a pestaña Medicamentos', 'El modo edición solo funciona en la pestaña de medicamentos', 'warning');
+                return;
+            }
+            
             const btn = $('addHoraBtn');
             modoEdicionActivo = !modoEdicionActivo;
             
@@ -1617,7 +1773,7 @@
                 showToast('📱 Modo selección activado', 'Toca cualquier medicamento para seleccionarlo', 'info');
             } else {
                 btn.classList.remove('modo-activo');
-                btn.innerHTML = '<span>+</span><span>Hora</span>';
+                btn.innerHTML = '<span>+</span><span>Agregar Hora</span>';
                 btn.style.background = '';
                 seleccionadoId = null;
                 
@@ -1625,22 +1781,29 @@
                 $('modo-indicator').style.display = 'none';
                 
                 // Deseleccionar todos
-                document.querySelectorAll('.med-item').forEach(el => {
-                    el.classList.remove('selected');
-                    const btn = el.querySelector('.med-select-btn');
-                    if (btn) {
-                        btn.style.background = 'rgba(0, 245, 255, 0.1)';
-                        btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
-                        btn.style.color = 'var(--neon-cyan)';
-                        btn.textContent = '+';
-                    }
-                });
+                deseleccionarTodos();
                 
                 showToast('✅ Modo normal', 'Toca un medicamento para ver sus detalles', 'info');
             }
             
             // Re-renderizar para aplicar el modo
             render();
+        }
+
+        // Función para deseleccionar todos los medicamentos
+        function deseleccionarTodos() {
+            seleccionadoId = null;
+            document.querySelectorAll('.med-item').forEach(el => {
+                el.classList.remove('selected');
+                const btn = el.querySelector('.med-select-btn');
+                if (btn) {
+                    btn.style.background = 'rgba(0, 245, 255, 0.1)';
+                    btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
+                    btn.style.color = 'var(--neon-cyan)';
+                    btn.textContent = '+';
+                    btn.classList.remove('selected');
+                }
+            });
         }
 
         // Toast mejorado
@@ -1686,7 +1849,7 @@
         }
 
         // ============================================
-        // RENDERIZADO DE LA LISTA DE MEDICAMENTOS
+        // RENDERIZADO DE LA LISTA DE MEDICAMENTOS (FIXED)
         // ============================================
         function render() {
             lista.innerHTML = '';
@@ -1719,7 +1882,7 @@
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px; align-items: center;">
-                        <button class="med-select-btn" data-id="${id}" style="
+                        <button class="med-select-btn ${isSelected ? 'selected' : ''}" data-id="${id}" style="
                             background: ${btnBg};
                             border-color: ${btnBorder};
                             color: ${btnColor};
@@ -1736,30 +1899,28 @@
                             e.target.classList.contains('med-select-btn') || 
                             e.target.classList.contains('time-chip')) return;
                         
-                        // Seleccionar este item
-                        document.querySelectorAll('.med-item').forEach(el => {
-                            el.classList.remove('selected');
-                            const btn = el.querySelector('.med-select-btn');
-                            if (btn) {
-                                btn.style.background = 'rgba(0, 245, 255, 0.1)';
-                                btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
-                                btn.style.color = 'var(--neon-cyan)';
-                                btn.textContent = '+';
-                            }
-                        });
-                        
-                        li.classList.add('selected');
-                        seleccionadoId = id;
-                        
-                        // Actualizar botón seleccionado
-                        const btn = li.querySelector('.med-select-btn');
-                        btn.style.background = 'var(--neon-cyan)';
-                        btn.style.borderColor = 'var(--neon-cyan)';
-                        btn.style.color = 'var(--bg-dark)';
-                        btn.textContent = '✓';
-                        
-                        // Feedback visual
-                        showSelectionFeedback(id);
+                        // Si ya está seleccionado, deseleccionar
+                        if (seleccionadoId === id) {
+                            deseleccionarTodos();
+                            showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
+                        } else {
+                            // Seleccionar este item
+                            deseleccionarTodos();
+                            
+                            li.classList.add('selected');
+                            seleccionadoId = id;
+                            
+                            // Actualizar botón seleccionado
+                            const btn = li.querySelector('.med-select-btn');
+                            btn.style.background = 'var(--neon-cyan)';
+                            btn.style.borderColor = 'var(--neon-cyan)';
+                            btn.style.color = 'var(--bg-dark)';
+                            btn.textContent = '✓';
+                            btn.classList.add('selected');
+                            
+                            // Feedback visual
+                            showSelectionFeedback(id);
+                        }
                     };
                 } else {
                     // MODO NORMAL: toque abre detalles
@@ -1771,31 +1932,31 @@
                     };
                 }
 
-                // Botón de selección (siempre funciona)
+                // Botón de selección (TOGGLE FIXED)
                 li.querySelector('.med-select-btn').onclick = e => {
                     e.stopPropagation();
                     
-                    document.querySelectorAll('.med-item').forEach(el => {
-                        el.classList.remove('selected');
-                        const btn = el.querySelector('.med-select-btn');
-                        if (btn) {
-                            btn.style.background = 'rgba(0, 245, 255, 0.1)';
-                            btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
-                            btn.style.color = 'var(--neon-cyan)';
-                            btn.textContent = '+';
-                        }
-                    });
-                    
-                    li.classList.add('selected');
-                    seleccionadoId = id;
-                    
-                    const btn = li.querySelector('.med-select-btn');
-                    btn.style.background = 'var(--neon-cyan)';
-                    btn.style.borderColor = 'var(--neon-cyan)';
-                    btn.style.color = 'var(--bg-dark)';
-                    btn.textContent = '✓';
-                    
-                    showSelectionFeedback(id);
+                    // Si ya está seleccionado, deseleccionar
+                    if (seleccionadoId === id) {
+                        deseleccionarTodos();
+                        showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
+                    } else {
+                        // Deseleccionar todos primero
+                        deseleccionarTodos();
+                        
+                        // Seleccionar este
+                        li.classList.add('selected');
+                        seleccionadoId = id;
+                        
+                        const btn = li.querySelector('.med-select-btn');
+                        btn.style.background = 'var(--neon-cyan)';
+                        btn.style.borderColor = 'var(--neon-cyan)';
+                        btn.style.color = 'var(--bg-dark)';
+                        btn.textContent = '✓';
+                        btn.classList.add('selected');
+                        
+                        showSelectionFeedback(id);
+                    }
                 };
 
                 // Delete
@@ -1901,8 +2062,7 @@
             };
 
             save();
-            render();
-
+            
             // Resetear formulario
             nombre.value = '';
             paciente.value = '';
@@ -1911,10 +2071,17 @@
             foto = '';
             photoPreview.classList.remove('active');
             photoZone.style.display = 'block';
+            
+            // Mostrar confirmación y cambiar a pestaña de medicamentos
+            showToast('✅ Medicamento agregado', `${upper(n)} agregado para ${upper(p)}`, 'success');
+            setTimeout(() => {
+                cambiarPestaña('medicamentos');
+                render();
+            }, 800);
         };
 
         // ============================================
-        // AGREGAR HORA A MEDICAMENTO EXISTENTE
+        // AGREGAR HORA A MEDICAMENTO EXISTENTE (FIXED)
         // ============================================
         $('addHoraBtn').onclick = () => {
             // Si no estamos en modo edición, activarlo
@@ -2021,7 +2188,7 @@
         $('calClose').onclick = () => calModal.classList.remove('open');
 
         // ============================================
-        // SISTEMA DE ALERTAS
+        // SISTEMA DE ALERTAS MEJORADO (MÚLTIPLES MEDICAMENTOS)
         // ============================================
         function showAlert() {
             if (!medsActuales.length) return;
@@ -2052,16 +2219,46 @@
         }
 
         async function activateAlarm() {
-            // Voz primero
+            // Voz primero - MEJORADA PARA MÚLTIPLES MEDICAMENTOS
             if (vozOn.checked && 'speechSynthesis' in window) {
                 let msg = `Son las ${horaActual}. `;
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
 
                 if (pacientes.length === 1) {
-                    msg += `Hola ${pacientes[0]}. Te toca tomar `;
-                    msg += medsActuales.map(m => `${m.nombre}, ${m.cantidad} ${m.cantidad === 1 ? 'pastilla' : 'pastillas'}`).join(' y ');
+                    const paciente = pacientes[0];
+                    msg += `Hola ${paciente}. Te toca tomar `;
+                    
+                    // Agrupar medicamentos por paciente
+                    const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
+                    
+                    if (medicamentosPaciente.length === 1) {
+                        // Un solo medicamento
+                        msg += `${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
+                    } else {
+                        // Múltiples medicamentos para el mismo paciente
+                        msg += medicamentosPaciente.map((med, index) => {
+                            const connector = index === medicamentosPaciente.length - 1 ? ' y ' : 
+                                             index === 0 ? '' : ', ';
+                            return `${connector}${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                        }).join('') + '.';
+                    }
                 } else {
-                    msg += 'Atención, es hora de medicación.';
+                    // Múltiples pacientes
+                    msg += 'Atención, es hora de medicación para ';
+                    msg += pacientes.map((paciente, index) => {
+                        const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
+                        const connector = index === pacientes.length - 1 ? ' y ' : 
+                                         index === 0 ? '' : ', ';
+                        
+                        if (medicamentosPaciente.length === 1) {
+                            return `${connector}${paciente}: ${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                        } else {
+                            const medicamentosStr = medicamentosPaciente.map(med => 
+                                `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`
+                            ).join(' y ');
+                            return `${connector}${paciente}: ${medicamentosStr}`;
+                        }
+                    }).join('') + '.';
                 }
 
                 await new Promise(resolve => {
@@ -2168,16 +2365,28 @@
                 return;
             }
             
-            const m = meds[keys[0]];
-            if (!m.horas.length) return;
-
-            medsActuales = [{
-                paciente: m.paciente,
-                nombre: m.nombre,
-                cantidad: m.horas[0].cant,
-                foto: m.foto
-            }];
-            horaActual = m.horas[0].h;
+            // Crear escenario de prueba con múltiples medicamentos
+            const testMedicamentos = [];
+            
+            // Tomar los primeros 3 medicamentos o menos si hay menos
+            const cantidadPrueba = Math.min(keys.length, 3);
+            
+            for (let i = 0; i < cantidadPrueba; i++) {
+                const m = meds[keys[i]];
+                if (m.horas.length) {
+                    testMedicamentos.push({
+                        paciente: m.paciente,
+                        nombre: m.nombre,
+                        cantidad: m.horas[0].cant,
+                        foto: m.foto
+                    });
+                }
+            }
+            
+            if (testMedicamentos.length === 0) return;
+            
+            medsActuales = testMedicamentos;
+            horaActual = '08:00'; // Hora de prueba
             showAlert();
         };
 
@@ -2216,14 +2425,18 @@
                 return;
             }
             
-            const u = new SpeechSynthesisUtterance('Prueba de voz. Sistema MediClock Neo activado.');
+            // Prueba mejorada con escenario de múltiples medicamentos
+            const u = new SpeechSynthesisUtterance(
+                'Prueba de voz. Sistema MediClock Neo activado. ' +
+                'Hola María. Te toca tomar Paracetamol, 1 pastilla, Ibuprofeno, 2 pastillas y Omeprazol, 1 pastilla.'
+            );
             u.lang = 'es-ES';
             u.volume = parseFloat(volSlider.value);
             speechSynthesis.speak(u);
         };
 
         // ============================================
-        // VERIFICACIÓN AUTOMÁTICA DE ALARMAS
+        // VERIFICACIÓN AUTOMÁTICA DE ALARMAS MEJORADA
         // ============================================
         function check() {
             const now = new Date();
@@ -2234,18 +2447,37 @@
             medsActuales = [];
             let ids = [];
 
+            // Agrupar medicamentos por paciente para la misma hora
+            const medicamentosPorPaciente = {};
+            
             Object.keys(meds).forEach(id => {
                 const m = meds[id];
                 m.horas.forEach(h => {
                     if (h.h === hhmm) {
-                        medsActuales.push({
-                            paciente: m.paciente,
+                        if (!medicamentosPorPaciente[m.paciente]) {
+                            medicamentosPorPaciente[m.paciente] = [];
+                        }
+                        
+                        medicamentosPorPaciente[m.paciente].push({
+                            id: id,
                             nombre: m.nombre,
                             cantidad: h.cant,
                             foto: m.foto
                         });
-                        ids.push(id);
                     }
+                });
+            });
+
+            // Aplanar la estructura para mostrar en la alerta
+            Object.values(medicamentosPorPaciente).forEach(medsPaciente => {
+                medsPaciente.forEach(med => {
+                    medsActuales.push({
+                        paciente: med.nombre.includes('_') ? med.nombre.split('_')[1] : 'PACIENTE', // Extraer paciente si está en formato
+                        nombre: med.nombre,
+                        cantidad: med.cantidad,
+                        foto: med.foto
+                    });
+                    ids.push(med.id);
                 });
             });
 
