@@ -595,7 +595,7 @@
 
         .med-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 1rem;
             padding: 1.25rem;
             background: rgba(0, 0, 0, 0.3);
@@ -605,6 +605,7 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
+            min-height: 120px;
         }
 
         .med-item::before {
@@ -666,25 +667,43 @@
         .med-info {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .med-name-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.3rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .med-name {
             font-size: 1rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 0.2rem;
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
         }
 
         .med-patient {
             font-size: 0.8rem;
             color: var(--text-muted);
             margin-bottom: 0.6rem;
+            word-break: break-word;
         }
 
         .med-times {
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
+            align-items: center;
+            margin-top: auto;
         }
 
         .time-chip {
@@ -700,12 +719,22 @@
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .time-chip:hover {
             background: rgba(0, 245, 255, 0.2);
             box-shadow: var(--glow-cyan);
             transform: scale(1.05);
+        }
+
+        .med-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-shrink: 0;
         }
 
         .med-select-btn {
@@ -722,6 +751,7 @@
             border: 1px solid rgba(0, 245, 255, 0.3);
             background: rgba(0, 245, 255, 0.1);
             color: var(--neon-cyan);
+            flex-shrink: 0;
         }
 
         .med-select-btn:hover {
@@ -985,7 +1015,7 @@
             width: 72px;
             height: 72px;
             margin: 0 auto 1.25rem;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -1062,12 +1092,14 @@
 
         .modal-med-info {
             flex: 1;
+            min-width: 0;
         }
 
         .modal-med-name {
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.4rem;
+            word-break: break-word;
         }
 
         .modal-med-qty {
@@ -1079,12 +1111,14 @@
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--neon-green);
+            white-space: nowrap;
         }
 
         .modal-med-patient {
             font-size: 0.75rem;
             color: var(--text-muted);
             margin-top: 0.4rem;
+            word-break: break-word;
         }
 
         .modal-footer {
@@ -1223,6 +1257,14 @@
             .tab {
                 padding: 0.6rem 0.8rem;
                 font-size: 0.85rem;
+            }
+            .med-item {
+                padding: 1rem;
+                min-height: 110px;
+            }
+            .med-avatar, .med-placeholder {
+                width: 48px;
+                height: 48px;
             }
         }
 
@@ -1704,10 +1746,6 @@
                 li.dataset.id = id;
 
                 const isSelected = seleccionadoId === id;
-                const btnBg = isSelected ? 'var(--neon-cyan)' : 'rgba(0, 245, 255, 0.1)';
-                const btnBorder = isSelected ? 'var(--neon-cyan)' : 'rgba(0, 245, 255, 0.3)';
-                const btnColor = isSelected ? 'var(--bg-dark)' : 'var(--neon-cyan)';
-                const btnText = isSelected ? '✓' : '+';
 
                 li.innerHTML = `
                     ${m.foto
@@ -1715,18 +1753,20 @@
                         : `<div class="med-placeholder">💊</div>`
                     }
                     <div class="med-info">
-                        <div class="med-name">${upper(m.nombre)}</div>
-                        <div class="med-patient">${upper(m.paciente)}</div>
+                        <div class="med-name-row">
+                            <div>
+                                <div class="med-name">${upper(m.nombre)}</div>
+                                <div class="med-patient">${upper(m.paciente)}</div>
+                            </div>
+                        </div>
                         <div class="med-times">
                             ${m.horas.map(h => `<span class="time-chip" data-h="${h.h}">${h.h} · ${h.cant}u</span>`).join('')}
                         </div>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: center;">
-                        <button class="med-select-btn ${isSelected ? 'selected' : ''}" data-id="${id}" style="
-                            background: ${btnBg};
-                            border-color: ${btnBorder};
-                            color: ${btnColor};
-                        ">${btnText}</button>
+                    <div class="med-actions">
+                        <button class="med-select-btn ${isSelected ? 'selected' : ''}" data-id="${id}">
+                            ${isSelected ? '✓' : '+'}
+                        </button>
                         <button class="med-delete" data-id="${id}">🗑️</button>
                     </div>
                 `;
@@ -2231,20 +2271,14 @@
                          now.getMinutes().toString().padStart(2, '0');
 
             medsActuales = [];
-            let ids = [];
 
-            const medicamentosPorPaciente = {};
-            
             Object.keys(meds).forEach(id => {
                 const m = meds[id];
                 m.horas.forEach(h => {
                     if (h.h === hhmm) {
-                        if (!medicamentosPorPaciente[m.paciente]) {
-                            medicamentosPorPaciente[m.paciente] = [];
-                        }
-                        
-                        medicamentosPorPaciente[m.paciente].push({
+                        medsActuales.push({
                             id: id,
+                            paciente: m.paciente,
                             nombre: m.nombre,
                             cantidad: h.cant,
                             foto: m.foto
@@ -2253,20 +2287,8 @@
                 });
             });
 
-            Object.values(medicamentosPorPaciente).forEach(medsPaciente => {
-                medsPaciente.forEach(med => {
-                    medsActuales.push({
-                        paciente: med.nombre.includes('_') ? med.nombre.split('_')[1] : 'PACIENTE',
-                        nombre: med.nombre,
-                        cantidad: med.cantidad,
-                        foto: med.foto
-                    });
-                    ids.push(med.id);
-                });
-            });
-
-            if (medsActuales.length) {
-                ids.sort();
+            if (medsActuales.length > 0) {
+                const ids = medsActuales.map(m => m.id).sort();
                 const key = `${today}-${hhmm}-${ids.join('-')}`;
                 const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
 
@@ -2302,7 +2324,7 @@
             
             localStorage.setItem('alarmsToday', JSON.stringify(filtered));
 
-            setInterval(check, 60000);
+            setInterval(check, 10000);
             setTimeout(check, 1000);
         };
 
