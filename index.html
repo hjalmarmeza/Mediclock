@@ -342,6 +342,7 @@
             letter-spacing: 0.05em;
             box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
             animation: pulse 2s infinite;
+            display: none;
         }
 
         /* ============================================ */
@@ -759,32 +760,39 @@
             transform: scale(1.05);
         }
 
-        /* Botón de selección */
-        .med-select-btn {
-            width: 36px;
-            height: 36px;
+        /* Botones de acción en tarjetas */
+        .med-action-btn {
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
             font-size: 0.9rem;
-            border: 1px solid rgba(0, 245, 255, 0.3);
-            background: rgba(0, 245, 255, 0.1);
-            color: var(--neon-cyan);
+            transition: all 0.3s ease;
         }
 
-        .med-select-btn:hover {
+        .med-action-btn:hover {
             background: rgba(0, 245, 255, 0.2);
-            transform: scale(1.05);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
         }
 
-        .med-select-btn.selected {
-            background: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-            color: var(--bg-dark);
+        .chip-edit {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-left: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip-edit:hover {
+            opacity: 1;
+            transform: scale(1.2);
         }
 
         .med-delete {
@@ -1211,7 +1219,7 @@
         }
 
         /* ============================================ */
-        /* MODAL DE CALENDARIO */
+        /* MODAL DE CALENDARIO/HISTORIAL */
         /* ============================================ */
         .cal-item {
             padding: 1.25rem;
@@ -1346,8 +1354,8 @@
     <!-- ============================================ -->
     <div class="app">
         <!-- INDICADOR DE MODO SELECCIÓN -->
-        <div class="modo-indicator" id="modo-indicator" style="display: none;">
-            📱 MODO SELECCIÓN ACTIVO • Toca un medicamento
+        <div class="modo-indicator" id="modo-indicator">
+            📱 MODO AGREGAR HORARIO • Toca un medicamento para seleccionarlo
         </div>
 
         <!-- HEADER -->
@@ -1588,7 +1596,8 @@
         let seleccionadoId = null;
         let detalleId = null;
         let modoEdicionActivo = false;
-        let pestañaActual = 'nuevo'; // 'nuevo' o 'medicamentos'
+        let pestañaActual = 'nuevo';
+        let ultimaAlarmaSonando = false;
 
         // Funciones auxiliares
         const $ = id => document.getElementById(id);
@@ -1749,33 +1758,99 @@
         }
 
         // ============================================
-        // SISTEMA DE MODO EDICIÓN (TOGGLE FIXED)
+        // FUNCIONES PARA EDITAR MEDICAMENTOS
         // ============================================
-        function toggleModoEdicion() {
-            // Solo permitir modo edición en pestaña de medicamentos
-            if (pestañaActual !== 'medicamentos') {
-                showToast('⚠️ Cambia a pestaña Medicamentos', 'El modo edición solo funciona en la pestaña de medicamentos', 'warning');
+        function editarMedicamento(id) {
+            const m = meds[id];
+            if (!m) return;
+            
+            const nuevoNombre = prompt('Nuevo nombre del medicamento:', m.nombre);
+            if (nuevoNombre && nuevoNombre.trim() !== '') {
+                m.nombre = upper(nuevoNombre);
+            }
+            
+            const nuevoPaciente = prompt('Nuevo nombre del paciente:', m.paciente);
+            if (nuevoPaciente && nuevoPaciente.trim() !== '') {
+                m.paciente = upper(nuevoPaciente);
+            }
+            
+            // Editar foto si se desea
+            if (confirm('¿Deseas cambiar la foto?')) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = ev => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const scale = 600 / img.width;
+                                canvas.width = 600;
+                                canvas.height = img.height * scale;
+                                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                                m.foto = canvas.toDataURL('image/jpeg', 0.6);
+                                save();
+                                render();
+                                showToast('✅ Medicamento actualizado', 'Información y foto actualizadas', 'success');
+                            };
+                            img.src = ev.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            } else {
+                save();
+                render();
+                showToast('✅ Medicamento actualizado', 'Información actualizada correctamente', 'success');
+            }
+        }
+
+        function agregarHorarioEspecifico(id) {
+            const m = meds[id];
+            if (!m) return;
+            
+            const horaNueva = prompt('Nueva hora (HH:MM):', '08:00');
+            if (!horaNueva || horaNueva.trim() === '') return;
+            
+            if (m.horas.some(h => h.h === horaNueva)) {
+                showToast('⚠️ Hora duplicada', 'Esta hora ya existe para este medicamento', 'warning');
                 return;
             }
             
-            const btn = $('addHoraBtn');
-            modoEdicionActivo = !modoEdicionActivo;
+            const cantidad = prompt('Cantidad (unidades):', '1');
+            if (!cantidad || isNaN(parseFloat(cantidad))) {
+                showToast('❌ Cantidad inválida', 'Ingresa un número válido', 'warning');
+                return;
+            }
             
+            m.horas.push({ 
+                h: horaNueva, 
+                cant: parseFloat(cantidad) 
+            });
+            m.horas.sort((a, b) => a.h.localeCompare(b.h));
+            
+            save();
+            render();
+            
+            showToast('✅ Horario agregado', `${horaNueva} agregado a ${upper(m.nombre)}`, 'success');
+        }
+
+        // ============================================
+        // SISTEMA DE MODO EDICIÓN MEJORADO
+        // ============================================
+        function toggleModoEdicion() {
+            // Si ya estamos en modo edición, salir
             if (modoEdicionActivo) {
-                btn.classList.add('modo-activo');
-                btn.innerHTML = '<span>❌</span><span>Salir modo selección</span>';
-                btn.style.background = 'linear-gradient(135deg, var(--neon-orange), #ff4757)';
-                
-                // Mostrar indicador
-                $('modo-indicator').style.display = 'block';
-                
-                // Mostrar instrucciones
-                showToast('📱 Modo selección activado', 'Toca cualquier medicamento para seleccionarlo', 'info');
-            } else {
+                modoEdicionActivo = false;
+                const btn = $('addHoraBtn');
                 btn.classList.remove('modo-activo');
                 btn.innerHTML = '<span>+</span><span>Agregar Hora</span>';
                 btn.style.background = '';
-                seleccionadoId = null;
                 
                 // Ocultar indicador
                 $('modo-indicator').style.display = 'none';
@@ -1784,33 +1859,56 @@
                 deseleccionarTodos();
                 
                 showToast('✅ Modo normal', 'Toca un medicamento para ver sus detalles', 'info');
+                render();
+                return;
             }
             
-            // Re-renderizar para aplicar el modo
+            // Solo permitir modo edición en pestaña de medicamentos
+            if (pestañaActual !== 'medicamentos') {
+                showToast('⚠️ Cambia a pestaña Medicamentos', 'Para agregar horarios, ve a la pestaña de medicamentos', 'warning');
+                return;
+            }
+            
+            // Si no hay medicamentos, mostrar mensaje
+            if (Object.keys(meds).length === 0) {
+                showToast('💊 Agrega un medicamento primero', 'No hay medicamentos para agregar horarios', 'warning');
+                return;
+            }
+            
+            const btn = $('addHoraBtn');
+            modoEdicionActivo = true;
+            
+            btn.classList.add('modo-activo');
+            btn.innerHTML = '<span>❌</span><span>Cancelar</span>';
+            btn.style.background = 'linear-gradient(135deg, var(--neon-orange), #ff4757)';
+            
+            // Mostrar indicador
+            $('modo-indicator').style.display = 'block';
+            
+            // Mostrar instrucciones
+            showToast('📱 Modo agregar horario', '1. Toca un medicamento para seleccionarlo\n2. Completa la hora en el formulario\n3. Presiona "Agregar Hora"', 'info', 5000);
+            
             render();
         }
+
+        $('addHoraBtn').onclick = toggleModoEdicion;
 
         // Función para deseleccionar todos los medicamentos
         function deseleccionarTodos() {
             seleccionadoId = null;
             document.querySelectorAll('.med-item').forEach(el => {
                 el.classList.remove('selected');
-                const btn = el.querySelector('.med-select-btn');
-                if (btn) {
-                    btn.style.background = 'rgba(0, 245, 255, 0.1)';
-                    btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
-                    btn.style.color = 'var(--neon-cyan)';
-                    btn.textContent = '+';
-                    btn.classList.remove('selected');
-                }
             });
         }
 
-        // Toast mejorado
-        function showToast(titulo, mensaje, tipo = 'info') {
+        // ============================================
+        // TOAST MEJORADO
+        // ============================================
+        function showToast(titulo, mensaje, tipo = 'info', duracion = 3000) {
             const toast = document.createElement('div');
             const color = tipo === 'info' ? 'var(--neon-violet)' : 
-                          tipo === 'success' ? 'var(--neon-green)' : 'var(--neon-orange)';
+                          tipo === 'success' ? 'var(--neon-green)' : 
+                          tipo === 'warning' ? 'var(--neon-orange)' : 'var(--neon-magenta)';
             
             toast.style.cssText = `
                 position: fixed;
@@ -1830,6 +1928,7 @@
                 text-align: center;
                 max-width: 85%;
                 backdrop-filter: blur(10px);
+                white-space: pre-line;
             `;
             toast.innerHTML = `<strong>${titulo}</strong><br><small>${mensaje}</small>`;
             toast.id = 'toast-' + Date.now();
@@ -1845,11 +1944,11 @@
                     t.style.animation = 'toastOut 0.4s ease forwards';
                     setTimeout(() => t.remove(), 400);
                 }
-            }, 3000);
+            }, duracion);
         }
 
         // ============================================
-        // RENDERIZADO DE LA LISTA DE MEDICAMENTOS (FIXED)
+        // RENDERIZADO DE LA LISTA DE MEDICAMENTOS
         // ============================================
         function render() {
             lista.innerHTML = '';
@@ -1864,29 +1963,35 @@
 
                 // Determinar si está seleccionado
                 const isSelected = seleccionadoId === id;
-                const btnBg = isSelected ? 'var(--neon-cyan)' : 'rgba(0, 245, 255, 0.1)';
-                const btnBorder = isSelected ? 'var(--neon-cyan)' : 'rgba(0, 245, 255, 0.3)';
-                const btnColor = isSelected ? 'var(--bg-dark)' : 'var(--neon-cyan)';
-                const btnText = isSelected ? '✓' : '+';
+                if (isSelected) li.classList.add('selected');
 
                 li.innerHTML = `
                     ${m.foto
-                        ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}">`
+                        ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1237/1237460.png'">`
                         : `<div class="med-placeholder">💊</div>`
                     }
                     <div class="med-info">
                         <div class="med-name">${upper(m.nombre)}</div>
                         <div class="med-patient">${upper(m.paciente)}</div>
                         <div class="med-times">
-                            ${m.horas.map(h => `<span class="time-chip" data-h="${h.h}">${h.h} · ${h.cant}u</span>`).join('')}
+                            ${m.horas.map(h => `
+                                <span class="time-chip" data-h="${h.h}">
+                                    <span>🕐 ${h.h}</span>
+                                    <span>· ${h.cant}u</span>
+                                    <span class="chip-edit">✏️</span>
+                                </span>
+                            `).join('')}
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px; align-items: center;">
-                        <button class="med-select-btn ${isSelected ? 'selected' : ''}" data-id="${id}" style="
-                            background: ${btnBg};
-                            border-color: ${btnBorder};
-                            color: ${btnColor};
-                        ">${btnText}</button>
+                        <div class="med-actions" style="display: flex; gap: 5px;">
+                            <button class="med-action-btn edit-btn" data-id="${id}" title="Editar información">
+                                ✏️
+                            </button>
+                            <button class="med-action-btn add-time-btn" data-id="${id}" title="Agregar horario">
+                                +
+                            </button>
+                        </div>
                         <button class="med-delete" data-id="${id}">🗑️</button>
                     </div>
                 `;
@@ -1896,7 +2001,7 @@
                     // MODO SELECCIÓN: toque en cualquier parte selecciona
                     li.onclick = e => {
                         if (e.target.classList.contains('med-delete') || 
-                            e.target.classList.contains('med-select-btn') || 
+                            e.target.classList.contains('med-action-btn') || 
                             e.target.classList.contains('time-chip')) return;
                         
                         // Si ya está seleccionado, deseleccionar
@@ -1906,57 +2011,31 @@
                         } else {
                             // Seleccionar este item
                             deseleccionarTodos();
-                            
                             li.classList.add('selected');
                             seleccionadoId = id;
-                            
-                            // Actualizar botón seleccionado
-                            const btn = li.querySelector('.med-select-btn');
-                            btn.style.background = 'var(--neon-cyan)';
-                            btn.style.borderColor = 'var(--neon-cyan)';
-                            btn.style.color = 'var(--bg-dark)';
-                            btn.textContent = '✓';
-                            btn.classList.add('selected');
-                            
-                            // Feedback visual
-                            showSelectionFeedback(id);
+                            showToast('✅ Seleccionado', `${upper(m.nombre)} listo para agregar horario`, 'success');
                         }
                     };
                 } else {
                     // MODO NORMAL: toque abre detalles
                     li.onclick = e => {
                         if (e.target.classList.contains('med-delete') || 
-                            e.target.classList.contains('med-select-btn') || 
+                            e.target.classList.contains('med-action-btn') || 
                             e.target.classList.contains('time-chip')) return;
                         showDetail(id);
                     };
                 }
 
-                // Botón de selección (TOGGLE FIXED)
-                li.querySelector('.med-select-btn').onclick = e => {
+                // Botón de editar
+                li.querySelector('.edit-btn').onclick = (e) => {
                     e.stopPropagation();
-                    
-                    // Si ya está seleccionado, deseleccionar
-                    if (seleccionadoId === id) {
-                        deseleccionarTodos();
-                        showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
-                    } else {
-                        // Deseleccionar todos primero
-                        deseleccionarTodos();
-                        
-                        // Seleccionar este
-                        li.classList.add('selected');
-                        seleccionadoId = id;
-                        
-                        const btn = li.querySelector('.med-select-btn');
-                        btn.style.background = 'var(--neon-cyan)';
-                        btn.style.borderColor = 'var(--neon-cyan)';
-                        btn.style.color = 'var(--bg-dark)';
-                        btn.textContent = '✓';
-                        btn.classList.add('selected');
-                        
-                        showSelectionFeedback(id);
-                    }
+                    editarMedicamento(id);
+                };
+
+                // Botón de agregar horario específico
+                li.querySelector('.add-time-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    agregarHorarioEspecifico(id);
                 };
 
                 // Delete
@@ -1967,10 +2046,11 @@
                         delete meds[id];
                         save();
                         render();
+                        showToast('🗑️ Medicamento eliminado', 'El medicamento ha sido eliminado', 'warning');
                     }
                 };
 
-                // Time chip click (editar hora)
+                // Editar chips de hora individuales
                 li.querySelectorAll('.time-chip').forEach(chip => {
                     chip.onclick = e => {
                         e.stopPropagation();
@@ -1979,66 +2059,29 @@
                         if (idx === -1) return;
 
                         const newH = prompt('Nueva hora (HH:MM):', oldH);
-                        if (newH && newH !== oldH) {
-                            if (m.horas.some(x => x.h === newH)) {
-                                alert('Esa hora ya existe');
-                                return;
-                            }
-                            const newC = prompt('Cantidad:', m.horas[idx].cant);
-                            m.horas[idx] = { h: newH, cant: parseFloat(newC || m.horas[idx].cant) };
-                            m.horas.sort((a, b) => a.h.localeCompare(b.h));
-                            save();
-                            render();
+                        if (!newH || newH === oldH) return;
+                        
+                        if (m.horas.some(x => x.h === newH)) {
+                            showToast('⚠️ Hora duplicada', 'Esa hora ya existe para este medicamento', 'warning');
+                            return;
                         }
+                        
+                        const newC = prompt('Nueva cantidad:', m.horas[idx].cant);
+                        if (!newC || isNaN(parseFloat(newC))) return;
+                        
+                        m.horas[idx] = { 
+                            h: newH, 
+                            cant: parseFloat(newC) 
+                        };
+                        m.horas.sort((a, b) => a.h.localeCompare(b.h));
+                        save();
+                        render();
+                        showToast('✅ Horario actualizado', `${oldH} → ${newH} (${newC}u)`, 'success');
                     };
                 });
 
                 lista.appendChild(li);
             });
-        }
-
-        // ============================================
-        // FEEDBACK DE SELECCIÓN
-        // ============================================
-        function showSelectionFeedback(id) {
-            const m = meds[id];
-            if (!m) return;
-            
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
-                color: white;
-                padding: 0.8rem 1.5rem;
-                border-radius: 30px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-                animation: toastIn 0.4s ease;
-                font-size: 0.9rem;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                text-align: center;
-                max-width: 90%;
-            `;
-            toast.innerHTML = `✅ <strong>${upper(m.nombre)}</strong><br>
-            <small>Seleccionado para agregar nueva hora</small>`;
-            toast.id = 'selection-toast';
-            
-            // Remover toast anterior si existe
-            const existing = document.getElementById('selection-toast');
-            if (existing) existing.remove();
-            
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                const t = document.getElementById('selection-toast');
-                if (t) {
-                    t.style.animation = 'toastOut 0.4s ease forwards';
-                    setTimeout(() => t.remove(), 400);
-                }
-            }, 3000);
         }
 
         // ============================================
@@ -2049,7 +2092,7 @@
             const p = upper(paciente.value);
             
             if (!n || !cant.value || !hora.value || !p) {
-                alert('Completa todos los campos');
+                showToast('❌ Campos incompletos', 'Completa todos los campos requeridos', 'warning');
                 return;
             }
 
@@ -2081,16 +2124,14 @@
         };
 
         // ============================================
-        // AGREGAR HORA A MEDICAMENTO EXISTENTE (FIXED)
+        // AGREGAR HORA A MEDICAMENTO EXISTENTE
         // ============================================
-        $('addHoraBtn').onclick = () => {
-            // Si no estamos en modo edición, activarlo
+        window.agregarHoraDesdeFormulario = function() {
             if (!modoEdicionActivo) {
-                toggleModoEdicion();
+                showToast('⚠️ Activa el modo agregar hora', 'Presiona "Agregar Hora" primero', 'warning');
                 return;
             }
             
-            // Si estamos en modo edición y tenemos hora + medicamento seleccionado
             if (!hora.value) {
                 showToast('⏰ Hora requerida', 'Selecciona una hora primero', 'warning');
                 return;
@@ -2188,72 +2229,112 @@
         $('calClose').onclick = () => calModal.classList.remove('open');
 
         // ============================================
-        // SISTEMA DE ALERTAS MEJORADO (MÚLTIPLES MEDICAMENTOS)
+        // SISTEMA DE ALERTAS MEJORADO
         // ============================================
         function showAlert() {
             if (!medsActuales.length) return;
+            
+            // Si ya hay una alarma sonando, no mostrar otra
+            if (ultimaAlarmaSonando) return;
 
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            // Agrupar medicamentos por paciente
+            const medicamentosPorPaciente = {};
+            medsActuales.forEach(med => {
+                if (!medicamentosPorPaciente[med.paciente]) {
+                    medicamentosPorPaciente[med.paciente] = [];
+                }
+                medicamentosPorPaciente[med.paciente].push(med);
+            });
+
+            const pacientes = Object.keys(medicamentosPorPaciente);
+            
             $('alertTitle').textContent = pacientes.length === 1 
                 ? `Hola ${upper(pacientes[0])}` 
-                : `${pacientes.length} pacientes`;
+                : `Atención: ${pacientes.length} pacientes`;
             
             $('alertTime').innerHTML = `<span>🕐</span><span>${horaActual}</span>`;
 
-            const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
-            $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
+            const totalMedicamentos = medsActuales.length;
+            const totalUnidades = medsActuales.reduce((s, m) => s + m.cantidad, 0);
+            
+            $('alertTotal').textContent = `Total: ${totalMedicamentos} medicamento${totalMedicamentos > 1 ? 's' : ''} (${totalUnidades} unidades)`;
 
-            $('alertBody').innerHTML = medsActuales.map(med => `
-                <div class="modal-med">
-                    <img class="modal-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
-                    <div class="modal-med-info">
-                        <div class="modal-med-name">${upper(med.nombre)}</div>
-                        <div class="modal-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
-                        <div class="modal-med-patient">${upper(med.paciente)}</div>
+            // Mostrar medicamentos ordenados por paciente
+            let alertHTML = '';
+            
+            pacientes.forEach(paciente => {
+                const medicamentos = medicamentosPorPaciente[paciente];
+                
+                alertHTML += `
+                    <div class="patient-group" style="margin-bottom: 1.5rem;">
+                        <div style="
+                            color: var(--neon-cyan);
+                            font-size: 0.9rem;
+                            font-weight: 600;
+                            margin-bottom: 0.75rem;
+                            padding-bottom: 0.5rem;
+                            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+                        ">
+                            👤 ${upper(paciente)}
+                        </div>
+                        ${medicamentos.map(med => `
+                            <div class="modal-med">
+                                <img class="modal-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" 
+                                     alt="${med.nombre}"
+                                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1237/1237460.png'">
+                                <div class="modal-med-info">
+                                    <div class="modal-med-name">${upper(med.nombre)}</div>
+                                    <div class="modal-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'unidad' : 'unidades'}</div>
+                                    <div class="modal-med-patient">Hora: ${horaActual}</div>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                </div>
-            `).join('');
+                `;
+            });
 
+            $('alertBody').innerHTML = alertHTML;
             alertModal.classList.add('open');
-            activateAlarm();
+            ultimaAlarmaSonando = true;
+            
+            // Iniciar alarma después de un breve retraso
+            setTimeout(() => {
+                activateAlarm();
+            }, 500);
         }
 
         async function activateAlarm() {
-            // Voz primero - MEJORADA PARA MÚLTIPLES MEDICAMENTOS
+            // 1. Primero la voz
             if (vozOn.checked && 'speechSynthesis' in window) {
                 let msg = `Son las ${horaActual}. `;
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
 
                 if (pacientes.length === 1) {
                     const paciente = pacientes[0];
+                    const medicamentos = medsActuales.filter(m => m.paciente === paciente);
+                    
                     msg += `Hola ${paciente}. Te toca tomar `;
                     
-                    // Agrupar medicamentos por paciente
-                    const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
-                    
-                    if (medicamentosPaciente.length === 1) {
-                        // Un solo medicamento
-                        msg += `${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
+                    if (medicamentos.length === 1) {
+                        msg += `${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
                     } else {
-                        // Múltiples medicamentos para el mismo paciente
-                        msg += medicamentosPaciente.map((med, index) => {
-                            const connector = index === medicamentosPaciente.length - 1 ? ' y ' : 
+                        msg += medicamentos.map((med, index) => {
+                            const connector = index === medicamentos.length - 1 ? ' y ' : 
                                              index === 0 ? '' : ', ';
                             return `${connector}${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
                         }).join('') + '.';
                     }
                 } else {
-                    // Múltiples pacientes
                     msg += 'Atención, es hora de medicación para ';
                     msg += pacientes.map((paciente, index) => {
-                        const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
+                        const medicamentos = medsActuales.filter(m => m.paciente === paciente);
                         const connector = index === pacientes.length - 1 ? ' y ' : 
                                          index === 0 ? '' : ', ';
                         
-                        if (medicamentosPaciente.length === 1) {
-                            return `${connector}${paciente}: ${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                        if (medicamentos.length === 1) {
+                            return `${connector}${paciente}: ${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
                         } else {
-                            const medicamentosStr = medicamentosPaciente.map(med => 
+                            const medicamentosStr = medicamentos.map(med => 
                                 `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`
                             ).join(' y ');
                             return `${connector}${paciente}: ${medicamentosStr}`;
@@ -2261,19 +2342,26 @@
                     }).join('') + '.';
                 }
 
+                // Esperar a que termine la voz antes de iniciar sonido
                 await new Promise(resolve => {
                     const u = new SpeechSynthesisUtterance(msg);
                     u.lang = 'es-ES';
                     u.rate = 0.9;
                     u.volume = parseFloat(volSlider.value);
-                    u.onend = resolve;
+                    u.onend = () => {
+                        // Después de la voz, iniciar sonido si está activado
+                        if (sonidoOn.checked) {
+                            playAlarm();
+                        }
+                        resolve();
+                    };
                     u.onerror = resolve;
                     speechSynthesis.speak(u);
                 });
+            } else if (sonidoOn.checked) {
+                // Si no hay voz pero sí sonido, iniciar sonido inmediatamente
+                playAlarm();
             }
-
-            // Sonido después
-            if (sonidoOn.checked) playAlarm();
         }
 
         function playAlarm() {
@@ -2307,10 +2395,18 @@
 
         function stopAlarm() {
             alarmaOn = false;
-            if (intervalo) clearInterval(intervalo);
-            if (audioCtx) audioCtx.close().catch(() => {});
-            audioCtx = null;
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            if (intervalo) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+            if (audioCtx) {
+                audioCtx.close().catch(() => {});
+                audioCtx = null;
+            }
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+            }
+            ultimaAlarmaSonando = false;
         }
 
         $('alertClose').onclick = () => {
@@ -2335,24 +2431,7 @@
             stopAlarm();
             
             // Feedback visual
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 2rem;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, var(--neon-green), #00d68f);
-                color: #050508;
-                padding: 1rem 2rem;
-                border-radius: 50px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
-                animation: toastIn 0.4s ease;
-            `;
-            toast.textContent = '✓ Registrado en historial';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            showToast('✓ Registrado en historial', 'La toma ha sido registrada correctamente', 'success');
         };
 
         // ============================================
@@ -2361,7 +2440,7 @@
         $('testBtn').onclick = () => {
             const keys = Object.keys(meds);
             if (!keys.length) {
-                alert('Agrega un medicamento primero');
+                showToast('💊 Agrega un medicamento primero', 'No hay medicamentos para probar', 'warning');
                 return;
             }
             
@@ -2386,13 +2465,13 @@
             if (testMedicamentos.length === 0) return;
             
             medsActuales = testMedicamentos;
-            horaActual = '08:00'; // Hora de prueba
+            horaActual = '08:00';
             showAlert();
         };
 
         $('testSound').onclick = () => {
             if (!sonidoOn.checked) {
-                alert('Activa el sonido primero');
+                showToast('🔕 Sonido desactivado', 'Activa el sonido primero en configuración', 'warning');
                 return;
             }
             
@@ -2414,14 +2493,16 @@
                         osc.stop(ctx.currentTime + 0.3);
                     }, delay);
                 });
+                showToast('🔔 Sonido de prueba', 'Reproduciendo sonido de alarma', 'info');
             } catch (e) { 
-                console.error('Error de sonido:', e); 
+                console.error('Error de sonido:', e);
+                showToast('❌ Error de audio', 'No se pudo reproducir el sonido', 'warning');
             }
         };
 
         $('testVoice').onclick = () => {
             if (!vozOn.checked) {
-                alert('Activa la voz primero');
+                showToast('🗣️ Voz desactivada', 'Activa la voz primero en configuración', 'warning');
                 return;
             }
             
@@ -2433,12 +2514,18 @@
             u.lang = 'es-ES';
             u.volume = parseFloat(volSlider.value);
             speechSynthesis.speak(u);
+            showToast('🗣️ Voz de prueba', 'Reproduciendo mensaje de voz', 'info');
         };
 
         // ============================================
-        // VERIFICACIÓN AUTOMÁTICA DE ALARMAS MEJORADA
+        // VERIFICACIÓN AUTOMÁTICA DE ALARMAS
         // ============================================
         function check() {
+            // Si ya hay una alarma sonando, no verificar nuevas
+            if (ultimaAlarmaSonando || alertModal.classList.contains('open')) {
+                return;
+            }
+            
             const now = new Date();
             const today = now.toISOString().slice(0, 10);
             const hhmm = now.getHours().toString().padStart(2, '0') + ':' + 
@@ -2461,6 +2548,7 @@
                         medicamentosPorPaciente[m.paciente].push({
                             id: id,
                             nombre: m.nombre,
+                            paciente: m.paciente,
                             cantidad: h.cant,
                             foto: m.foto
                         });
@@ -2472,7 +2560,7 @@
             Object.values(medicamentosPorPaciente).forEach(medsPaciente => {
                 medsPaciente.forEach(med => {
                     medsActuales.push({
-                        paciente: med.nombre.includes('_') ? med.nombre.split('_')[1] : 'PACIENTE', // Extraer paciente si está en formato
+                        paciente: med.paciente,
                         nombre: med.nombre,
                         cantidad: med.cantidad,
                         foto: med.foto
@@ -2528,6 +2616,8 @@
             // Iniciar verificación periódica
             setInterval(check, 60000);
             setTimeout(check, 1000);
+            
+            showToast('🚀 MediClock Neo iniciado', 'Sistema de medicación inteligente activo', 'info', 2000);
         };
 
         // Detener alarmas al cerrar la página
