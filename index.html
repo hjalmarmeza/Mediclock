@@ -1,765 +1,2879 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hjalmarmeza.github.io - MediClock Neo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <title>MediClock Neo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* ============================================ */
+        /* VARIABLES CSS */
+        /* ============================================ */
+        :root {
+            /* Colores de fondo */
+            --bg-dark: #050508;
+            --bg-card: rgba(15, 15, 25, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.02);
+            
+            /* Colores neon */
+            --neon-cyan: #00f5ff;
+            --neon-magenta: #ff00ea;
+            --neon-violet: #8b5cf6;
+            --neon-blue: #3b82f6;
+            --neon-green: #00ff88;
+            --neon-orange: #ff6b35;
+            
+            /* Glows */
+            --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
+            --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
+            --glow-violet: 0 0 30px rgba(139, 92, 246, 0.4);
+            
+            /* Textos */
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            
+            /* Bordes */
+            --border-glow: rgba(0, 245, 255, 0.2);
+            
+            /* Radios */
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+        }
+
+        /* ============================================ */
+        /* RESET Y CONFIGURACIÓN BASE */
+        /* ============================================ */
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
         }
-        
+
         body {
-            background-color: #f0f5ff;
-            color: #333;
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #4a6fff 0%, #2c5af0 100%);
-            border-radius: 16px;
-            color: white;
-            box-shadow: 0 8px 20px rgba(74, 111, 255, 0.2);
-        }
-        
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            font-weight: 300;
-            opacity: 0.9;
-        }
-        
-        .country-badge {
-            display: inline-block;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-top: 10px;
-            font-weight: 500;
-        }
-        
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        
-        .med-section {
-            margin-bottom: 30px;
-        }
-        
-        .section-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e7ff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: #4a6fff;
-        }
-        
-        .med-card {
-            background-color: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0e7ff;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .med-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
-        }
-        
-        .card-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            position: relative;
-            padding-right: 80px;
-        }
-        
-        .med-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .med-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #2c3e50;
-            line-height: 1.3;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            margin-bottom: 5px;
-        }
-        
-        .med-patient {
-            color: #4a6fff;
-            font-weight: 600;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .med-patient i {
-            font-size: 14px;
-        }
-        
-        .med-type {
-            color: #7f8c8d;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .pill-image-container {
-            width: 90px;
-            height: 90px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid #e0e7ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8faff;
-            flex-shrink: 0;
-            margin-left: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .pill-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .card-actions {
-            position: absolute;
-            top: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 10;
-        }
-        
-        .action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #f0f4ff;
-            border: none;
-            color: #4a6fff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .action-btn:hover {
-            background-color: #4a6fff;
-            color: white;
-            transform: scale(1.1);
-        }
-        
-        .close-btn {
-            background-color: #ffeaea;
-            color: #ff6b6b;
-        }
-        
-        .close-btn:hover {
-            background-color: #ff6b6b;
-            color: white;
-        }
-        
-        .dosage-info {
-            background-color: #f8faff;
-            border-radius: 12px;
-            padding: 18px;
-        }
-        
-        .dosage-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4a6fff;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .dosage-title i {
-            font-size: 18px;
-        }
-        
-        .dosage-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 0;
-            border-bottom: 1px dashed #d1ddff;
-        }
-        
-        .dosage-item:last-child {
-            border-bottom: none;
-        }
-        
-        .time-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .time {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            min-width: 70px;
-        }
-        
-        .days {
-            font-size: 14px;
-            color: #7f8c8d;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-        
-        .quantity {
-            background: linear-gradient(135deg, #4a6fff 0%, #2c5af0 100%);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 3px 6px rgba(74, 111, 255, 0.2);
-        }
-        
-        .add-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background-color: #f0f4ff;
-            border: 2px dashed #c2d1ff;
-            border-radius: 12px;
-            padding: 14px;
-            color: #4a6fff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 15px;
-            width: 100%;
-        }
-        
-        .add-btn:hover {
-            background-color: #e1e9ff;
-            border-color: #4a6fff;
-        }
-        
-        .add-btn i {
-            font-size: 18px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            color: #95a5a6;
-            font-size: 14px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e7ff;
-        }
-        
-        .modal {
-            display: none;
+
+        /* ============================================ */
+        /* EFECTOS DE FONDO ANIMADOS */
+        /* ============================================ */
+        .bg-animation {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5%, -5%) scale(1.1); }
+            66% { transform: translate(5%, 5%) scale(0.95); }
+        }
+
+        /* Orbes flotantes */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-cyan);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-magenta);
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--neon-violet);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(-30px, 30px) rotate(180deg); }
+            75% { transform: translate(20px, 50px) rotate(270deg); }
+        }
+
+        /* Patrón de cuadrícula */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================ */
+        /* CONTENEDOR PRINCIPAL */
+        /* ============================================ */
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        /* ============================================ */
+        /* HEADER Y LOGO */
+        /* ============================================ */
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.6;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+        }
+
+        .logo-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            vertical-align: super;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================ */
+        /* PESTAÑAS */
+        /* ============================================ */
+        .tabs {
+            display: flex;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab:hover::before {
+            opacity: 1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15));
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: tabGlow 2s infinite;
+        }
+
+        @keyframes tabGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* ============================================ */
+        /* CONTENIDO DE PESTAÑAS */
+        /* ============================================ */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ============================================ */
+        /* INDICADOR DE MODO */
+        /* ============================================ */
+        .modo-indicator {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-magenta));
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 9998;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+            display: none;
+        }
+
+        /* ============================================ */
+        /* TARJETAS */
+        /* ============================================ */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
+            opacity: 0.6;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 245, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), var(--glow-cyan);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.2));
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ============================================ */
+        /* TARJETAS DE MEDICAMENTOS MEJORADAS */
+        /* ============================================ */
+        .med-item {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            background: rgba(15, 15, 30, 0.7);
+            border: 1px solid rgba(0, 245, 255, 0.15);
+            border-radius: var(--radius-xl);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .med-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+            border-radius: 5px 0 0 5px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .med-item:hover {
+            background: rgba(20, 20, 40, 0.8);
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px) translateX(5px);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                var(--glow-cyan),
+                0 0 0 1px rgba(0, 245, 255, 0.2);
+        }
+
+        .med-item:hover::before {
+            opacity: 1;
+            animation: gradientFlow 3s infinite alternate;
+        }
+
+        @keyframes gradientFlow {
+            0% { background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta)); }
+            100% { background: linear-gradient(180deg, var(--neon-magenta), var(--neon-violet)); }
+        }
+
+        .med-item.selected {
+            border-color: var(--neon-magenta);
+            box-shadow: 
+                0 15px 40px rgba(139, 92, 246, 0.2),
+                var(--glow-magenta),
+                0 0 0 2px rgba(255, 0, 234, 0.3);
+            background: rgba(30, 15, 40, 0.8);
+        }
+
+        .med-item.selected::before {
+            background: var(--neon-magenta);
+            opacity: 1;
+        }
+
+        .med-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-lg);
+            object-fit: cover;
+            border: 2px solid rgba(0, 245, 255, 0.4);
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .med-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.2));
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .med-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .med-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .med-patient {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .med-patient::before {
+            content: '👤';
+            font-size: 0.8rem;
+        }
+
+        .med-times {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 100px;
+            justify-content: space-between;
+        }
+
+        .time-chip:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--neon-cyan);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .time-chip::before {
+            content: '🕐';
+            font-size: 0.9rem;
+        }
+
+        .chip-edit {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.2rem;
+            border-radius: 4px;
+        }
+
+        .chip-edit:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.2);
+        }
+
+        /* Acciones de tarjetas */
+        .med-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .med-action-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.15), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .med-action-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(139, 92, 246, 0.2));
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.4);
+        }
+
+        .med-action-btn[title="Editar información"]:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(255, 0, 234, 0.2));
+            border-color: var(--neon-violet);
+        }
+
+        .med-action-btn[title="Agregar horario"]:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(0, 255, 136, 0.2));
+            border-color: var(--neon-green);
+        }
+
+        .med-delete {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .med-delete:hover {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+            color: #ff4757;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        /* ============================================ */
+        /* FORMULARIOS */
+        /* ============================================ */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
+        /* ============================================ */
+        /* CONTROLES DE CANTIDAD */
+        /* ============================================ */
+        .qty-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .qty-btn {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.05);
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .qty-input {
+            flex: 1;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* ============================================ */
+        /* SUBIDA DE FOTOS */
+        /* ============================================ */
+        .photo-zone {
+            position: relative;
+            border: 2px dashed rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.02), rgba(255, 0, 234, 0.02));
+        }
+
+        .photo-zone:hover {
+            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(255, 0, 234, 0.05));
+            box-shadow: inset 0 0 30px rgba(0, 245, 255, 0.1);
+        }
+
+        .photo-zone-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .photo-zone-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .photo-zone-hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            display: none;
+        }
+
+        .photo-preview.active {
+            display: block;
+        }
+
+        /* ============================================ */
+        /* BOTONES */
+        /* ============================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: 0.02em;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px rgba(0, 245, 255, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--neon-green), #00d68f);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.875rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Botón en modo activo */
+        .btn.modo-activo {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* ============================================ */
+        /* LISTA DE MEDICAMENTOS */
+        /* ============================================ */
+        .med-list {
+            list-style: none;
+        }
+
+        /* ============================================ */
+        /* ESTADO VACÍO */
+        /* ============================================ */
+        .empty {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.1));
+            border: 1px dashed rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================ */
+        /* CONFIGURACIÓN */
+        /* ============================================ */
+        .settings {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 1.75rem;
+            padding-top: 1.75rem;
+        }
+
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .settings-arrow {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .settings-panel {
+            display: none;
+            padding-top: 1.25rem;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        /* ============================================ */
+        /* INTERRUPTORES */
+        /* ============================================ */
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .switch-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            transition: all 0.4s ease;
+        }
+
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            box-shadow: var(--glow-cyan);
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(24px);
+            background: white;
+        }
+
+        /* ============================================ */
+        /* CONTROL DE VOLUMEN */
+        /* ============================================ */
+        .volume-row {
+            padding: 1rem 0;
+        }
+
+        .volume-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .volume-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .volume-value {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            transition: transform 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* ============================================ */
+        /* MODALES */
+        /* ============================================ */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            padding: 1.25rem;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 30px;
-            position: relative;
-            animation: slideUp 0.4s ease;
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .modal-header {
+
+        .modal-bg.open {
             display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f4ff;
         }
-        
-        .modal-pill-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 16px;
+
+        .modal-bg.open .modal {
+            max-width: 450px;
+            max-height: 90vh;
+        }
+
+        .modal {
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98));
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
             overflow: hidden;
-            border: 3px solid #e0e7ff;
-            margin-right: 25px;
-            flex-shrink: 0;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 80px rgba(0, 245, 255, 0.2), 0 40px 80px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        .modal-med-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            line-height: 1.2;
-            margin-bottom: 8px;
+
+        @keyframes modalIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
-        
-        .modal-close {
+
+        /* ============================================ */
+        /* MODAL DE ALERTA MEJORADO */
+        /* ============================================ */
+        .modal-header {
+            padding: 2.5rem 2rem 1.5rem;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 245, 255, 0.12), rgba(139, 92, 246, 0.08), transparent);
+            position: relative;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.15);
+        }
+
+        .modal-header::after {
+            content: '';
             position: absolute;
-            top: 25px;
-            right: 25px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: #95a5a6;
-            cursor: pointer;
-            transition: color 0.2s;
-            width: 40px;
-            height: 40px;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
+            font-size: 2rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconFloat 3s ease-in-out infinite;
         }
-        
-        .modal-close:hover {
-            color: #ff6b6b;
-            background-color: #f9f9f9;
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-        
-        .modal-details {
-            margin-top: 20px;
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.01em;
         }
-        
-        .detail-item {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
+
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 1.5rem;
         }
-        
-        .detail-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .detail-label {
+
+        .modal-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.15));
+            border: 2px solid rgba(0, 245, 255, 0.4);
+            border-radius: 30px;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: #4a6fff;
-            margin-bottom: 8px;
-            display: block;
-            font-size: 16px;
+            color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
         }
-        
-        .detail-value {
-            color: #2c3e50;
-            line-height: 1.5;
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2rem;
+            max-height: 400px;
         }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
+
+        /* Grupo de paciente mejorado */
+        .patient-group {
+            margin-bottom: 2rem;
+            background: rgba(10, 10, 20, 0.4);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .patient-group-header {
+            color: var(--neon-green);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .patient-group-header::before {
+            content: '👤';
+            font-size: 1rem;
+        }
+
+        /* Medicamentos dentro del alerta mejorados */
+        .modal-med {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            background: rgba(15, 15, 25, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-med:hover {
+            border-color: rgba(0, 245, 255, 0.3);
+            background: rgba(20, 20, 35, 0.8);
+            transform: translateX(5px);
+        }
+
+        .modal-med-img {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-lg);
+            object-fit: cover;
+            border: 2px solid rgba(0, 245, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .modal-med-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .modal-med-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .modal-med-qty {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 245, 255, 0.15));
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--neon-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-med-qty::before {
+            content: '💊';
+            font-size: 0.9rem;
+        }
+
+        .modal-med-patient {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-med-patient::before {
+            content: '🕐';
+            font-size: 0.8rem;
+        }
+
+        .modal-footer {
+            padding: 1.75rem 2rem;
+            background: rgba(5, 5, 10, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .modal-total {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            padding: 0.8rem;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: var(--radius-md);
+        }
+
+        /* Botones del modal mejorados */
+        .modal-footer .btn-group {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            padding: 1.1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: var(--radius-lg);
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .modal-footer .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 0 25px rgba(255, 71, 87, 0.4);
+        }
+
+        .modal-footer .btn-success {
+            background: linear-gradient(135deg, var(--neon-green), #00d68f);
+            color: var(--bg-dark);
+            font-weight: 800;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
+        }
+
+        .modal-footer .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.6);
+        }
+
+        .modal-footer .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.6);
+        }
+
+        /* ============================================ */
+        /* MODAL DE DETALLE ESPECÍFICO */
+        /* ============================================ */
+        .detail-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .detail-time-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .detail-time-item:hover {
+            background: rgba(0, 245, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .detail-time-hour {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-time-qty {
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        /* ============================================ */
+        /* MODAL DE CALENDARIO/HISTORIAL */
+        /* ============================================ */
+        .cal-item {
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-green);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.875rem;
+        }
+
+        .cal-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .cal-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cal-item-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cal-item-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================ */
+        /* SCROLLBAR PERSONALIZADA */
+        /* ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 245, 255, 0.5);
+        }
+
+        /* ============================================ */
+        /* ANIMACIONES DE TOAST */
+        /* ============================================ */
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        }
+
+        /* ============================================ */
+        /* RESPONSIVE */
+        /* ============================================ */
+        @media (max-width: 480px) {
+            .app {
+                padding: 1.5rem 0.875rem;
             }
-            
-            .card-header {
+            .card {
+                padding: 1.5rem;
+                border-radius: var(--radius-lg);
+            }
+            .btn-group {
                 flex-direction: column;
-                padding-right: 0;
+            }
+            .logo-text {
+                font-size: 1.6rem;
+            }
+            .modo-indicator {
+                top: 60px;
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+            .tabs {
+                margin-bottom: 1rem;
+            }
+            .tab {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
             }
             
-            .pill-image-container {
-                margin-left: 0;
-                margin-top: 15px;
-                align-self: center;
-                width: 100px;
-                height: 100px;
+            /* Responsive para modal */
+            .modal-footer .btn-group {
+                flex-direction: column;
             }
             
-            .card-actions {
-                position: relative;
-                flex-direction: row;
-                justify-content: flex-end;
-                margin-top: 15px;
+            .modal-footer .btn {
                 width: 100%;
+                min-height: 60px;
+                font-size: 1.1rem;
             }
             
-            .modal-header {
-                flex-direction: column;
-                text-align: center;
+            .modal-med-img {
+                width: 70px;
+                height: 70px;
             }
             
-            .modal-pill-image {
-                margin-right: 0;
-                margin-bottom: 20px;
+            .modal-med-name {
+                font-size: 1.1rem;
+            }
+            
+            .patient-group {
+                padding: 1.25rem;
+            }
+            
+            .modal-body {
+                padding: 1.25rem 1.5rem;
+                max-height: 350px;
+            }
+            
+            .med-avatar {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .med-placeholder {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .med-name {
+                font-size: 1.1rem;
+            }
+            
+            .time-chip {
+                min-width: 90px;
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
             }
         }
-        
-        .pill-taken {
-            opacity: 0.6;
-            background-color: #f9f9f9;
+
+        /* ============================================ */
+        /* EFECTO DE LÍNEA DE ESCANEO */
+        /* ============================================ */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            opacity: 0.3;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
         }
-        
-        .pill-taken .med-name {
-            text-decoration: line-through;
-            color: #95a5a6;
-        }
-        
-        .pill-taken .pill-image-container {
-            opacity: 0.7;
-            filter: grayscale(0.5);
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>MediClock Neo</h1>
-        <p class="subtitle">Sistema de recordatorios de medicamentos</p>
-        <div class="country-badge">
-            <i class="fas fa-map-marker-alt"></i> ISRAEL
+    <!-- ============================================ -->
+    <!-- EFECTOS DE FONDO -->
+    <!-- ============================================ -->
+    <div class="bg-animation"></div>
+    <div class="grid-pattern"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="scanline"></div>
+
+    <!-- ============================================ -->
+    <!-- CONTENEDOR PRINCIPAL DE LA APP -->
+    <!-- ============================================ -->
+    <div class="app">
+        <!-- INDICADOR DE MODO SELECCIÓN -->
+        <div class="modo-indicator" id="modo-indicator">
+            📱 MODO AGREGAR HORARIO • Toca un medicamento para seleccionarlo
         </div>
-    </header>
-    
-    <main class="container">
-        <div class="med-section">
-            <h2 class="section-title">
-                <i class="fas fa-prescription-bottle-alt"></i>
-                PARAI
-            </h2>
-            
-            <div class="med-card">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">MediClock</span>
+                <span class="logo-badge">NEO</span>
+            </div>
+            <p class="tagline">Sistema inteligente de medicación</p>
+        </header>
+
+        <!-- PESTAÑAS -->
+        <div class="tabs">
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">
+                <span>✨</span>
+                <span>Nuevo</span>
+            </button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">
+                <span>💊</span>
+                <span>Mis Medicamentos</span>
+            </button>
+        </div>
+
+        <!-- CONTENIDO PESTAÑA NUEVO -->
+        <div class="tab-content active" id="tabContentNuevo">
+            <!-- TARJETA PARA AGREGAR NUEVA MEDICACIÓN -->
+            <div class="card">
                 <div class="card-header">
-                    <div class="med-info">
-                        <div class="med-name">Panadol</div>
-                        <div class="med-patient">
-                            <i class="fas fa-user-md"></i>
-                            ISRAEL
-                        </div>
-                        <div class="med-type">Analgésico</div>
-                    </div>
-                    
-                    <div class="pill-image-container">
-                        <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGlsbHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=80" 
-                             alt="Pastilla Panadol" 
-                             class="pill-image">
-                    </div>
-                    
-                    <div class="card-actions">
-                        <button class="action-btn" title="Marcar como tomado">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="action-btn" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn close-btn" title="Cerrar">
-                            <i class="fas fa-times"></i>
-                        </button>
+                    <div class="card-icon">✨</div>
+                    <h2 class="card-title">Nueva medicación</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: María García" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="menos">−</button>
+                        <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="mas">+</button>
                     </div>
                 </div>
-                
-                <div class="dosage-info">
-                    <div class="dosage-title">
-                        <i class="far fa-clock"></i>
-                        Horarios
+
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto (opcional)</label>
+                    <div class="photo-zone" id="photoZone">
+                        <div class="photo-zone-icon">📷</div>
+                        <div class="photo-zone-text">Toca para capturar</div>
+                        <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
                     </div>
-                    
-                    <div class="dosage-item">
-                        <div class="time-info">
-                            <span class="time">01:03</span>
-                            <span class="days">Martes</span>
-                        </div>
-                        <div class="quantity">1 tableta</div>
-                    </div>
-                    
-                    <button class="add-btn">
-                        <i class="fas fa-plus"></i>
-                        Añadir horario
+                    <img class="photo-preview" id="photoPreview" src="" alt="Preview">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-full" id="addBtn">
+                        <span>⚡</span>
+                        <span>Agregar</span>
                     </button>
                 </div>
+
+                <!-- CONFIGURACIÓN DE ALERTAS -->
+                <div class="settings">
+                    <div class="settings-toggle" id="settingsToggle">
+                        <div class="settings-label">
+                            <span>⚙️</span>
+                            <span>Configuración de alertas</span>
+                        </div>
+                        <span class="settings-arrow" id="settingsArrow">▼</span>
+                    </div>
+
+                    <div class="settings-panel" id="settingsPanel">
+                        <div class="switch-row">
+                            <span class="switch-text">Sonido de alarma</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sonidoOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span class="switch-text">Recordatorio por voz</span>
+                            <label class="switch">
+                                <input type="checkbox" id="vozOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="volume-row">
+                            <div class="volume-header">
+                                <span class="volume-label">Volumen</span>
+                                <span class="volume-value" id="volValue">70%</span>
+                            </div>
+                            <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
+                            <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="med-section">
-            <h2 class="section-title">
-                <i class="fas fa-capsules"></i>
-                PARAK
-            </h2>
-            
-            <div class="med-card">
+
+        <!-- CONTENIDO PESTAÑA MEDICAMENTOS -->
+        <div class="tab-content" id="tabContentMedicamentos">
+            <!-- LISTA DE MEDICAMENTOS -->
+            <div class="card">
                 <div class="card-header">
-                    <div class="med-info">
-                        <div class="med-name">Medicamento Control</div>
-                        <div class="med-patient">
-                            <i class="fas fa-user-md"></i>
-                            ISRAEL
-                        </div>
-                        <div class="med-type">Control diario</div>
-                    </div>
-                    
-                    <div class="pill-image-container">
-                        <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGlsbHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=80" 
-                             alt="Pastilla Control" 
-                             class="pill-image">
-                    </div>
-                    
-                    <div class="card-actions">
-                        <button class="action-btn" title="Marcar como tomado">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="action-btn" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn close-btn" title="Cerrar">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                    <div class="card-icon">💊</div>
+                    <h2 class="card-title">Mis medicamentos</h2>
                 </div>
-                
-                <div class="dosage-info">
-                    <div class="dosage-title">
-                        <i class="far fa-clock"></i>
-                        Horarios
-                    </div>
-                    
-                    <div class="dosage-item">
-                        <div class="time-info">
-                            <span class="time">01:03</span>
-                            <span class="days">Martes</span>
-                        </div>
-                        <div class="quantity">1 tableta</div>
-                    </div>
-                    
-                    <div class="dosage-item">
-                        <div class="time-info">
-                            <span class="time">15:45</span>
-                            <span class="days">1.5 unidades</span>
-                        </div>
-                        <div class="quantity">1.5u</div>
-                    </div>
-                    
-                    <button class="add-btn">
-                        <i class="fas fa-plus"></i>
-                        Añadir horario
+
+                <ul class="med-list" id="lista"></ul>
+
+                <div class="empty" id="empty">
+                    <div class="empty-icon">💊</div>
+                    <h3 class="empty-title">Sin medicamentos</h3>
+                    <p class="empty-text">Agrega tu primera medicación en la pestaña "Nuevo"</p>
+                </div>
+
+                <!-- ACCIONES PARA MEDICAMENTOS -->
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" id="addHoraBtn">
+                        <span>+</span>
+                        <span>Agregar Hora</span>
                     </button>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <div id="medicationModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close">&times;</button>
-            <div class="modal-header">
-                <div class="modal-pill-image">
-                    <img id="modalPillImage" src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGlsbHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=80" alt="Pastilla" class="pill-image">
-                </div>
-                <div>
-                    <div id="modalMedName" class="modal-med-name">Panadol</div>
-                    <div class="med-patient">
-                        <i class="fas fa-user-md"></i>
-                        ISRAEL
-                    </div>
-                    <div class="med-type" id="modalMedType">Analgésico</div>
-                </div>
-            </div>
-            
-            <div class="modal-details">
-                <div class="detail-item">
-                    <span class="detail-label">Próxima toma:</span>
-                    <span id="modalNextDose" class="detail-value">01:03 (Martes)</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">Dosis:</span>
-                    <span id="modalDosage" class="detail-value">1 tableta</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">Última toma:</span>
-                    <span id="modalLastTaken" class="detail-value">No registrada</span>
+                    <button class="btn btn-secondary" id="calBtn">
+                        <span>📅</span>
+                        <span>Historial</span>
+                    </button>
+                    <button class="btn btn-secondary" id="testBtn">
+                        <span>🧪</span>
+                        <span>Probar</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <footer>
-        <p>MediClock Neo &copy; 2023</p>
-        <p>ISRAEL • hjalmarmeza.github.io</p>
-    </footer>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('medicationModal');
-            const closeModalBtn = document.querySelector('.modal-close');
-            const medicationCards = document.querySelectorAll('.med-card');
-            const addButtons = document.querySelectorAll('.add-btn');
-            const checkButtons = document.querySelectorAll('.action-btn .fa-check');
-            const closeButtons = document.querySelectorAll('.close-btn');
-            const editButtons = document.querySelectorAll('.action-btn .fa-edit');
 
-            // Datos simplificados para el modal
-            const medicationData = {
-                'Panadol': {
-                    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGlsbHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=80',
-                    type: 'Analgésico',
-                    nextDose: '01:03 (Martes)',
-                    dosage: '1 tableta',
-                    lastTaken: 'No registrada'
-                },
-                'Medicamento Control': {
-                    image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGlsbHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=80',
-                    type: 'Control diario',
-                    nextDose: '01:03 (Martes)',
-                    dosage: '1 tableta',
-                    lastTaken: 'No registrada'
+    <!-- ============================================ -->
+    <!-- MODALES -->
+    <!-- ============================================ -->
+
+    <!-- MODAL DE ALERTA -->
+    <div class="modal-bg" id="alertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">⏰</div>
+                <h2 class="modal-title" id="alertTitle">Hola ISRAEL</h2>
+                <p class="modal-subtitle">Es hora de tu medicación</p>
+                <div class="modal-time" id="alertTime">
+                    <span>🕐</span>
+                    <span>08:00</span>
+                </div>
+            </div>
+
+            <div class="modal-body" id="alertBody"></div>
+
+            <div class="modal-footer">
+                <p class="modal-total" id="alertTotal">Total: 1 medicamento</p>
+                <div class="btn-group">
+                    <button class="btn btn-danger" id="alertClose">Cerrar</button>
+                    <button class="btn btn-success" id="alertTake">✓ Tomado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE -->
+    <div class="modal-bg" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">💊</div>
+                <p class="modal-subtitle" id="detailPatient">Paciente</p>
+                <h2 class="modal-title" id="detailName">Medicamento</h2>
+            </div>
+
+            <div class="modal-body">
+                <img class="detail-img" id="detailImg" src="" alt="">
+                <div id="detailTimes"></div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="detailClose">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CALENDARIO/HISTORIAL -->
+    <div class="modal-bg" id="calModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">📅</div>
+                <h2 class="modal-title">Historial de tomas</h2>
+            </div>
+
+            <div class="modal-body" id="calBody"></div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="calClose">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO PARA ALARMAS -->
+    <audio id="audio" preload="auto"></audio>
+
+    <script>
+        // ============================================ 
+        // MEDICLOCK NEO - SISTEMA PRINCIPAL
+        // ============================================
+        
+        // Variables globales
+        let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
+        let foto = '';
+        let alarmaOn = false;
+        let medsActuales = [];
+        let horaActual = '';
+        let intervalo = null;
+        let audioCtx = null;
+        let seleccionadoId = null;
+        let detalleId = null;
+        let modoEdicionActivo = false;
+        let pestañaActual = 'nuevo';
+        let ultimaAlarmaSonando = false;
+
+        // Funciones auxiliares
+        const $ = id => document.getElementById(id);
+        const upper = t => t ? t.toString().toUpperCase().trim() : '';
+
+        // Elementos DOM principales
+        const nombre = $('nombre');
+        const paciente = $('paciente');
+        const cant = $('cant');
+        const hora = $('hora');
+        const lista = $('lista');
+        const empty = $('empty');
+        const photoZone = $('photoZone');
+        const photoPreview = $('photoPreview');
+        const sonidoOn = $('sonidoOn');
+        const vozOn = $('vozOn');
+        const volSlider = $('volSlider');
+        const volValue = $('volValue');
+        const alertModal = $('alertModal');
+        const detailModal = $('detailModal');
+        const calModal = $('calModal');
+
+        // ============================================
+        // SISTEMA DE PESTAÑAS
+        // ============================================
+        function cambiarPestaña(nombrePestaña) {
+            pestañaActual = nombrePestaña;
+            
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar la pestaña seleccionada
+            $(`tabContent${nombrePestaña.charAt(0).toUpperCase() + nombrePestaña.slice(1)}`).classList.add('active');
+            
+            // Actualizar botones de pestañas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === nombrePestaña) {
+                    tab.classList.add('active');
                 }
+            });
+            
+            // Si cambiamos a la pestaña de medicamentos, renderizar la lista
+            if (nombrePestaña === 'medicamentos') {
+                render();
+            }
+            
+            // Si cambiamos a otra pestaña, salir del modo edición si está activo
+            if (nombrePestaña !== 'medicamentos' && modoEdicionActivo) {
+                toggleModoEdicion();
+            }
+        }
+
+        // Event listeners para pestañas
+        $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
+        $('tabMedicamentos').onclick = () => cambiarPestaña('medicamentos');
+
+        // ============================================
+        // CONFIGURACIÓN DE ENTRADA DE TEXTO
+        // ============================================
+        nombre.oninput = function() { this.value = upper(this.value); };
+        paciente.oninput = function() { this.value = upper(this.value); };
+
+        // ============================================
+        // CONTROL DE CANTIDAD
+        // ============================================
+        $('menos').onclick = () => {
+            cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2);
+        };
+        
+        $('mas').onclick = () => {
+            cant.value = (parseFloat(cant.value) + 0.25).toFixed(2);
+        };
+
+        // ============================================
+        // SUBIDA DE FOTOS
+        // ============================================
+        photoZone.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = 600 / img.width;
+                        canvas.width = 600;
+                        canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        foto = canvas.toDataURL('image/jpeg', 0.6);
+                        photoPreview.src = foto;
+                        photoPreview.classList.add('active');
+                        photoZone.style.display = 'none';
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+
+        // ============================================
+        // CONFIGURACIÓN DE ALERTAS
+        // ============================================
+        $('settingsToggle').onclick = () => {
+            const panel = $('settingsPanel');
+            const arrow = $('settingsArrow');
+            panel.classList.toggle('open');
+            arrow.classList.toggle('open');
+        };
+
+        // Control de volumen
+        volSlider.oninput = function() {
+            volValue.textContent = Math.round(this.value * 100) + '%';
+            saveConfig();
+        };
+
+        // ============================================
+        // CONFIGURACIÓN - GUARDAR Y CARGAR
+        // ============================================
+        function saveConfig() {
+            localStorage.setItem('mcConfig', JSON.stringify({
+                sound: sonidoOn.checked,
+                voice: vozOn.checked,
+                vol: parseFloat(volSlider.value)
+            }));
+        }
+
+        function loadConfig() {
+            const c = JSON.parse(localStorage.getItem('mcConfig') || '{}');
+            if (c.sound !== undefined) sonidoOn.checked = c.sound;
+            if (c.voice !== undefined) vozOn.checked = c.voice;
+            if (c.vol !== undefined) {
+                volSlider.value = c.vol;
+                volValue.textContent = Math.round(c.vol * 100) + '%';
+            }
+        }
+
+        // Event listeners para configuración
+        sonidoOn.onchange = saveConfig;
+        vozOn.onchange = saveConfig;
+
+        // ============================================
+        // ALMACENAMIENTO DE DATOS
+        // ============================================
+        function save() {
+            localStorage.setItem('medsMC2', JSON.stringify(meds));
+        }
+
+        // ============================================
+        // FUNCIONES PARA EDITAR MEDICAMENTOS
+        // ============================================
+        function editarMedicamento(id) {
+            const m = meds[id];
+            if (!m) return;
+            
+            const nuevoNombre = prompt('Nuevo nombre del medicamento:', m.nombre);
+            if (nuevoNombre && nuevoNombre.trim() !== '') {
+                m.nombre = upper(nuevoNombre);
+            }
+            
+            const nuevoPaciente = prompt('Nuevo nombre del paciente:', m.paciente);
+            if (nuevoPaciente && nuevoPaciente.trim() !== '') {
+                m.paciente = upper(nuevoPaciente);
+            }
+            
+            // Editar foto si se desea
+            if (confirm('¿Deseas cambiar la foto?')) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = ev => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const scale = 600 / img.width;
+                                canvas.width = 600;
+                                canvas.height = img.height * scale;
+                                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                                m.foto = canvas.toDataURL('image/jpeg', 0.6);
+                                save();
+                                render();
+                                showToast('✅ Medicamento actualizado', 'Información y foto actualizadas', 'success');
+                            };
+                            img.src = ev.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            } else {
+                save();
+                render();
+                showToast('✅ Medicamento actualizado', 'Información actualizada correctamente', 'success');
+            }
+        }
+
+        function agregarHorarioEspecifico(id) {
+            const m = meds[id];
+            if (!m) return;
+            
+            const horaNueva = prompt('Nueva hora (HH:MM):', '08:00');
+            if (!horaNueva || horaNueva.trim() === '') return;
+            
+            if (m.horas.some(h => h.h === horaNueva)) {
+                showToast('⚠️ Hora duplicada', 'Esta hora ya existe para este medicamento', 'warning');
+                return;
+            }
+            
+            const cantidad = prompt('Cantidad (unidades):', '1');
+            if (!cantidad || isNaN(parseFloat(cantidad))) {
+                showToast('❌ Cantidad inválida', 'Ingresa un número válido', 'warning');
+                return;
+            }
+            
+            m.horas.push({ 
+                h: horaNueva, 
+                cant: parseFloat(cantidad) 
+            });
+            m.horas.sort((a, b) => a.h.localeCompare(b.h));
+            
+            save();
+            render();
+            
+            showToast('✅ Horario agregado', `${horaNueva} agregado a ${upper(m.nombre)}`, 'success');
+        }
+
+        // ============================================
+        // SISTEMA DE MODO EDICIÓN MEJORADO
+        // ============================================
+        function toggleModoEdicion() {
+            // Si ya estamos en modo edición, salir
+            if (modoEdicionActivo) {
+                modoEdicionActivo = false;
+                const btn = $('addHoraBtn');
+                btn.classList.remove('modo-activo');
+                btn.innerHTML = '<span>+</span><span>Agregar Hora</span>';
+                btn.style.background = '';
+                
+                // Ocultar indicador
+                $('modo-indicator').style.display = 'none';
+                
+                // Deseleccionar todos
+                deseleccionarTodos();
+                
+                showToast('✅ Modo normal', 'Toca un medicamento para ver sus detalles', 'info');
+                render();
+                return;
+            }
+            
+            // Solo permitir modo edición en pestaña de medicamentos
+            if (pestañaActual !== 'medicamentos') {
+                showToast('⚠️ Cambia a pestaña Medicamentos', 'Para agregar horarios, ve a la pestaña de medicamentos', 'warning');
+                return;
+            }
+            
+            // Si no hay medicamentos, mostrar mensaje
+            if (Object.keys(meds).length === 0) {
+                showToast('💊 Agrega un medicamento primero', 'No hay medicamentos para agregar horarios', 'warning');
+                return;
+            }
+            
+            const btn = $('addHoraBtn');
+            modoEdicionActivo = true;
+            
+            btn.classList.add('modo-activo');
+            btn.innerHTML = '<span>❌</span><span>Cancelar</span>';
+            btn.style.background = 'linear-gradient(135deg, var(--neon-orange), #ff4757)';
+            
+            // Mostrar indicador
+            $('modo-indicator').style.display = 'block';
+            
+            // Mostrar instrucciones
+            showToast('📱 Modo agregar horario', '1. Toca un medicamento para seleccionarlo\n2. Completa la hora en el formulario\n3. Presiona "Agregar Hora"', 'info', 5000);
+            
+            render();
+        }
+
+        $('addHoraBtn').onclick = toggleModoEdicion;
+
+        // Función para deseleccionar todos los medicamentos
+        function deseleccionarTodos() {
+            seleccionadoId = null;
+            document.querySelectorAll('.med-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+        }
+
+        // ============================================
+        // TOAST MEJORADO
+        // ============================================
+        function showToast(titulo, mensaje, tipo = 'info', duracion = 3000) {
+            const toast = document.createElement('div');
+            const color = tipo === 'info' ? 'var(--neon-violet)' : 
+                          tipo === 'success' ? 'var(--neon-green)' : 
+                          tipo === 'warning' ? 'var(--neon-orange)' : 'var(--neon-magenta)';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, ${color}, rgba(139, 92, 246, 0.9));
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 16px;
+                font-weight: 600;
+                z-index: 9999;
+                box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+                animation: toastIn 0.4s ease;
+                font-size: 0.9rem;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                text-align: center;
+                max-width: 85%;
+                backdrop-filter: blur(10px);
+                white-space: pre-line;
+            `;
+            toast.innerHTML = `<strong>${titulo}</strong><br><small>${mensaje}</small>`;
+            toast.id = 'toast-' + Date.now();
+            
+            // Remover toast anterior
+            const existing = document.querySelector('[id^="toast-"]');
+            if (existing) existing.remove();
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                const t = document.getElementById(toast.id);
+                if (t) {
+                    t.style.animation = 'toastOut 0.4s ease forwards';
+                    setTimeout(() => t.remove(), 400);
+                }
+            }, duracion);
+        }
+
+        // ============================================
+        // RENDERIZADO DE LA LISTA DE MEDICAMENTOS MEJORADO
+        // ============================================
+        function render() {
+            lista.innerHTML = '';
+            const keys = Object.keys(meds);
+            empty.style.display = keys.length ? 'none' : 'block';
+
+            keys.forEach(id => {
+                const m = meds[id];
+                const li = document.createElement('li');
+                li.className = 'med-item';
+                li.dataset.id = id;
+
+                if (seleccionadoId === id) li.classList.add('selected');
+
+                li.innerHTML = `
+                    ${m.foto
+                        ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1237/1237460.png'">`
+                        : `<div class="med-placeholder">💊</div>`
+                    }
+                    <div class="med-info">
+                        <div class="med-name">${upper(m.nombre)}</div>
+                        <div class="med-patient">${upper(m.paciente)}</div>
+                        <div class="med-times">
+                            ${m.horas.map(h => `
+                                <span class="time-chip" data-h="${h.h}">
+                                    <span>${h.h}</span>
+                                    <span>${h.cant}u</span>
+                                    <span class="chip-edit" title="Editar horario">✏️</span>
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="med-actions">
+                            <button class="med-action-btn" title="Editar información" data-id="${id}">
+                                ✏️
+                            </button>
+                            <button class="med-action-btn" title="Agregar horario" data-id="${id}">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                    <button class="med-delete" data-id="${id}" title="Eliminar medicamento">
+                        🗑️
+                    </button>
+                `;
+
+                // Comportamiento según el modo
+                if (modoEdicionActivo) {
+                    // MODO SELECCIÓN: toque en cualquier parte selecciona
+                    li.onclick = e => {
+                        if (e.target.classList.contains('med-delete') || 
+                            e.target.classList.contains('med-action-btn') || 
+                            e.target.classList.contains('time-chip') ||
+                            e.target.classList.contains('chip-edit')) return;
+                        
+                        // Si ya está seleccionado, deseleccionar
+                        if (seleccionadoId === id) {
+                            deseleccionarTodos();
+                            showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
+                        } else {
+                            // Seleccionar este item
+                            deseleccionarTodos();
+                            li.classList.add('selected');
+                            seleccionadoId = id;
+                            showToast('✅ Seleccionado', `${upper(m.nombre)} listo para agregar horario`, 'success');
+                        }
+                    };
+                } else {
+                    // MODO NORMAL: toque abre detalles
+                    li.onclick = e => {
+                        if (e.target.classList.contains('med-delete') || 
+                            e.target.classList.contains('med-action-btn') || 
+                            e.target.classList.contains('time-chip') ||
+                            e.target.classList.contains('chip-edit')) return;
+                        showDetail(id);
+                    };
+                }
+
+                // Botón de editar
+                li.querySelector('.med-action-btn[title="Editar información"]').onclick = (e) => {
+                    e.stopPropagation();
+                    editarMedicamento(id);
+                };
+
+                // Botón de agregar horario específico
+                li.querySelector('.med-action-btn[title="Agregar horario"]').onclick = (e) => {
+                    e.stopPropagation();
+                    agregarHorarioEspecifico(id);
+                };
+
+                // Delete
+                li.querySelector('.med-delete').onclick = e => {
+                    e.stopPropagation();
+                    if (confirm('¿Eliminar este medicamento?')) {
+                        if (seleccionadoId === id) seleccionadoId = null;
+                        delete meds[id];
+                        save();
+                        render();
+                        showToast('🗑️ Medicamento eliminado', 'El medicamento ha sido eliminado', 'warning');
+                    }
+                };
+
+                // Editar chips de hora individuales
+                li.querySelectorAll('.chip-edit').forEach(chip => {
+                    chip.onclick = e => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const chipElement = e.target.closest('.time-chip');
+                        const oldH = chipElement.dataset.h;
+                        const idx = m.horas.findIndex(x => x.h === oldH);
+                        if (idx === -1) return;
+
+                        const newH = prompt('Nueva hora (HH:MM):', oldH);
+                        if (!newH || newH === oldH) return;
+                        
+                        if (m.horas.some(x => x.h === newH)) {
+                            showToast('⚠️ Hora duplicada', 'Esa hora ya existe para este medicamento', 'warning');
+                            return;
+                        }
+                        
+                        const newC = prompt('Nueva cantidad:', m.horas[idx].cant);
+                        if (!newC || isNaN(parseFloat(newC))) return;
+                        
+                        m.horas[idx] = { 
+                            h: newH, 
+                            cant: parseFloat(newC) 
+                        };
+                        m.horas.sort((a, b) => a.h.localeCompare(b.h));
+                        save();
+                        render();
+                        showToast('✅ Horario actualizado', `${oldH} → ${newH} (${newC}u)`, 'success');
+                    };
+                });
+
+                lista.appendChild(li);
+            });
+        }
+
+        // ============================================
+        // AGREGAR NUEVO MEDICAMENTO
+        // ============================================
+        $('addBtn').onclick = () => {
+            const n = upper(nombre.value);
+            const p = upper(paciente.value);
+            
+            if (!n || !cant.value || !hora.value || !p) {
+                showToast('❌ Campos incompletos', 'Completa todos los campos requeridos', 'warning');
+                return;
+            }
+
+            const id = Date.now().toString();
+            meds[id] = {
+                nombre: n,
+                paciente: p,
+                foto: foto,
+                horas: [{ h: hora.value, cant: parseFloat(cant.value) }]
             };
 
-            // Abrir modal
-            medicationCards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    if (e.target.closest('.action-btn') || e.target.closest('.add-btn')) {
-                        return;
-                    }
+            save();
+            
+            // Resetear formulario
+            nombre.value = '';
+            paciente.value = '';
+            cant.value = '1';
+            hora.value = '';
+            foto = '';
+            photoPreview.classList.remove('active');
+            photoZone.style.display = 'block';
+            
+            // Mostrar confirmación y cambiar a pestaña de medicamentos
+            showToast('✅ Medicamento agregado', `${upper(n)} agregado para ${upper(p)}`, 'success');
+            setTimeout(() => {
+                cambiarPestaña('medicamentos');
+                render();
+            }, 800);
+        };
+
+        // ============================================
+        // AGREGAR HORA A MEDICAMENTO EXISTENTE
+        // ============================================
+        window.agregarHoraDesdeFormulario = function() {
+            if (!modoEdicionActivo) {
+                showToast('⚠️ Activa el modo agregar hora', 'Presiona "Agregar Hora" primero', 'warning');
+                return;
+            }
+            
+            if (!hora.value) {
+                showToast('⏰ Hora requerida', 'Selecciona una hora primero', 'warning');
+                return;
+            }
+            
+            if (!seleccionadoId) {
+                showToast('💊 Selecciona un medicamento', 'Toca un medicamento de la lista', 'warning');
+                return;
+            }
+
+            const m = meds[seleccionadoId];
+            if (m.horas.some(x => x.h === hora.value)) {
+                showToast('⚠️ Hora duplicada', 'Esta hora ya existe para este medicamento', 'warning');
+                return;
+            }
+
+            m.horas.push({ h: hora.value, cant: parseFloat(cant.value) });
+            m.horas.sort((a, b) => a.h.localeCompare(b.h));
+            
+            save();
+            render();
+            
+            // Mostrar confirmación y salir del modo
+            showToast('✅ Hora agregada', `${hora.value} agregada a ${upper(m.nombre)}`, 'success');
+            
+            // Resetear campos y salir del modo
+            hora.value = '';
+            cant.value = '1';
+            toggleModoEdicion();
+        };
+
+        // ============================================
+        // MODAL DE DETALLE
+        // ============================================
+        function showDetail(id) {
+            const m = meds[id];
+            if (!m) return;
+
+            detalleId = id;
+            $('detailPatient').textContent = upper(m.paciente);
+            $('detailName').textContent = upper(m.nombre);
+            $('detailImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+
+            $('detailTimes').innerHTML = m.horas.map(h => `
+                <div class="detail-time-item">
+                    <span class="detail-time-hour">${h.h}</span>
+                    <span class="detail-time-qty">${h.cant} ${h.cant === 1 ? 'unidad' : 'unidades'}</span>
+                </div>
+            `).join('');
+
+            detailModal.classList.add('open');
+        }
+
+        $('detailClose').onclick = () => detailModal.classList.remove('open');
+
+        // ============================================
+        // MODAL DE CALENDARIO/HISTORIAL
+        // ============================================
+        $('calBtn').onclick = () => {
+            const tomas = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+            const body = $('calBody');
+
+            if (!tomas.length) {
+                body.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">📅</div>
+                        <p class="empty-text">Sin registros aún</p>
+                    </div>
+                `;
+            } else {
+                tomas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                body.innerHTML = tomas.map(t => {
+                    const fecha = new Date(t.fecha).toLocaleDateString('es-ES', {
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short', 
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+                    return `
+                        <div class="cal-item">
+                            <div class="cal-item-header">
+                                <span class="cal-item-name">${upper(t.pastilla)}</span>
+                                <span class="cal-item-date">${fecha}</span>
+                            </div>
+                            <div class="cal-item-detail">${upper(t.paciente)} · ${t.cantidad}u a las ${t.hora}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            calModal.classList.add('open');
+        };
+
+        $('calClose').onclick = () => calModal.classList.remove('open');
+
+        // ============================================
+        // SISTEMA DE ALARMAS CORREGIDO
+        // ============================================
+        async function activateAlarm() {
+            // 1. Primero la voz
+            if (vozOn.checked && 'speechSynthesis' in window) {
+                let msg = `Son las ${horaActual}. `;
+                const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+
+                if (pacientes.length === 1) {
+                    const paciente = pacientes[0];
+                    const medicamentos = medsActuales.filter(m => m.paciente === paciente);
                     
-                    const medName = this.querySelector('.med-name').textContent;
-                    const data = medicationData[medName];
+                    msg += `Hola ${paciente}. Te toca tomar `;
                     
-                    if (data) {
-                        document.getElementById('modalPillImage').src = data.image;
-                        document.getElementById('modalMedName').textContent = medName;
-                        document.getElementById('modalMedType').textContent = data.type;
-                        document.getElementById('modalNextDose').textContent = data.nextDose;
-                        document.getElementById('modalDosage').textContent = data.dosage;
-                        document.getElementById('modalLastTaken').textContent = data.lastTaken;
-                        
-                        modal.style.display = 'flex';
-                    }
-                });
-            });
-
-            // Cerrar modal
-            closeModalBtn.addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-            // Funcionalidad botones
-            addButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    alert('Añadir nuevo horario');
-                });
-            });
-
-            checkButtons.forEach(button => {
-                button.closest('.action-btn').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const card = this.closest('.med-card');
-                    card.classList.toggle('pill-taken');
-                    
-                    if (card.classList.contains('pill-taken')) {
-                        this.innerHTML = '<i class="fas fa-undo"></i>';
-                        this.title = 'Marcar como pendiente';
+                    if (medicamentos.length === 1) {
+                        msg += `${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
                     } else {
-                        this.innerHTML = '<i class="fas fa-check"></i>';
-                        this.title = 'Marcar como tomado';
+                        msg += medicamentos.map((med, index) => {
+                            const connector = index === medicamentos.length - 1 ? ' y ' : 
+                                             index === 0 ? '' : ', ';
+                            return `${connector}${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                        }).join('') + '.';
+                    }
+                } else {
+                    // Múltiples pacientes
+                    msg += 'Atención, es hora de medicación para ';
+                    msg += pacientes.map((paciente, index) => {
+                        const medicamentos = medsActuales.filter(m => m.paciente === paciente);
+                        const connector = index === pacientes.length - 1 ? ' y ' : 
+                                         index === 0 ? '' : ', ';
+                        
+                        if (medicamentos.length === 1) {
+                            return `${connector}${paciente}: ${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                        } else {
+                            const medicamentosStr = medicamentos.map(med => 
+                                `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`
+                            ).join(' y ');
+                            return `${connector}${paciente}: ${medicamentosStr}`;
+                        }
+                    }).join('') + '.';
+                }
+
+                // ESPERAR A QUE TERMINE LA VOZ ANTES DE INICIAR SONIDO
+                return new Promise((resolve) => {
+                    const u = new SpeechSynthesisUtterance(msg);
+                    u.lang = 'es-ES';
+                    u.rate = 0.9;
+                    u.volume = parseFloat(volSlider.value);
+                    
+                    u.onend = () => {
+                        console.log('Voz terminada, iniciando sonido...');
+                        // Después de la voz, iniciar sonido si está activado
+                        if (sonidoOn.checked) {
+                            playAlarm();
+                        }
+                        resolve();
+                    };
+                    
+                    u.onerror = (e) => {
+                        console.error('Error en voz:', e);
+                        // Si hay error con la voz, iniciar sonido de inmediato
+                        if (sonidoOn.checked) {
+                            playAlarm();
+                        }
+                        resolve();
+                    };
+                    
+                    speechSynthesis.speak(u);
+                });
+            } else if (sonidoOn.checked) {
+                // Si no hay voz pero sí sonido, iniciar sonido inmediatamente
+                playAlarm();
+            }
+        }
+
+        // Modificar la función showAlert para usar async/await correctamente
+        async function showAlert() {
+            if (!medsActuales.length || ultimaAlarmaSonando) return;
+
+            // Configurar contenido del modal
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            
+            $('alertTitle').textContent = pacientes.length === 1 
+                ? `Hola ${upper(pacientes[0])}` 
+                : `Atención: ${pacientes.length} pacientes`;
+            
+            $('alertTime').innerHTML = `<span>🕐</span><span>${horaActual}</span>`;
+
+            const totalMedicamentos = medsActuales.length;
+            const totalUnidades = medsActuales.reduce((s, m) => s + m.cantidad, 0);
+            
+            $('alertTotal').textContent = `Total: ${totalMedicamentos} medicamento${totalMedicamentos > 1 ? 's' : ''} (${totalUnidades} unidades)`;
+
+            // Mostrar medicamentos ordenados por paciente
+            let alertHTML = '';
+            
+            pacientes.forEach(paciente => {
+                const medicamentos = medsActuales.filter(m => m.paciente === paciente);
+                
+                alertHTML += `
+                    <div class="patient-group">
+                        <div class="patient-group-header">
+                            ${upper(paciente)}
+                        </div>
+                        ${medicamentos.map(med => `
+                            <div class="modal-med">
+                                <img class="modal-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" 
+                                     alt="${med.nombre}"
+                                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1237/1237460.png'">
+                                <div class="modal-med-info">
+                                    <div class="modal-med-name">${upper(med.nombre)}</div>
+                                    <div class="modal-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'unidad' : 'unidades'}</div>
+                                    <div class="modal-med-patient">Hora: ${horaActual}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+
+            $('alertBody').innerHTML = alertHTML;
+            alertModal.classList.add('open');
+            ultimaAlarmaSonando = true;
+            
+            // Iniciar alarma con async/await
+            await activateAlarm();
+        }
+
+        // Asegurarse de que el sonido funcione correctamente
+        function playAlarm() {
+            try {
+                // Cerrar contexto anterior si existe
+                if (audioCtx) {
+                    audioCtx.close().catch(() => {});
+                }
+                
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                alarmaOn = true;
+
+                function beep() {
+                    if (!alarmaOn || !audioCtx) return;
+                    
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.5);
+                    } catch (e) {
+                        console.error('Error en beep:', e);
+                    }
+                }
+
+                // Iniciar inmediatamente y luego cada 1.5 segundos
+                beep();
+                intervalo = setInterval(beep, 1500);
+                
+                console.log('Alarma de sonido iniciada');
+            } catch (e) {
+                console.error('Error al iniciar audio:', e);
+                showToast('❌ Error de audio', 'No se pudo iniciar la alarma de sonido', 'warning');
+            }
+        }
+
+        function stopAlarm() {
+            console.log('Deteniendo alarma...');
+            alarmaOn = false;
+            
+            if (intervalo) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+            
+            if (audioCtx) {
+                try {
+                    audioCtx.close().catch(() => {});
+                } catch (e) {
+                    console.error('Error cerrando audio context:', e);
+                }
+                audioCtx = null;
+            }
+            
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+            }
+            
+            ultimaAlarmaSonando = false;
+        }
+
+        $('alertClose').onclick = () => {
+            alertModal.classList.remove('open');
+            stopAlarm();
+        };
+
+        $('alertTake').onclick = () => {
+            medsActuales.forEach(med => {
+                const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+                hist.push({
+                    fecha: new Date().toISOString(),
+                    paciente: med.paciente,
+                    pastilla: med.nombre,
+                    cantidad: med.cantidad,
+                    hora: horaActual
+                });
+                localStorage.setItem('tomasMC', JSON.stringify(hist));
+            });
+
+            alertModal.classList.remove('open');
+            stopAlarm();
+            
+            // Feedback visual
+            showToast('✓ Registrado en historial', 'La toma ha sido registrada correctamente', 'success');
+        };
+
+        // ============================================
+        // BOTONES DE PRUEBA
+        // ============================================
+        $('testBtn').onclick = () => {
+            const keys = Object.keys(meds);
+            if (!keys.length) {
+                showToast('💊 Agrega un medicamento primero', 'No hay medicamentos para probar', 'warning');
+                return;
+            }
+            
+            // Crear escenario de prueba con múltiples medicamentos
+            const testMedicamentos = [];
+            
+            // Tomar los primeros 3 medicamentos o menos si hay menos
+            const cantidadPrueba = Math.min(keys.length, 3);
+            
+            for (let i = 0; i < cantidadPrueba; i++) {
+                const m = meds[keys[i]];
+                if (m.horas.length) {
+                    testMedicamentos.push({
+                        paciente: m.paciente,
+                        nombre: m.nombre,
+                        cantidad: m.horas[0].cant,
+                        foto: m.foto
+                    });
+                }
+            }
+            
+            if (testMedicamentos.length === 0) return;
+            
+            medsActuales = testMedicamentos;
+            horaActual = '08:00';
+            showAlert();
+        };
+
+        $('testSound').onclick = () => {
+            if (!sonidoOn.checked) {
+                showToast('🔕 Sonido desactivado', 'Activa el sonido primero en configuración', 'warning');
+                return;
+            }
+            
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [0, 250, 500].forEach(delay => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = 880;
+                        gain.gain.setValueAtTime(parseFloat(volSlider.value), ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                        
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.3);
+                    }, delay);
+                });
+                showToast('🔔 Sonido de prueba', 'Reproduciendo sonido de alarma', 'info');
+            } catch (e) { 
+                console.error('Error de sonido:', e);
+                showToast('❌ Error de audio', 'No se pudo reproducir el sonido', 'warning');
+            }
+        };
+
+        $('testVoice').onclick = () => {
+            if (!vozOn.checked) {
+                showToast('🗣️ Voz desactivada', 'Activa la voz primero en configuración', 'warning');
+                return;
+            }
+            
+            // Prueba mejorada con escenario de múltiples medicamentos
+            const u = new SpeechSynthesisUtterance(
+                'Prueba de voz. Sistema MediClock Neo activado. ' +
+                'Hola María. Te toca tomar Paracetamol, 1 pastilla, Ibuprofeno, 2 pastillas y Omeprazol, 1 pastilla.'
+            );
+            u.lang = 'es-ES';
+            u.volume = parseFloat(volSlider.value);
+            speechSynthesis.speak(u);
+            showToast('🗣️ Voz de prueba', 'Reproduciendo mensaje de voz', 'info');
+        };
+
+        // ============================================
+        // VERIFICACIÓN AUTOMÁTICA DE ALARMAS
+        // ============================================
+        function check() {
+            // Si ya hay una alarma sonando, no verificar nuevas
+            if (ultimaAlarmaSonando || alertModal.classList.contains('open')) {
+                return;
+            }
+            
+            const now = new Date();
+            const today = now.toISOString().slice(0, 10);
+            const hhmm = now.getHours().toString().padStart(2, '0') + ':' + 
+                         now.getMinutes().toString().padStart(2, '0');
+
+            medsActuales = [];
+            let ids = [];
+
+            // Agrupar medicamentos por paciente para la misma hora
+            const medicamentosPorPaciente = {};
+            
+            Object.keys(meds).forEach(id => {
+                const m = meds[id];
+                m.horas.forEach(h => {
+                    if (h.h === hhmm) {
+                        if (!medicamentosPorPaciente[m.paciente]) {
+                            medicamentosPorPaciente[m.paciente] = [];
+                        }
+                        
+                        medicamentosPorPaciente[m.paciente].push({
+                            id: id,
+                            nombre: m.nombre,
+                            paciente: m.paciente,
+                            cantidad: h.cant,
+                            foto: m.foto
+                        });
                     }
                 });
             });
 
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const card = this.closest('.med-card');
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateX(-100px)';
-                    
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                    }, 300);
+            // Aplanar la estructura para mostrar en la alerta
+            Object.values(medicamentosPorPaciente).forEach(medsPaciente => {
+                medsPaciente.forEach(med => {
+                    medsActuales.push({
+                        paciente: med.paciente,
+                        nombre: med.nombre,
+                        cantidad: med.cantidad,
+                        foto: med.foto
+                    });
+                    ids.push(med.id);
                 });
             });
 
-            editButtons.forEach(button => {
-                button.closest('.action-btn').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    alert('Editar medicamento');
-                });
-            });
+            if (medsActuales.length) {
+                ids.sort();
+                const key = `${today}-${hhmm}-${ids.join('-')}`;
+                const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+
+                if (!fired[key]) {
+                    horaActual = hhmm;
+                    showAlert();
+                    fired[key] = true;
+                    localStorage.setItem('alarmsToday', JSON.stringify(fired));
+                }
+            }
+        }
+
+        // ============================================
+        // CIERRE DE MODALES AL HACER CLIC EN EL FONDO
+        // ============================================
+        [alertModal, detailModal, calModal].forEach(modal => {
+            modal.onclick = e => {
+                if (e.target === modal) {
+                    modal.classList.remove('open');
+                    if (modal === alertModal) stopAlarm();
+                }
+            };
         });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        window.onload = () => {
+            loadConfig();
+            render();
+
+            // Limpiar alarmas antiguas
+            const today = new Date().toISOString().slice(0, 10);
+            const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+            const filtered = {};
+            
+            Object.keys(fired).forEach(k => { 
+                if (k.startsWith(today)) filtered[k] = true; 
+            });
+            
+            localStorage.setItem('alarmsToday', JSON.stringify(filtered));
+
+            // Iniciar verificación periódica
+            setInterval(check, 60000);
+            setTimeout(check, 1000);
+            
+            showToast('🚀 MediClock Neo iniciado', 'Sistema de medicación inteligente activo', 'info', 2000);
+        };
+
+        // Detener alarmas al cerrar la página
+        window.onbeforeunload = stopAlarm;
     </script>
 </body>
 </html>
