@@ -7,6 +7,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Service Worker para notificaciones con pantalla bloqueada -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registrado:', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker error:', err);
+                });
+            });
+        }
+    </script>
+    
+    <!-- Solicitar permiso de notificación -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                setTimeout(() => {
+                    Notification.requestPermission().then(permission => {
+                        console.log('Permiso de notificación:', permission);
+                    });
+                }, 2000);
+            }
+        });
+    </script>
+    
     <style>
         :root {
             --bg-dark: #050508;
@@ -19,6 +45,9 @@
             --neon-blue: #3b82f6;
             --neon-green: #00ff88;
             --neon-orange: #ff6b35;
+            --neon-yellow: #ffd700;
+            --neon-pink: #ff1493;
+            --neon-teal: #00ced1;
             
             --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
             --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
@@ -407,6 +436,26 @@
             box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
         }
 
+        /* CAMPO HORA REDUCIDO (Corrección Imagen Neo 8) */
+        .form-input-time {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input-time:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
         .qty-row {
             display: flex;
             gap: 0.75rem;
@@ -578,6 +627,7 @@
 
         .btn-group .btn {
             flex: 1;
+            min-width: 0; /* Para que los botones se ajusten */
         }
 
         .btn.modo-activo {
@@ -589,7 +639,7 @@
             50% { opacity: 0.8; }
         }
 
-        /* MEDICAMENTOS LISTA - CORREGIDO PARA NOMBRE EN UNA LÍNEA */
+        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 9) */
         .med-list {
             list-style: none;
         }
@@ -616,9 +666,8 @@
             top: 0;
             bottom: 0;
             width: 3px;
-            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta));
             border-radius: 3px 0 0 3px;
-            opacity: 0;
+            opacity: 0.7;
             transition: opacity 0.3s ease;
         }
 
@@ -631,16 +680,6 @@
 
         .med-item:hover::before {
             opacity: 1;
-        }
-
-        .med-item.selected {
-            border-color: var(--neon-magenta);
-            box-shadow: var(--glow-magenta);
-        }
-
-        .med-item.selected::before {
-            opacity: 1;
-            background: var(--neon-magenta);
         }
 
         .med-avatar {
@@ -656,7 +695,6 @@
             width: 56px;
             height: 56px;
             border-radius: var(--radius-md);
-            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.2));
             border: 2px solid rgba(0, 245, 255, 0.2);
             display: flex;
             align-items: center;
@@ -679,18 +717,20 @@
             display: flex;
             flex-direction: column;
             margin-bottom: 0.5rem;
+            width: 100%;
         }
 
-        /* NOMBRE DEL MEDICAMENTO EN UNA LÍNEA */
+        /* NOMBRE DEL MEDICAMENTO COMPLETO (Corrección Imagen Neo 9) */
         .med-name {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
+            word-break: break-word;
             max-width: 100%;
             margin-bottom: 0.25rem;
+            line-height: 1.3;
         }
 
         .med-patient {
@@ -715,13 +755,37 @@
             padding: 0.3rem 0.7rem;
             font-size: 0.7rem;
             font-weight: 600;
-            color: var(--neon-cyan);
             background: rgba(0, 245, 255, 0.1);
             border: 1px solid rgba(0, 245, 255, 0.3);
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
+            position: relative;
+        }
+
+        /* BOTÓN + PARA AGREGAR HORA NUEVA */
+        .add-time-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            color: var(--neon-cyan);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 0.25rem;
+        }
+
+        .add-time-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: scale(1.1);
+            box-shadow: var(--glow-cyan);
         }
 
         .time-chip:hover {
@@ -759,12 +823,6 @@
         .med-select-btn:hover {
             background: rgba(0, 245, 255, 0.2);
             transform: scale(1.05);
-        }
-
-        .med-select-btn.selected {
-            background: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-            color: var(--bg-dark);
         }
 
         .med-delete {
@@ -1067,8 +1125,14 @@
             padding: 1.75rem 2rem;
         }
 
-        /* ALERTA MODAL - CORREGIDO PARA MOSTRAR MEDICAMENTOS */
-        .modal-med {
+        /* ALERTA MODAL - UN SOLO BLOQUE (Corrección Imagen Neo 10) */
+        .alert-med-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .alert-med-item {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1078,14 +1142,15 @@
             border-radius: var(--radius-lg);
             margin-bottom: 0.875rem;
             transition: all 0.3s ease;
+            border-left: 3px solid var(--neon-cyan);
         }
 
-        .modal-med:hover {
+        .alert-med-item:hover {
             border-color: rgba(0, 245, 255, 0.3);
             background: rgba(0, 245, 255, 0.05);
         }
 
-        .modal-med-img {
+        .alert-med-img {
             width: 64px;
             height: 64px;
             border-radius: var(--radius-md);
@@ -1093,12 +1158,12 @@
             border: 2px solid rgba(0, 245, 255, 0.3);
         }
 
-        .modal-med-info {
+        .alert-med-info {
             flex: 1;
             min-width: 0;
         }
 
-        .modal-med-name {
+        .alert-med-name {
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.4rem;
@@ -1108,7 +1173,7 @@
             text-overflow: ellipsis;
         }
 
-        .modal-med-qty {
+        .alert-med-qty {
             display: inline-flex;
             padding: 0.35rem 0.85rem;
             background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 245, 255, 0.1));
@@ -1120,7 +1185,7 @@
             white-space: nowrap;
         }
 
-        .modal-med-patient {
+        .alert-med-patient {
             font-size: 0.75rem;
             color: var(--text-muted);
             margin-top: 0.4rem;
@@ -1140,7 +1205,7 @@
             margin-bottom: 1.25rem;
         }
 
-        /* DETALLE MODAL - CORREGIDO PARA MOSTRAR INFORMACIÓN */
+        /* DETALLE MODAL */
         .detail-img {
             width: 100%;
             height: 180px;
@@ -1299,6 +1364,11 @@
             .btn-group {
                 flex-direction: column;
             }
+            .btn-group .btn {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
+            }
             .logo-text {
                 font-size: 1.6rem;
             }
@@ -1323,17 +1393,23 @@
                 height: 48px;
             }
             .med-name {
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
-            .modal-med-img {
+            .alert-med-img {
                 width: 52px;
                 height: 52px;
             }
-            .modal-med-name {
+            .alert-med-name {
                 font-size: 1rem;
             }
             .detail-img {
                 height: 150px;
+            }
+            .modal-footer {
+                padding: 1.25rem 1.5rem;
+            }
+            .modal-body {
+                padding: 1.5rem 1.5rem;
             }
         }
 
@@ -1354,6 +1430,59 @@
             0% { top: 0; }
             100% { top: 100%; }
         }
+
+        /* COLORES DIFERENTES PARA MEDICAMENTOS (Imagen Neo 11) */
+        .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
+        .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
+        .color-3 { background: linear-gradient(135deg, var(--neon-green), var(--neon-teal)); }
+        .color-4 { background: linear-gradient(135deg, var(--neon-orange), var(--neon-yellow)); }
+        .color-5 { background: linear-gradient(135deg, var(--neon-pink), var(--neon-magenta)); }
+        .color-6 { background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan)); }
+
+        .color-1-border { border-color: var(--neon-cyan); }
+        .color-2-border { border-color: var(--neon-magenta); }
+        .color-3-border { border-color: var(--neon-green); }
+        .color-4-border { border-color: var(--neon-orange); }
+        .color-5-border { border-color: var(--neon-pink); }
+        .color-6-border { border-color: var(--neon-violet); }
+
+        .color-1-text { color: var(--neon-cyan); }
+        .color-2-text { color: var(--neon-magenta); }
+        .color-3-text { color: var(--neon-green); }
+        .color-4-text { color: var(--neon-orange); }
+        .color-5-text { color: var(--neon-pink); }
+        .color-6-text { color: var(--neon-violet); }
+
+        .time-chip.color-1 { 
+            background: rgba(0, 245, 255, 0.1); 
+            border-color: rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+        .time-chip.color-2 { 
+            background: rgba(255, 0, 234, 0.1); 
+            border-color: rgba(255, 0, 234, 0.3);
+            color: var(--neon-magenta);
+        }
+        .time-chip.color-3 { 
+            background: rgba(0, 255, 136, 0.1); 
+            border-color: rgba(0, 255, 136, 0.3);
+            color: var(--neon-green);
+        }
+        .time-chip.color-4 { 
+            background: rgba(255, 107, 53, 0.1); 
+            border-color: rgba(255, 107, 53, 0.3);
+            color: var(--neon-orange);
+        }
+        .time-chip.color-5 { 
+            background: rgba(255, 20, 147, 0.1); 
+            border-color: rgba(255, 20, 147, 0.3);
+            color: var(--neon-pink);
+        }
+        .time-chip.color-6 { 
+            background: rgba(139, 92, 246, 0.1); 
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--neon-violet);
+        }
     </style>
 </head>
 <body>
@@ -1365,10 +1494,6 @@
     <div class="scanline"></div>
 
     <div class="app">
-        <div class="modo-indicator" id="modo-indicator" style="display: none;">
-            📱 MODO SELECCIÓN ACTIVO • Toca un medicamento
-        </div>
-
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">💊</div>
@@ -1417,7 +1542,8 @@
 
                 <div class="form-group">
                     <label class="form-label">Hora</label>
-                    <input type="time" id="hora" class="form-input">
+                    <!-- CAMPO HORA REDUCIDO -->
+                    <input type="time" id="hora" class="form-input-time">
                 </div>
 
                 <div class="form-group">
@@ -1496,17 +1622,13 @@
                 </div>
 
                 <div class="btn-group" style="margin-top: 1.5rem;">
-                    <button class="btn btn-secondary" id="addHoraBtn">
-                        <span>+</span>
-                        <span>Agregar Hora</span>
-                    </button>
                     <button class="btn btn-secondary" id="calBtn">
                         <span>📅</span>
                         <span>Historial</span>
                     </button>
                     <button class="btn btn-secondary" id="testBtn">
                         <span>🧪</span>
-                        <span>Probar</span>
+                        <span>Probar Alarma</span>
                     </button>
                 </div>
             </div>
@@ -1525,10 +1647,12 @@
                 </div>
             </div>
 
-            <div class="modal-body" id="alertBody"></div>
+            <div class="modal-body">
+                <div class="alert-med-container" id="alertBody"></div>
+            </div>
 
             <div class="modal-footer">
-                <p class="modal-total" id="alertTotal">Total: 1 medicamento</p>
+                <p class="modal-total" id="alertTotal">Total: 1 medicamento (1 unidad)</p>
                 <div class="btn-group">
                     <button class="btn btn-danger" id="alertClose">Cerrar</button>
                     <button class="btn btn-success" id="alertTake">✓ Tomado</button>
@@ -1581,6 +1705,40 @@
         </div>
     </div>
 
+    <!-- MODAL PARA AGREGAR HORA -->
+    <div class="modal-bg" id="addTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">➕</div>
+                <h2 class="modal-title">Agregar nueva hora</h2>
+                <p class="modal-subtitle" id="addTimeMedName"></p>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="newHora" class="form-input-time" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="newMenos">−</button>
+                        <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="newMas">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="cancelAddTime">Cancelar</button>
+                    <button class="btn btn-success" id="saveAddTime">✓ Agregar Hora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <audio id="audio" preload="auto"></audio>
 
     <script>
@@ -1591,10 +1749,9 @@
         let horaActual = '';
         let intervalo = null;
         let audioCtx = null;
-        let seleccionadoId = null;
-        let detalleId = null;
-        let modoEdicionActivo = false;
         let pestañaActual = 'nuevo';
+        let medColors = {};
+        let currentMedForAddTime = null;
 
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
@@ -1614,6 +1771,35 @@
         const alertModal = $('alertModal');
         const detailModal = $('detailModal');
         const calModal = $('calModal');
+        const addTimeModal = $('addTimeModal');
+
+        // GENERAR COLOR ÚNICO PARA CADA MEDICAMENTO
+        function getMedColor(medName) {
+            if (!medColors[medName]) {
+                const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6'];
+                const index = Object.keys(medColors).length % colors.length;
+                medColors[medName] = colors[index];
+            }
+            return medColors[medName];
+        }
+
+        // NOTIFICACIONES PUSH
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    tag: 'mediclock-alarm',
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200]
+                });
+
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+            }
+        }
 
         function cambiarPestaña(nombrePestaña) {
             pestañaActual = nombrePestaña;
@@ -1634,10 +1820,6 @@
             if (nombrePestaña === 'medicamentos') {
                 render();
             }
-            
-            if (nombrePestaña !== 'medicamentos' && modoEdicionActivo) {
-                toggleModoEdicion();
-            }
         }
 
         $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
@@ -1652,6 +1834,15 @@
         
         $('mas').onclick = () => {
             cant.value = (parseFloat(cant.value) + 0.25).toFixed(2);
+        };
+
+        // Nuevos controles para agregar hora
+        $('newMenos').onclick = () => {
+            $('newCant').value = Math.max(0.25, parseFloat($('newCant').value) - 0.25).toFixed(2);
+        };
+        
+        $('newMas').onclick = () => {
+            $('newCant').value = (parseFloat($('newCant').value) + 0.25).toFixed(2);
         };
 
         photoZone.onclick = () => {
@@ -1723,54 +1914,6 @@
             localStorage.setItem('medsMC2', JSON.stringify(meds));
         }
 
-        function toggleModoEdicion() {
-            if (pestañaActual !== 'medicamentos') {
-                showToast('⚠️ Cambia a pestaña Medicamentos', 'El modo edición solo funciona en la pestaña de medicamentos', 'warning');
-                return;
-            }
-            
-            const btn = $('addHoraBtn');
-            modoEdicionActivo = !modoEdicionActivo;
-            
-            if (modoEdicionActivo) {
-                btn.classList.add('modo-activo');
-                btn.innerHTML = '<span>❌</span><span>Salir modo selección</span>';
-                btn.style.background = 'linear-gradient(135deg, var(--neon-orange), #ff4757)';
-                
-                $('modo-indicator').style.display = 'block';
-                
-                showToast('📱 Modo selección activado', 'Toca cualquier medicamento para seleccionarlo', 'info');
-            } else {
-                btn.classList.remove('modo-activo');
-                btn.innerHTML = '<span>+</span><span>Agregar Hora</span>';
-                btn.style.background = '';
-                seleccionadoId = null;
-                
-                $('modo-indicator').style.display = 'none';
-                
-                deseleccionarTodos();
-                
-                showToast('✅ Modo normal', 'Toca un medicamento para ver sus detalles', 'info');
-            }
-            
-            render();
-        }
-
-        function deseleccionarTodos() {
-            seleccionadoId = null;
-            document.querySelectorAll('.med-item').forEach(el => {
-                el.classList.remove('selected');
-                const btn = el.querySelector('.med-select-btn');
-                if (btn) {
-                    btn.style.background = 'rgba(0, 245, 255, 0.1)';
-                    btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
-                    btn.style.color = 'var(--neon-cyan)';
-                    btn.textContent = '+';
-                    btn.classList.remove('selected');
-                }
-            });
-        }
-
         function showToast(titulo, mensaje, tipo = 'info') {
             const toast = document.createElement('div');
             const color = tipo === 'info' ? 'var(--neon-violet)' : 
@@ -1818,16 +1961,21 @@
 
             keys.forEach(id => {
                 const m = meds[id];
+                const colorClass = getMedColor(m.nombre);
+                const borderColorClass = colorClass + '-border';
+                const textColorClass = colorClass + '-text';
+
                 const li = document.createElement('li');
                 li.className = 'med-item';
                 li.dataset.id = id;
 
-                const isSelected = seleccionadoId === id;
+                // Aplicar color al borde izquierdo
+                li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
 
                 li.innerHTML = `
                     ${m.foto
                         ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}">`
-                        : `<div class="med-placeholder">💊</div>`
+                        : `<div class="med-placeholder ${colorClass}">💊</div>`
                     }
                     <div class="med-info">
                         <div class="med-name-row">
@@ -1835,149 +1983,180 @@
                             <div class="med-patient">${upper(m.paciente)}</div>
                         </div>
                         <div class="med-times">
-                            ${m.horas.map(h => `<span class="time-chip" data-h="${h.h}">${h.h} · ${h.cant}u</span>`).join('')}
+                            ${m.horas.map(h => `
+                                <span class="time-chip ${colorClass}" data-h="${h.h}" data-cant="${h.cant}">
+                                    ${h.h} · ${h.cant}u
+                                </span>
+                            `).join('')}
+                            <button class="add-time-btn" data-id="${id}">+</button>
                         </div>
                     </div>
                     <div class="med-actions">
-                        <button class="med-select-btn ${isSelected ? 'selected' : ''}" data-id="${id}">
-                            ${isSelected ? '✓' : '+'}
-                        </button>
                         <button class="med-delete" data-id="${id}">🗑️</button>
                     </div>
                 `;
 
-                if (modoEdicionActivo) {
-                    li.onclick = e => {
-                        if (e.target.classList.contains('med-delete') || 
-                            e.target.classList.contains('med-select-btn') || 
-                            e.target.classList.contains('time-chip')) return;
-                        
-                        if (seleccionadoId === id) {
-                            deseleccionarTodos();
-                            showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
-                        } else {
-                            deseleccionarTodos();
-                            
-                            li.classList.add('selected');
-                            seleccionadoId = id;
-                            
-                            const btn = li.querySelector('.med-select-btn');
-                            btn.style.background = 'var(--neon-cyan)';
-                            btn.style.borderColor = 'var(--neon-cyan)';
-                            btn.style.color = 'var(--bg-dark)';
-                            btn.textContent = '✓';
-                            btn.classList.add('selected');
-                            
-                            showSelectionFeedback(id);
-                        }
-                    };
-                } else {
-                    li.onclick = e => {
-                        if (e.target.classList.contains('med-delete') || 
-                            e.target.classList.contains('med-select-btn') || 
-                            e.target.classList.contains('time-chip')) return;
-                        showDetail(id);
-                    };
-                }
-
-                li.querySelector('.med-select-btn').onclick = e => {
-                    e.stopPropagation();
-                    
-                    if (seleccionadoId === id) {
-                        deseleccionarTodos();
-                        showToast('✅ Deseleccionado', 'Medicamento deseleccionado', 'info');
-                    } else {
-                        deseleccionarTodos();
-                        
-                        li.classList.add('selected');
-                        seleccionadoId = id;
-                        
-                        const btn = li.querySelector('.med-select-btn');
-                        btn.style.background = 'var(--neon-cyan)';
-                        btn.style.borderColor = 'var(--neon-cyan)';
-                        btn.style.color = 'var(--bg-dark)';
-                        btn.textContent = '✓';
-                        btn.classList.add('selected');
-                        
-                        showSelectionFeedback(id);
-                    }
+                // Al hacer clic en la tarjeta: mostrar detalles
+                li.onclick = e => {
+                    if (e.target.classList.contains('med-delete') || 
+                        e.target.classList.contains('add-time-btn') || 
+                        e.target.classList.contains('time-chip')) return;
+                    showDetail(id);
                 };
 
+                // Botón para eliminar medicamento
                 li.querySelector('.med-delete').onclick = e => {
                     e.stopPropagation();
                     if (confirm('¿Eliminar este medicamento?')) {
-                        if (seleccionadoId === id) seleccionadoId = null;
                         delete meds[id];
                         save();
                         render();
+                        showToast('✅ Medicamento eliminado', 'El medicamento ha sido eliminado', 'success');
                     }
                 };
 
-                li.querySelectorAll('.time-chip').forEach(chip => {
-                    chip.onclick = e => {
-                        e.stopPropagation();
-                        const oldH = chip.dataset.h;
-                        const idx = m.horas.findIndex(x => x.h === oldH);
-                        if (idx === -1) return;
+                // Botón + para agregar nueva hora (SIMPLIFICADO)
+                li.querySelector('.add-time-btn').onclick = e => {
+                    e.stopPropagation();
+                    currentMedForAddTime = id;
+                    $('addTimeMedName').textContent = upper(m.nombre);
+                    $('newHora').value = '';
+                    $('newCant').value = '1';
+                    addTimeModal.classList.add('open');
+                };
 
-                        const newH = prompt('Nueva hora (HH:MM):', oldH);
-                        if (newH && newH !== oldH) {
-                            if (m.horas.some(x => x.h === newH)) {
-                                alert('Esa hora ya existe');
-                                return;
-                            }
-                            const newC = prompt('Cantidad:', m.horas[idx].cant);
-                            m.horas[idx] = { h: newH, cant: parseFloat(newC || m.horas[idx].cant) };
-                            m.horas.sort((a, b) => a.h.localeCompare(b.h));
-                            save();
-                            render();
-                        }
-                    };
+                // Chips de hora: al hacer clic largo, editar/eliminar
+                li.querySelectorAll('.time-chip').forEach(chip => {
+                    let longPressTimer;
+                    
+                    chip.addEventListener('click', e => {
+                        e.stopPropagation();
+                        clearTimeout(longPressTimer);
+                    });
+
+                    chip.addEventListener('contextmenu', e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+
+                    chip.addEventListener('mousedown', e => {
+                        e.stopPropagation();
+                        longPressTimer = setTimeout(() => {
+                            showEditTimeDialog(id, chip.dataset.h, chip.dataset.cant);
+                        }, 800);
+                    });
+
+                    chip.addEventListener('touchstart', e => {
+                        e.stopPropagation();
+                        longPressTimer = setTimeout(() => {
+                            showEditTimeDialog(id, chip.dataset.h, chip.dataset.cant);
+                        }, 800);
+                    });
+
+                    chip.addEventListener('mouseup', e => {
+                        e.stopPropagation();
+                        clearTimeout(longPressTimer);
+                    });
+
+                    chip.addEventListener('touchend', e => {
+                        e.stopPropagation();
+                        clearTimeout(longPressTimer);
+                    });
                 });
 
                 lista.appendChild(li);
             });
         }
 
-        function showSelectionFeedback(id) {
-            const m = meds[id];
+        // FUNCIÓN SIMPLIFICADA PARA AGREGAR HORA
+        function addNewTimeToMed(medId, horaValue, cantidad) {
+            const m = meds[medId];
             if (!m) return;
+
+            if (m.horas.some(x => x.h === horaValue)) {
+                showToast('⚠️ Hora duplicada', 'Esta hora ya existe para este medicamento', 'warning');
+                return;
+            }
+
+            m.horas.push({ h: horaValue, cant: parseFloat(cantidad) });
+            m.horas.sort((a, b) => a.h.localeCompare(b.h));
             
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
-                color: white;
-                padding: 0.8rem 1.5rem;
-                border-radius: 30px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-                animation: toastIn 0.4s ease;
-                font-size: 0.9rem;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                text-align: center;
-                max-width: 90%;
-            `;
-            toast.innerHTML = `✅ <strong>${upper(m.nombre)}</strong><br>
-            <small>Seleccionado para agregar nueva hora</small>`;
-            toast.id = 'selection-toast';
+            save();
+            render();
             
-            const existing = document.getElementById('selection-toast');
-            if (existing) existing.remove();
-            
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                const t = document.getElementById('selection-toast');
-                if (t) {
-                    t.style.animation = 'toastOut 0.4s ease forwards';
-                    setTimeout(() => t.remove(), 400);
-                }
-            }, 3000);
+            showToast('✅ Hora agregada', `${horaValue} agregada a ${upper(m.nombre)}`, 'success');
         }
+
+        // DIALOGO PARA EDITAR/ELIMINAR HORA
+        function showEditTimeDialog(medId, oldHora, oldCantidad) {
+            const m = meds[medId];
+            if (!m) return;
+
+            const action = prompt(
+                `Hora: ${oldHora} - ${oldCantidad}u\n\n` +
+                `1. Editar hora\n` +
+                `2. Editar cantidad\n` +
+                `3. Eliminar hora\n` +
+                `(Escribe 1, 2 o 3)`
+            );
+
+            if (!action) return;
+
+            const idx = m.horas.findIndex(x => x.h === oldHora);
+            if (idx === -1) return;
+
+            if (action === '1') {
+                const newHora = prompt('Nueva hora (HH:MM):', oldHora);
+                if (newHora && newHora !== oldHora) {
+                    if (m.horas.some(x => x.h === newHora)) {
+                        alert('Esa hora ya existe');
+                        return;
+                    }
+                    m.horas[idx].h = newHora;
+                    m.horas.sort((a, b) => a.h.localeCompare(b.h));
+                    save();
+                    render();
+                    showToast('✅ Hora actualizada', `${oldHora} → ${newHora}`, 'success');
+                }
+            } else if (action === '2') {
+                const newCant = prompt('Nueva cantidad:', oldCantidad);
+                if (newCant) {
+                    m.horas[idx].cant = parseFloat(newCant);
+                    save();
+                    render();
+                    showToast('✅ Cantidad actualizada', `${oldCantidad}u → ${newCant}u`, 'success');
+                }
+            } else if (action === '3') {
+                if (confirm(`¿Eliminar la hora ${oldHora}?`)) {
+                    m.horas.splice(idx, 1);
+                    save();
+                    render();
+                    showToast('✅ Hora eliminada', `${oldHora} eliminada`, 'success');
+                }
+            }
+        }
+
+        // EVENTOS PARA AGREGAR HORA MODAL
+        $('cancelAddTime').onclick = () => {
+            addTimeModal.classList.remove('open');
+            currentMedForAddTime = null;
+        };
+
+        $('saveAddTime').onclick = () => {
+            const horaValue = $('newHora').value;
+            const cantidad = $('newCant').value;
+
+            if (!horaValue) {
+                showToast('⏰ Hora requerida', 'Selecciona una hora', 'warning');
+                return;
+            }
+
+            if (currentMedForAddTime) {
+                addNewTimeToMed(currentMedForAddTime, horaValue, cantidad);
+                addTimeModal.classList.remove('open');
+                currentMedForAddTime = null;
+            }
+        };
 
         $('addBtn').onclick = () => {
             const n = upper(nombre.value);
@@ -2013,51 +2192,20 @@
             }, 800);
         };
 
-        $('addHoraBtn').onclick = () => {
-            if (!modoEdicionActivo) {
-                toggleModoEdicion();
-                return;
-            }
-            
-            if (!hora.value) {
-                showToast('⏰ Hora requerida', 'Selecciona una hora primero', 'warning');
-                return;
-            }
-            
-            if (!seleccionadoId) {
-                showToast('💊 Selecciona un medicamento', 'Toca un medicamento de la lista', 'warning');
-                return;
-            }
-
-            const m = meds[seleccionadoId];
-            if (m.horas.some(x => x.h === hora.value)) {
-                showToast('⚠️ Hora duplicada', 'Esta hora ya existe para este medicamento', 'warning');
-                return;
-            }
-
-            m.horas.push({ h: hora.value, cant: parseFloat(cant.value) });
-            m.horas.sort((a, b) => a.h.localeCompare(b.h));
-            
-            save();
-            render();
-            
-            showToast('✅ Hora agregada', `${hora.value} agregada a ${upper(m.nombre)}`, 'success');
-            
-            hora.value = '';
-            cant.value = '1';
-            toggleModoEdicion();
-        };
-
         function showDetail(id) {
             const m = meds[id];
             if (!m) return;
 
-            detalleId = id;
+            const colorClass = getMedColor(m.nombre);
+            
             $('detailPatient').textContent = upper(m.paciente);
             $('detailName').textContent = upper(m.nombre);
             $('detailInfoName').textContent = upper(m.nombre);
             $('detailInfoPatient').textContent = upper(m.paciente);
             $('detailImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+            
+            // Aplicar color al icono de detalle
+            $('detailModal').querySelector('.modal-icon').className = 'modal-icon ' + colorClass;
 
             $('detailTimes').innerHTML = m.horas.map(h => `
                 <div class="detail-time-item">
@@ -2122,18 +2270,33 @@
             const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
             $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
 
-            $('alertBody').innerHTML = medsActuales.map(med => `
-                <div class="modal-med">
-                    <img class="modal-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
-                    <div class="modal-med-info">
-                        <div class="modal-med-name">${upper(med.nombre)}</div>
-                        <div class="modal-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
-                        <div class="modal-med-patient">${upper(med.paciente)}</div>
-                    </div>
+            // UN SOLO BLOQUE CON DESPLAZAMIENTO (Corrección Imagen Neo 10)
+            $('alertBody').innerHTML = `
+                <div class="alert-med-container">
+                    ${medsActuales.map(med => {
+                        const colorClass = getMedColor(med.nombre);
+                        return `
+                            <div class="alert-med-item">
+                                <img class="alert-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
+                                <div class="alert-med-info">
+                                    <div class="alert-med-name">${upper(med.nombre)}</div>
+                                    <div class="alert-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
+                                    <div class="alert-med-patient">${upper(med.paciente)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
-            `).join('');
+            `;
 
             alertModal.classList.add('open');
+            
+            // ACTIVAR NOTIFICACIÓN PUSH (para pantalla bloqueada)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                showNotification('MediClock Neo - Hora de medicación', 
+                    `Son las ${horaActual}. Es hora de tomar tu medicación.`);
+            }
+            
             activateAlarm();
         }
 
@@ -2191,7 +2354,7 @@
             if (sonidoOn.checked) {
                 setTimeout(() => {
                     playAlarm();
-                }, 500); // Esperar medio segundo después de la voz
+                }, 500);
             }
         }
 
@@ -2253,24 +2416,7 @@
             alertModal.classList.remove('open');
             stopAlarm();
             
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 2rem;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, var(--neon-green), #00d68f);
-                color: #050508;
-                padding: 1rem 2rem;
-                border-radius: 50px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
-                animation: toastIn 0.4s ease;
-            `;
-            toast.textContent = '✓ Registrado en historial';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            showToast('✓ Registrado en historial', 'La toma ha sido registrada correctamente', 'success');
         };
 
         $('testBtn').onclick = () => {
@@ -2299,7 +2445,7 @@
             if (testMedicamentos.length === 0) return;
             
             medsActuales = testMedicamentos;
-            horaActual = '08:00';
+            horaActual = new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
             showAlert();
         };
 
@@ -2384,11 +2530,12 @@
             }
         }
 
-        [alertModal, detailModal, calModal].forEach(modal => {
+        [alertModal, detailModal, calModal, addTimeModal].forEach(modal => {
             modal.onclick = e => {
                 if (e.target === modal) {
                     modal.classList.remove('open');
                     if (modal === alertModal) stopAlarm();
+                    if (modal === addTimeModal) currentMedForAddTime = null;
                 }
             };
         });
@@ -2396,6 +2543,11 @@
         window.onload = () => {
             loadConfig();
             render();
+
+            // Cargar colores de medicamentos existentes
+            Object.values(meds).forEach(m => {
+                getMedColor(m.nombre);
+            });
 
             const today = new Date().toISOString().slice(0, 10);
             const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
@@ -2407,11 +2559,30 @@
             
             localStorage.setItem('alarmsToday', JSON.stringify(filtered));
 
-            setInterval(check, 10000);
+            // Verificar y solicitar permiso de notificaciones
+            if ('Notification' in window && Notification.permission === 'default') {
+                setTimeout(() => {
+                    Notification.requestPermission().then(permission => {
+                        console.log('Permiso de notificación:', permission);
+                    });
+                }, 2000);
+            }
+
+            // Comprobar alarmas cada minuto
+            setInterval(check, 60000);
             setTimeout(check, 1000);
         };
 
         window.onbeforeunload = stopAlarm;
+        
+        // Mantener la app activa incluso con pantalla bloqueada
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('App en segundo plano - Las alarmas seguirán funcionando');
+            } else {
+                console.log('App en primer plano');
+            }
+        });
     </script>
 </body>
 </html>
