@@ -4,6 +4,9 @@
     <meta charset="utf-8"/>
     <title>MediClock Neo</title>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -640,7 +643,7 @@
             50% { opacity: 0.8; }
         }
 
-        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 15) */
+        /* MEDICAMENTOS LISTA - CORREGIDO (Nombre HORIZONTAL) */
         .med-list {
             list-style: none;
         }
@@ -657,7 +660,7 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
-            min-height: 160px; /* Aumentado para mejor distribución */
+            min-height: 160px;
         }
 
         .med-item::before {
@@ -683,7 +686,7 @@
             opacity: 1;
         }
 
-        /* FOTO DEL MEDICAMENTO - POSICIONADO MÁS ABAJO (Corrección Neo 15) */
+        /* FOTO DEL MEDICAMENTO */
         .med-avatar {
             width: 60px;
             height: 60px;
@@ -691,7 +694,7 @@
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
-            margin-top: 35px; /* Movido 35px hacia abajo */
+            margin-top: 35px;
         }
 
         .med-placeholder {
@@ -704,7 +707,7 @@
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
-            margin-top: 35px; /* Movido 35px hacia abajo */
+            margin-top: 35px;
         }
 
         .med-info {
@@ -724,15 +727,15 @@
             width: 100%;
         }
 
-        /* NOMBRE DEL MEDICAMENTO HORIZONTAL (Corrección Neo 15) */
+        /* NOMBRE DEL MEDICAMENTO HORIZONTAL (Corregido) */
         .med-name {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-primary);
-            white-space: normal;
-            overflow: visible;
-            word-break: break-word;
-            max-width: calc(100% - 80px);
+            white-space: nowrap; /* Cambiado de normal a nowrap */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Agregado para puntos suspensivos */
+            max-width: 100%;
             margin-bottom: 0.35rem;
             line-height: 1.3;
             width: 100%;
@@ -804,7 +807,7 @@
             transform: scale(1.05);
         }
 
-        /* ACCIONES - ICONO BASURERO MÁS ABAJO (Corrección Neo 15) */
+        /* ACCIONES */
         .med-actions {
             display: flex;
             flex-direction: column;
@@ -812,7 +815,7 @@
             align-items: center;
             justify-content: flex-start;
             flex-shrink: 0;
-            margin-top: 35px; /* Movido 35px hacia abajo */
+            margin-top: 35px;
         }
 
         .med-select-btn {
@@ -1123,17 +1126,14 @@
             padding: 1.75rem 2rem;
         }
 
-        /* ALERTA MODAL - UN SOLO BLOQUE DESPLAZANTE (Corrección Neo 14) */
+        /* ALERTA MODAL - BLOQUE ÚNICO COMPLETO (Corrección Neo 17) */
         .alert-container {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 0.5rem;
         }
 
-        /* BLOQUE COMPLETO CON TODO EL CONTENIDO (Neo 14) */
+        /* BLOQUE COMPLETO CON TODO EL CONTENIDO (Corrección Neo 17) */
         .alert-complete-block {
             background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 92, 246, 0.1));
             border: 1px solid rgba(0, 245, 255, 0.3);
@@ -1189,7 +1189,6 @@
             background: rgba(0, 0, 0, 0.3);
             border-radius: var(--radius-md);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 1rem;
         }
 
         .alert-medication-img {
@@ -1682,25 +1681,23 @@
         </div>
     </div>
 
-    <!-- MODAL DE ALARMA - BLOQUE ÚNICO DESPLAZANTE (Corrección Neo 14) -->
+    <!-- MODAL DE ALARMA - BLOQUE ÚNICO COMPLETO (Corrección Neo 17) -->
     <div class="modal-bg" id="alertModal">
         <div class="modal">
-            <div class="modal-header">
-                <div class="modal-icon">⏰</div>
-                <h2 class="modal-title">Es hora de tu medicación</h2>
-            </div>
-
+            <!-- CONTENIDO DEL MODAL EN UN SOLO BLOQUE -->
             <div class="modal-body">
                 <div class="alert-container">
-                    <!-- BLOQUE COMPLETO CON TODO (Neo 14) -->
+                    <!-- BLOQUE COMPLETO CON TODO (Corrección Neo 17) -->
                     <div class="alert-complete-block">
                         <div class="alert-header-content">
-                            <div class="alert-clock-icon">🕐</div>
+                            <div class="alert-clock-icon">⏰</div>
                             <div class="alert-greeting">
                                 <div class="alert-greeting-text" id="alertGreeting">Hola IRMA</div>
                                 <div class="alert-time-display" id="alertTimeDisplay">23:21</div>
                             </div>
                         </div>
+                        
+                        <h2 class="modal-title" style="margin: 1.5rem 0 1rem; text-align: center;">Es hora de tu medicación</h2>
                         
                         <div class="alert-medication-details">
                             <img class="alert-medication-img" id="alertMedicationImg" src="" alt="">
@@ -1804,7 +1801,7 @@
         </div>
     </div>
 
-    <audio id="audio" preload="auto"></audio>
+    <audio id="audio" preload="auto" loop></audio>
 
     <script>
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
@@ -1849,30 +1846,77 @@
         }
 
         // NOTIFICACIONES PUSH PARA CELULAR BLOQUEADO
-        function showNotification(title, body) {
+        function showLockScreenNotification(title, body, medData) {
             if ('Notification' in window && Notification.permission === 'granted') {
-                const notification = new Notification(title, {
+                const options = {
                     body: body,
                     icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                    tag: 'mediclock-alarm',
+                    tag: 'mediclock-alarm-' + Date.now(),
                     requireInteraction: true,
                     vibrate: [200, 100, 200, 100, 200],
                     badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                    silent: false, // Asegurar que haga sonido
-                    sound: 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3'
+                    silent: false,
+                    data: medData,
+                    actions: [
+                        {
+                            action: 'take',
+                            title: '✓ Tomado',
+                            icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828640.png'
+                        },
+                        {
+                            action: 'close',
+                            title: 'Cerrar',
+                            icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828843.png'
+                        }
+                    ]
+                };
+
+                // Para iOS, usar notificaciones con badge y sound
+                if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                    options.sound = 'default';
+                }
+
+                const notification = new Notification(title, options);
+
+                notification.onclick = function(event) {
+                    event.preventDefault();
+                    window.focus();
+                    showAlert();
+                };
+
+                notification.onclose = function() {
+                    console.log('Notificación cerrada');
+                };
+
+                // Manejar acciones de la notificación
+                navigator.serviceWorker.ready.then(function(registration) {
+                    registration.getNotifications().then(function(notifications) {
+                        notifications.forEach(function(notification) {
+                            notification.addEventListener('click', function(event) {
+                                if (event.action === 'take') {
+                                    // Registrar toma desde notificación
+                                    medsActuales.forEach(med => {
+                                        const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+                                        hist.push({
+                                            fecha: new Date().toISOString(),
+                                            paciente: med.paciente,
+                                            pastilla: med.nombre,
+                                            cantidad: med.cantidad,
+                                            hora: horaActual
+                                        });
+                                        localStorage.setItem('tomasMC', JSON.stringify(hist));
+                                    });
+                                    stopAlarm();
+                                    notification.close();
+                                } else if (event.action === 'close') {
+                                    stopAlarm();
+                                    notification.close();
+                                }
+                            });
+                        });
+                    });
                 });
 
-                notification.onclick = function() {
-                    window.focus();
-                    notification.close();
-                    showAlert(); // Mostrar la alerta en la app
-                };
-                
-                // Forzar reproducción de audio incluso con pantalla bloqueada
-                if (sonidoOn.checked) {
-                    playAlarmForLockedScreen();
-                }
-                
                 return notification;
             }
             return null;
@@ -1881,40 +1925,59 @@
         // REPRODUCIR SONIDO INCLUSO CON PANTALLA BLOQUEADA
         function playAlarmForLockedScreen() {
             try {
-                // Crear un contexto de audio que funcione incluso con pantalla bloqueada
+                // Crear contexto de audio que funcione en segundo plano
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Resumir contexto si está suspendido (pantalla bloqueada)
-                    if (audioCtx.state === 'suspended') {
-                        audioCtx.resume().then(() => {
-                            console.log('AudioContext resumido para pantalla bloqueada');
-                        });
+                    // Configurar para iOS
+                    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                        // En iOS necesitamos interactividad del usuario primero
+                        const unlockAudio = () => {
+                            if (audioCtx.state === 'suspended') {
+                                audioCtx.resume();
+                            }
+                            document.removeEventListener('click', unlockAudio);
+                            document.removeEventListener('touchstart', unlockAudio);
+                        };
+                        document.addEventListener('click', unlockAudio);
+                        document.addEventListener('touchstart', unlockAudio);
                     }
+                }
+                
+                // Resumir contexto si está suspendido
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => {
+                        console.log('AudioContext resumido');
+                    }).catch(e => console.error('Error resumiendo audio:', e));
                 }
                 
                 alarmaOn = true;
                 
                 function beep() {
-                    if (!alarmaOn) return;
+                    if (!alarmaOn || !audioCtx) return;
                     
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-                    
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.4);
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.4);
+                    } catch (e) {
+                        console.error('Error en beep:', e);
+                    }
                 }
                 
                 beep();
                 if (intervalo) clearInterval(intervalo);
                 intervalo = setInterval(beep, 800);
+                
             } catch (e) {
                 console.error('Error de audio:', e);
                 // Fallback a audio HTML5
@@ -1923,14 +1986,19 @@
                     audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
                     audio.volume = parseFloat(volSlider.value);
                     audio.loop = true;
-                    audio.play().catch(e => {
-                        console.log('Error reproduciendo audio:', e);
-                        // Intentar con usuario gesture
-                        document.body.addEventListener('click', function resumeAudio() {
-                            audio.play();
-                            document.body.removeEventListener('click', resumeAudio);
-                        }, { once: true });
-                    });
+                    
+                    // Para iOS, necesitamos interacción del usuario
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Error reproduciendo audio:', error);
+                            // Intentar con gesto del usuario
+                            document.body.addEventListener('click', function resumeAudio() {
+                                audio.play();
+                                document.body.removeEventListener('click', resumeAudio);
+                            }, { once: true });
+                        });
+                    }
                 }
             }
         }
@@ -2111,8 +2179,8 @@
                     }
                     <div class="med-info">
                         <div class="med-name-row">
-                            <!-- NOMBRE HORIZONTAL (Corrección Neo 15) -->
-                            <div class="med-name">${upper(m.nombre)}</div>
+                            <!-- NOMBRE HORIZONTAL (Corregido) -->
+                            <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
                             <div class="med-patient">${upper(m.paciente)}</div>
                         </div>
                         <div class="med-times">
@@ -2398,7 +2466,7 @@
         function showAlert() {
             if (!medsActuales.length) return;
 
-            // Para la imagen Neo 14, tomamos solo el primer medicamento
+            // Para la imagen Neo 17, tomamos solo el primer medicamento
             const primeraAlerta = medsActuales[0];
             
             // Configurar saludo
@@ -2418,8 +2486,16 @@
             
             // ACTIVAR NOTIFICACIÓN PUSH (para pantalla bloqueada)
             if ('Notification' in window && Notification.permission === 'granted') {
-                showNotification('MediClock Neo - Hora de medicación', 
-                    `Hola ${upper(primeraAlerta.paciente)}. Es hora de tomar ${upper(primeraAlerta.nombre)}.`);
+                showLockScreenNotification(
+                    'MediClock Neo - Hora de medicación', 
+                    `Hola ${upper(primeraAlerta.paciente)}. Es hora de tomar ${upper(primeraAlerta.nombre)}.`,
+                    {
+                        paciente: primeraAlerta.paciente,
+                        medicamento: primeraAlerta.nombre,
+                        cantidad: primeraAlerta.cantidad,
+                        hora: horaActual
+                    }
+                );
             }
             
             activateAlarm();
@@ -2471,7 +2547,16 @@
                     u.volume = parseFloat(volSlider.value);
                     u.onend = resolve;
                     u.onerror = resolve;
-                    speechSynthesis.speak(u);
+                    
+                    // Para iOS, asegurar que la voz funcione
+                    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                        // En iOS necesitamos estar en modo foreground para voz
+                        setTimeout(() => {
+                            speechSynthesis.speak(u);
+                        }, 100);
+                    } else {
+                        speechSynthesis.speak(u);
+                    }
                 });
             }
 
@@ -2529,6 +2614,15 @@
             if (audio) {
                 audio.pause();
                 audio.currentTime = 0;
+            }
+            
+            // Cerrar todas las notificaciones
+            if ('Notification' in window && Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.getNotifications().then(notifications => {
+                        notifications.forEach(notification => notification.close());
+                    });
+                });
             }
         }
 
@@ -2701,6 +2795,9 @@
                 setTimeout(() => {
                     Notification.requestPermission().then(permission => {
                         console.log('Permiso de notificación:', permission);
+                        if (permission === 'granted') {
+                            showToast('🔔 Notificaciones activadas', 'Recibirás alertas incluso con pantalla bloqueada', 'success');
+                        }
                     });
                 }, 2000);
             }
@@ -2709,7 +2806,7 @@
             setInterval(check, 60000);
             setTimeout(check, 1000);
             
-            // Mantener la app activa para alarmas
+            // Mantener la app activa para alarmas (Wake Lock API)
             if ('wakeLock' in navigator) {
                 try {
                     navigator.wakeLock.request('screen').then(wakeLock => {
@@ -2722,6 +2819,8 @@
                                 });
                             }
                         });
+                    }).catch(err => {
+                        console.log('Wake Lock no disponible:', err);
                     });
                 } catch (err) {
                     console.log('Wake Lock no soportado:', err);
@@ -2734,7 +2833,7 @@
                     // Verificar si ya estamos suscritos
                     registration.pushManager.getSubscription().then(subscription => {
                         if (!subscription) {
-                            // Configurar las claves VAPID (puedes generar tus propias claves)
+                            // Configurar las claves VAPID
                             const vapidPublicKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
                             
                             // Convertir la clave base64 a Uint8Array
@@ -2758,13 +2857,22 @@
                                 userVisibleOnly: true,
                                 applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
                             }).then(subscription => {
-                                console.log('Usuario suscrito:', subscription);
-                                // Aquí normalmente enviarías la suscripción a tu servidor
+                                console.log('Usuario suscrito a notificaciones push:', subscription);
                             }).catch(error => {
                                 console.log('Error al suscribirse:', error);
                             });
                         }
                     });
+                });
+            }
+            
+            // Para iOS: Solicitar permiso para audio
+            if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                document.addEventListener('click', function initAudio() {
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    document.removeEventListener('click', initAudio);
                 });
             }
         };
@@ -2789,17 +2897,28 @@
             // Solicitar permiso para notificaciones después de un breve retraso
             setTimeout(() => {
                 if ('Notification' in window && Notification.permission === 'default') {
-                    Notification.requestPermission();
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            console.log('Permiso de notificación concedido');
+                        }
+                    });
                 }
                 
                 // Solicitar permiso para audio (importante para iOS)
                 if ('AudioContext' in window || 'webkitAudioContext' in window) {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    // Crear un nodo de audio silencioso para activar el contexto
-                    const oscillator = ctx.createOscillator();
-                    oscillator.connect(ctx.destination);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + 0.001);
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        // Crear un nodo de audio silencioso para activar el contexto
+                        const oscillator = ctx.createOscillator();
+                        const gainNode = ctx.createGain();
+                        gainNode.gain.value = 0;
+                        oscillator.connect(gainNode);
+                        gainNode.connect(ctx.destination);
+                        oscillator.start();
+                        oscillator.stop(ctx.currentTime + 0.001);
+                    } catch (e) {
+                        console.log('Error inicializando audio:', e);
+                    }
                 }
             }, 1000);
         });
@@ -2816,7 +2935,56 @@
                     showAlert();
                 }
             });
+            
+            // Manejar clics en notificaciones
+            navigator.serviceWorker.addEventListener('notificationclick', event => {
+                event.notification.close();
+                
+                if (event.action === 'take') {
+                    // Registrar toma desde notificación
+                    medsActuales.forEach(med => {
+                        const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+                        hist.push({
+                            fecha: new Date().toISOString(),
+                            paciente: med.paciente,
+                            pastilla: med.nombre,
+                            cantidad: med.cantidad,
+                            hora: horaActual
+                        });
+                        localStorage.setItem('tomasMC', JSON.stringify(hist));
+                    });
+                    stopAlarm();
+                    showToast('✓ Toma registrada', 'Desde pantalla bloqueada', 'success');
+                } else if (event.action === 'close') {
+                    stopAlarm();
+                } else {
+                    // Clic en el cuerpo de la notificación
+                    window.focus();
+                    showAlert();
+                }
+            });
         }
+        
+        // Para PWA: Instalar la app
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botón de instalación
+            setTimeout(() => {
+                if (confirm('¿Deseas instalar MediClock Neo como app?')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuario instaló la app');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            }, 5000);
+        });
     </script>
 </body>
 </html>
