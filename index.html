@@ -396,6 +396,7 @@
             background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .form-group {
@@ -436,7 +437,7 @@
             box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
         }
 
-        /* CAMPO HORA REDUCIDO (Corrección Imagen Neo 8) */
+        /* CAMPO HORA REDUCIDO */
         .form-input-time {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -639,7 +640,7 @@
             50% { opacity: 0.8; }
         }
 
-        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 9) CON CAMBIOS DE NEO 13 */
+        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 15) */
         .med-list {
             list-style: none;
         }
@@ -656,7 +657,7 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
-            min-height: 140px; /* Aumentado para acomodar mejor */
+            min-height: 160px; /* Aumentado para mejor distribución */
         }
 
         .med-item::before {
@@ -682,20 +683,20 @@
             opacity: 1;
         }
 
-        /* FOTO DEL MEDICAMENTO - POSICIONADO MÁS ABAJO (Corrección Neo 13) */
+        /* FOTO DEL MEDICAMENTO - POSICIONADO MÁS ABAJO (Corrección Neo 15) */
         .med-avatar {
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             border-radius: var(--radius-md);
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
-            margin-top: 20px; /* Movido hacia abajo */
+            margin-top: 35px; /* Movido 35px hacia abajo */
         }
 
         .med-placeholder {
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             border-radius: var(--radius-md);
             border: 2px solid rgba(0, 245, 255, 0.2);
             display: flex;
@@ -703,7 +704,7 @@
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
-            margin-top: 20px; /* Movido hacia abajo */
+            margin-top: 35px; /* Movido 35px hacia abajo */
         }
 
         .med-info {
@@ -711,7 +712,7 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Cambiado de space-between a flex-start */
+            justify-content: flex-start;
             height: 100%;
             padding: 0.25rem 0;
         }
@@ -723,26 +724,29 @@
             width: 100%;
         }
 
-        /* NOMBRE DEL MEDICAMENTO COMPLETO (Corrección Imagen Neo 9) */
+        /* NOMBRE DEL MEDICAMENTO HORIZONTAL (Corrección Neo 15) */
         .med-name {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: var(--text-primary);
             white-space: normal;
             overflow: visible;
             word-break: break-word;
-            max-width: calc(100% - 80px); /* Deja espacio para acciones */
-            margin-bottom: 0.25rem;
+            max-width: calc(100% - 80px);
+            margin-bottom: 0.35rem;
             line-height: 1.3;
-            width: 100%; /* Ocupa todo el ancho disponible */
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
         .med-patient {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            margin-bottom: 0.75rem;
             word-break: break-word;
             width: 100%;
+            font-weight: 600;
         }
 
         .med-times {
@@ -758,8 +762,8 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            padding: 0.3rem 0.7rem;
-            font-size: 0.7rem;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             background: rgba(0, 245, 255, 0.1);
             border: 1px solid rgba(0, 245, 255, 0.3);
@@ -800,7 +804,7 @@
             transform: scale(1.05);
         }
 
-        /* ACCIONES - ICONO BASURERO MÁS ABAJO (Corrección Neo 13) */
+        /* ACCIONES - ICONO BASURERO MÁS ABAJO (Corrección Neo 15) */
         .med-actions {
             display: flex;
             flex-direction: column;
@@ -808,7 +812,7 @@
             align-items: center;
             justify-content: flex-start;
             flex-shrink: 0;
-            margin-top: 20px; /* Movido hacia abajo */
+            margin-top: 35px; /* Movido 35px hacia abajo */
         }
 
         .med-select-btn {
@@ -1031,7 +1035,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(5, 5, 8, 0.9);
+            background: rgba(5, 5, 8, 0.95);
             backdrop-filter: blur(20px);
             z-index: 1000;
             align-items: center;
@@ -1113,27 +1117,13 @@
             color: var(--text-muted);
         }
 
-        .modal-time {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.6rem 1.25rem;
-            background: linear-gradient(135deg, rgba(0, 245, 255, 0.15), rgba(255, 0, 234, 0.1));
-            border: 1px solid rgba(0, 245, 255, 0.3);
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--neon-cyan);
-        }
-
         .modal-body {
             flex: 1;
             overflow-y: auto;
             padding: 1.75rem 2rem;
         }
 
-        /* ALERTA MODAL - UN SOLO BLOQUE DESPLAZANTE (Corrección Imagen Neo 12) */
+        /* ALERTA MODAL - UN SOLO BLOQUE DESPLAZANTE (Corrección Neo 14) */
         .alert-container {
             display: flex;
             flex-direction: column;
@@ -1143,105 +1133,98 @@
             padding-right: 0.5rem;
         }
 
-        .alert-header-block {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.25rem;
+        /* BLOQUE COMPLETO CON TODO EL CONTENIDO (Neo 14) */
+        .alert-complete-block {
             background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 92, 246, 0.1));
             border: 1px solid rgba(0, 245, 255, 0.3);
             border-radius: var(--radius-lg);
-            margin-bottom: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        .alert-time-icon {
+        .alert-header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-clock-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 2rem;
-            color: var(--neon-cyan);
             flex-shrink: 0;
+            box-shadow: var(--glow-cyan);
         }
 
-        .alert-time-info {
+        .alert-greeting {
             flex: 1;
             min-width: 0;
         }
 
-        .alert-time-title {
-            font-size: 1.2rem;
+        .alert-greeting-text {
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.25rem;
+            word-break: break-word;
         }
 
-        .alert-time-hour {
+        .alert-time-display {
             font-size: 1.1rem;
             color: var(--neon-cyan);
             font-weight: 600;
         }
 
-        .alert-med-container {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .alert-med-item {
+        .alert-medication-details {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1.25rem;
+            padding: 1rem;
             background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-lg);
-            margin-bottom: 0.875rem;
-            transition: all 0.3s ease;
-            border-left: 3px solid var(--neon-cyan);
+            margin-top: 1rem;
         }
 
-        .alert-med-item:hover {
-            border-color: rgba(0, 245, 255, 0.3);
-            background: rgba(0, 245, 255, 0.05);
-        }
-
-        .alert-med-img {
-            width: 64px;
-            height: 64px;
+        .alert-medication-img {
+            width: 70px;
+            height: 70px;
             border-radius: var(--radius-md);
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
         }
 
-        .alert-med-info {
+        .alert-medication-info {
             flex: 1;
             min-width: 0;
         }
 
-        .alert-med-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
+        .alert-medication-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
             word-break: break-word;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .alert-med-qty {
+        .alert-medication-qty {
             display: inline-flex;
-            padding: 0.35rem 0.85rem;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
             background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 245, 255, 0.1));
             border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 700;
             color: var(--neon-green);
-            white-space: nowrap;
-        }
-
-        .alert-med-patient {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.4rem;
-            word-break: break-word;
         }
 
         .modal-footer {
@@ -1438,26 +1421,34 @@
             }
             .med-item {
                 padding: 1rem;
-                min-height: 130px;
+                min-height: 150px;
             }
             .med-avatar, .med-placeholder {
-                width: 48px;
-                height: 48px;
-                margin-top: 15px;
+                width: 52px;
+                height: 52px;
+                margin-top: 30px;
             }
             .med-name {
-                font-size: 1rem;
+                font-size: 1.15rem;
                 max-width: calc(100% - 70px);
             }
             .med-actions {
-                margin-top: 15px;
+                margin-top: 30px;
             }
-            .alert-med-img {
-                width: 52px;
-                height: 52px;
+            .alert-clock-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
             }
-            .alert-med-name {
-                font-size: 1rem;
+            .alert-greeting-text {
+                font-size: 1.1rem;
+            }
+            .alert-medication-img {
+                width: 60px;
+                height: 60px;
+            }
+            .alert-medication-name {
+                font-size: 1.1rem;
             }
             .detail-img {
                 height: 150px;
@@ -1488,7 +1479,7 @@
             100% { top: 100%; }
         }
 
-        /* COLORES DIFERENTES PARA MEDICAMENTOS (Imagen Neo 11) */
+        /* COLORES DIFERENTES PARA MEDICAMENTOS */
         .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
         .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
         .color-3 { background: linear-gradient(135deg, var(--neon-green), var(--neon-teal)); }
@@ -1599,7 +1590,6 @@
 
                 <div class="form-group">
                     <label class="form-label">Hora</label>
-                    <!-- CAMPO HORA REDUCIDO -->
                     <input type="time" id="hora" class="form-input-time">
                 </div>
 
@@ -1692,33 +1682,39 @@
         </div>
     </div>
 
-    <!-- MODAL DE ALARMA - CON BLOQUE ÚNICO DESPLAZANTE (Corrección Neo 12) -->
+    <!-- MODAL DE ALARMA - BLOQUE ÚNICO DESPLAZANTE (Corrección Neo 14) -->
     <div class="modal-bg" id="alertModal">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-icon">⏰</div>
-                <h2 class="modal-title" id="alertTitle">Hola María</h2>
-                <p class="modal-subtitle">Es hora de tu medicación</p>
+                <h2 class="modal-title">Es hora de tu medicación</h2>
             </div>
 
             <div class="modal-body">
                 <div class="alert-container">
-                    <!-- BLOQUE ÚNICO CON RELOJ, HORA Y NOMBRE DE MEDICAMENTOS -->
-                    <div class="alert-header-block">
-                        <div class="alert-time-icon">🕐</div>
-                        <div class="alert-time-info">
-                            <div class="alert-time-title" id="alertTimeDisplay">22:45</div>
-                            <div class="alert-time-hour" id="alertTimeHour"></div>
+                    <!-- BLOQUE COMPLETO CON TODO (Neo 14) -->
+                    <div class="alert-complete-block">
+                        <div class="alert-header-content">
+                            <div class="alert-clock-icon">🕐</div>
+                            <div class="alert-greeting">
+                                <div class="alert-greeting-text" id="alertGreeting">Hola IRMA</div>
+                                <div class="alert-time-display" id="alertTimeDisplay">23:21</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-medication-details">
+                            <img class="alert-medication-img" id="alertMedicationImg" src="" alt="">
+                            <div class="alert-medication-info">
+                                <div class="alert-medication-name" id="alertMedicationName">LEVOTIROXINA</div>
+                                <div class="alert-medication-qty" id="alertMedicationQty">1.25 pastillas</div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- LISTA DE MEDICAMENTOS -->
-                    <div class="alert-med-container" id="alertBody"></div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <p class="modal-total" id="alertTotal">Total: 1 medicamento (1 unidad)</p>
+                <p class="modal-total" id="alertTotal">Total: 1 medicamento (1.25 unidades)</p>
                 <div class="btn-group">
                     <button class="btn btn-danger" id="alertClose">Cerrar</button>
                     <button class="btn btn-success" id="alertTake">✓ Tomado</button>
@@ -1771,7 +1767,7 @@
         </div>
     </div>
 
-    <!-- MODAL PARA AGREGAR HORA CON CANTIDAD (Corrección Neo 13) -->
+    <!-- MODAL PARA AGREGAR HORA CON CANTIDAD -->
     <div class="modal-bg" id="addTimeModal">
         <div class="modal">
             <div class="modal-header">
@@ -1860,18 +1856,10 @@
                     icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
                     tag: 'mediclock-alarm',
                     requireInteraction: true,
-                    vibrate: [200, 100, 200],
+                    vibrate: [200, 100, 200, 100, 200],
                     badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                    actions: [
-                        {
-                            action: 'take',
-                            title: '✓ Tomado'
-                        },
-                        {
-                            action: 'snooze',
-                            title: '⏰ Posponer'
-                        }
-                    ]
+                    silent: false, // Asegurar que haga sonido
+                    sound: 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3'
                 });
 
                 notification.onclick = function() {
@@ -1880,11 +1868,14 @@
                     showAlert(); // Mostrar la alerta en la app
                 };
                 
-                // Para iOS y dispositivos móviles, forzar el sonido
+                // Forzar reproducción de audio incluso con pantalla bloqueada
                 if (sonidoOn.checked) {
-                    playAlarm();
+                    playAlarmForLockedScreen();
                 }
+                
+                return notification;
             }
+            return null;
         }
 
         // REPRODUCIR SONIDO INCLUSO CON PANTALLA BLOQUEADA
@@ -1893,6 +1884,13 @@
                 // Crear un contexto de audio que funcione incluso con pantalla bloqueada
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Resumir contexto si está suspendido (pantalla bloqueada)
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume().then(() => {
+                            console.log('AudioContext resumido para pantalla bloqueada');
+                        });
+                    }
                 }
                 
                 alarmaOn = true;
@@ -1925,7 +1923,14 @@
                     audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
                     audio.volume = parseFloat(volSlider.value);
                     audio.loop = true;
-                    audio.play().catch(e => console.log('Error reproduciendo audio:', e));
+                    audio.play().catch(e => {
+                        console.log('Error reproduciendo audio:', e);
+                        // Intentar con usuario gesture
+                        document.body.addEventListener('click', function resumeAudio() {
+                            audio.play();
+                            document.body.removeEventListener('click', resumeAudio);
+                        }, { once: true });
+                    });
                 }
             }
         }
@@ -2091,8 +2096,6 @@
             keys.forEach(id => {
                 const m = meds[id];
                 const colorClass = getMedColor(m.nombre);
-                const borderColorClass = colorClass + '-border';
-                const textColorClass = colorClass + '-text';
 
                 const li = document.createElement('li');
                 li.className = 'med-item';
@@ -2108,6 +2111,7 @@
                     }
                     <div class="med-info">
                         <div class="med-name-row">
+                            <!-- NOMBRE HORIZONTAL (Corrección Neo 15) -->
                             <div class="med-name">${upper(m.nombre)}</div>
                             <div class="med-patient">${upper(m.paciente)}</div>
                         </div>
@@ -2394,38 +2398,28 @@
         function showAlert() {
             if (!medsActuales.length) return;
 
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-            $('alertTitle').textContent = pacientes.length === 1 
-                ? `Hola ${upper(pacientes[0])}` 
-                : `${pacientes.length} pacientes`;
+            // Para la imagen Neo 14, tomamos solo el primer medicamento
+            const primeraAlerta = medsActuales[0];
             
+            // Configurar saludo
+            $('alertGreeting').textContent = `Hola ${upper(primeraAlerta.paciente)}`;
             $('alertTimeDisplay').textContent = horaActual;
-            $('alertTimeHour').textContent = `Hora de medicación`;
+            
+            // Configurar detalles del medicamento
+            $('alertMedicationName').textContent = upper(primeraAlerta.nombre);
+            $('alertMedicationQty').textContent = `${primeraAlerta.cantidad} ${primeraAlerta.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+            $('alertMedicationImg').src = primeraAlerta.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
 
+            // Configurar total
             const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
             $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
-
-            // UN SOLO BLOQUE CON DESPLAZAMIENTO (Corrección Imagen Neo 12)
-            $('alertBody').innerHTML = medsActuales.map(med => {
-                const colorClass = getMedColor(med.nombre);
-                return `
-                    <div class="alert-med-item">
-                        <img class="alert-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
-                        <div class="alert-med-info">
-                            <div class="alert-med-name">${upper(med.nombre)}</div>
-                            <div class="alert-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
-                            <div class="alert-med-patient">${upper(med.paciente)}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
 
             alertModal.classList.add('open');
             
             // ACTIVAR NOTIFICACIÓN PUSH (para pantalla bloqueada)
             if ('Notification' in window && Notification.permission === 'granted') {
                 showNotification('MediClock Neo - Hora de medicación', 
-                    `Son las ${horaActual}. Es hora de tomar tu medicación.`);
+                    `Hola ${upper(primeraAlerta.paciente)}. Es hora de tomar ${upper(primeraAlerta.nombre)}.`);
             }
             
             activateAlarm();
@@ -2524,8 +2518,10 @@
         function stopAlarm() {
             alarmaOn = false;
             if (intervalo) clearInterval(intervalo);
-            if (audioCtx) audioCtx.close().catch(() => {});
-            audioCtx = null;
+            if (audioCtx) {
+                audioCtx.close().catch(() => {});
+                audioCtx = null;
+            }
             if ('speechSynthesis' in window) speechSynthesis.cancel();
             
             // Detener audio HTML5 si se está usando
@@ -2718,10 +2714,58 @@
                 try {
                     navigator.wakeLock.request('screen').then(wakeLock => {
                         console.log('Wake Lock activado');
+                        // Liberar wake lock cuando la página se oculta
+                        document.addEventListener('visibilitychange', () => {
+                            if (document.visibilityState === 'hidden') {
+                                wakeLock.release().then(() => {
+                                    console.log('Wake Lock liberado');
+                                });
+                            }
+                        });
                     });
                 } catch (err) {
                     console.log('Wake Lock no soportado:', err);
                 }
+            }
+            
+            // Configurar Service Worker para notificaciones push
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    // Verificar si ya estamos suscritos
+                    registration.pushManager.getSubscription().then(subscription => {
+                        if (!subscription) {
+                            // Configurar las claves VAPID (puedes generar tus propias claves)
+                            const vapidPublicKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+                            
+                            // Convertir la clave base64 a Uint8Array
+                            function urlBase64ToUint8Array(base64String) {
+                                const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                                const base64 = (base64String + padding)
+                                    .replace(/\-/g, '+')
+                                    .replace(/_/g, '/');
+                                
+                                const rawData = window.atob(base64);
+                                const outputArray = new Uint8Array(rawData.length);
+                                
+                                for (let i = 0; i < rawData.length; ++i) {
+                                    outputArray[i] = rawData.charCodeAt(i);
+                                }
+                                return outputArray;
+                            }
+                            
+                            // Suscribirse a notificaciones push
+                            registration.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+                            }).then(subscription => {
+                                console.log('Usuario suscrito:', subscription);
+                                // Aquí normalmente enviarías la suscripción a tu servidor
+                            }).catch(error => {
+                                console.log('Error al suscribirse:', error);
+                            });
+                        }
+                    });
+                });
             }
         };
 
@@ -2731,43 +2775,47 @@
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 console.log('App en segundo plano - Alarmas activas');
+                // Asegurar que el audio siga funcionando
+                if (alarmaOn && audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
             } else {
                 console.log('App en primer plano');
             }
         });
         
-        // Solicitar permiso para notificaciones push persistentes
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-            navigator.serviceWorker.ready.then(registration => {
-                registration.pushManager.getSubscription().then(subscription => {
-                    if (!subscription) {
-                        // Solicitar suscripción para notificaciones push
-                        registration.pushManager.subscribe({
-                            userVisibleOnly: true,
-                            applicationServerKey: urlBase64ToUint8Array('BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U')
-                        }).then(subscription => {
-                            console.log('Suscripción push exitosa:', subscription);
-                        }).catch(error => {
-                            console.log('Error en suscripción push:', error);
-                        });
-                    }
-                });
-            });
-        }
+        // Solicitar permiso para notificaciones al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solicitar permiso para notificaciones después de un breve retraso
+            setTimeout(() => {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+                
+                // Solicitar permiso para audio (importante para iOS)
+                if ('AudioContext' in window || 'webkitAudioContext' in window) {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    // Crear un nodo de audio silencioso para activar el contexto
+                    const oscillator = ctx.createOscillator();
+                    oscillator.connect(ctx.destination);
+                    oscillator.start();
+                    oscillator.stop(ctx.currentTime + 0.001);
+                }
+            }, 1000);
+        });
         
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding)
-                .replace(/\-/g, '+')
-                .replace(/_/g, '/');
-            
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
-            }
-            return outputArray;
+        // Manejar mensajes del Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                console.log('Mensaje del Service Worker:', event.data);
+                
+                if (event.data && event.data.type === 'ALARM_TRIGGERED') {
+                    // Mostrar alerta cuando se active desde el Service Worker
+                    horaActual = event.data.time || new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+                    medsActuales = event.data.medications || [];
+                    showAlert();
+                }
+            });
         }
     </script>
 </body>
