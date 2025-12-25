@@ -639,7 +639,7 @@
             50% { opacity: 0.8; }
         }
 
-        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 9) */
+        /* MEDICAMENTOS LISTA - CORREGIDO (Imagen Neo 9) CON CAMBIOS DE NEO 13 */
         .med-list {
             list-style: none;
         }
@@ -656,7 +656,7 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
-            min-height: 120px;
+            min-height: 140px; /* Aumentado para acomodar mejor */
         }
 
         .med-item::before {
@@ -682,6 +682,7 @@
             opacity: 1;
         }
 
+        /* FOTO DEL MEDICAMENTO - POSICIONADO MÁS ABAJO (Corrección Neo 13) */
         .med-avatar {
             width: 56px;
             height: 56px;
@@ -689,6 +690,7 @@
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
+            margin-top: 20px; /* Movido hacia abajo */
         }
 
         .med-placeholder {
@@ -701,6 +703,7 @@
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
+            margin-top: 20px; /* Movido hacia abajo */
         }
 
         .med-info {
@@ -708,7 +711,7 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; /* Cambiado de space-between a flex-start */
             height: 100%;
             padding: 0.25rem 0;
         }
@@ -728,9 +731,10 @@
             white-space: normal;
             overflow: visible;
             word-break: break-word;
-            max-width: 100%;
+            max-width: calc(100% - 80px); /* Deja espacio para acciones */
             margin-bottom: 0.25rem;
             line-height: 1.3;
+            width: 100%; /* Ocupa todo el ancho disponible */
         }
 
         .med-patient {
@@ -738,6 +742,7 @@
             color: var(--text-muted);
             margin-bottom: 0.5rem;
             word-break: break-word;
+            width: 100%;
         }
 
         .med-times {
@@ -746,6 +751,7 @@
             gap: 0.4rem;
             align-items: center;
             margin-top: auto;
+            width: 100%;
         }
 
         .time-chip {
@@ -794,6 +800,7 @@
             transform: scale(1.05);
         }
 
+        /* ACCIONES - ICONO BASURERO MÁS ABAJO (Corrección Neo 13) */
         .med-actions {
             display: flex;
             flex-direction: column;
@@ -801,6 +808,7 @@
             align-items: center;
             justify-content: flex-start;
             flex-shrink: 0;
+            margin-top: 20px; /* Movido hacia abajo */
         }
 
         .med-select-btn {
@@ -1125,11 +1133,54 @@
             padding: 1.75rem 2rem;
         }
 
-        /* ALERTA MODAL - UN SOLO BLOQUE (Corrección Imagen Neo 10) */
-        .alert-med-container {
+        /* ALERTA MODAL - UN SOLO BLOQUE DESPLAZANTE (Corrección Imagen Neo 12) */
+        .alert-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             max-height: 300px;
             overflow-y: auto;
-            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .alert-header-block {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-time-icon {
+            font-size: 2rem;
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
+
+        .alert-time-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alert-time-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-time-hour {
+            font-size: 1.1rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .alert-med-container {
+            flex: 1;
+            overflow-y: auto;
         }
 
         .alert-med-item {
@@ -1156,6 +1207,7 @@
             border-radius: var(--radius-md);
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
+            flex-shrink: 0;
         }
 
         .alert-med-info {
@@ -1386,14 +1438,19 @@
             }
             .med-item {
                 padding: 1rem;
-                min-height: 110px;
+                min-height: 130px;
             }
             .med-avatar, .med-placeholder {
                 width: 48px;
                 height: 48px;
+                margin-top: 15px;
             }
             .med-name {
                 font-size: 1rem;
+                max-width: calc(100% - 70px);
+            }
+            .med-actions {
+                margin-top: 15px;
             }
             .alert-med-img {
                 width: 52px;
@@ -1635,20 +1692,29 @@
         </div>
     </div>
 
+    <!-- MODAL DE ALARMA - CON BLOQUE ÚNICO DESPLAZANTE (Corrección Neo 12) -->
     <div class="modal-bg" id="alertModal">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-icon">⏰</div>
                 <h2 class="modal-title" id="alertTitle">Hola María</h2>
                 <p class="modal-subtitle">Es hora de tu medicación</p>
-                <div class="modal-time" id="alertTime">
-                    <span>🕐</span>
-                    <span>08:00</span>
-                </div>
             </div>
 
             <div class="modal-body">
-                <div class="alert-med-container" id="alertBody"></div>
+                <div class="alert-container">
+                    <!-- BLOQUE ÚNICO CON RELOJ, HORA Y NOMBRE DE MEDICAMENTOS -->
+                    <div class="alert-header-block">
+                        <div class="alert-time-icon">🕐</div>
+                        <div class="alert-time-info">
+                            <div class="alert-time-title" id="alertTimeDisplay">22:45</div>
+                            <div class="alert-time-hour" id="alertTimeHour"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- LISTA DE MEDICAMENTOS -->
+                    <div class="alert-med-container" id="alertBody"></div>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -1705,7 +1771,7 @@
         </div>
     </div>
 
-    <!-- MODAL PARA AGREGAR HORA -->
+    <!-- MODAL PARA AGREGAR HORA CON CANTIDAD (Corrección Neo 13) -->
     <div class="modal-bg" id="addTimeModal">
         <div class="modal">
             <div class="modal-header">
@@ -1726,6 +1792,9 @@
                         <button class="qty-btn" id="newMenos">−</button>
                         <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
                         <button class="qty-btn" id="newMas">+</button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Ej: 1.25 para 1¼ pastillas
                     </div>
                 </div>
             </div>
@@ -1783,7 +1852,7 @@
             return medColors[medName];
         }
 
-        // NOTIFICACIONES PUSH
+        // NOTIFICACIONES PUSH PARA CELULAR BLOQUEADO
         function showNotification(title, body) {
             if ('Notification' in window && Notification.permission === 'granted') {
                 const notification = new Notification(title, {
@@ -1791,13 +1860,73 @@
                     icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
                     tag: 'mediclock-alarm',
                     requireInteraction: true,
-                    vibrate: [200, 100, 200]
+                    vibrate: [200, 100, 200],
+                    badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    actions: [
+                        {
+                            action: 'take',
+                            title: '✓ Tomado'
+                        },
+                        {
+                            action: 'snooze',
+                            title: '⏰ Posponer'
+                        }
+                    ]
                 });
 
                 notification.onclick = function() {
                     window.focus();
                     notification.close();
+                    showAlert(); // Mostrar la alerta en la app
                 };
+                
+                // Para iOS y dispositivos móviles, forzar el sonido
+                if (sonidoOn.checked) {
+                    playAlarm();
+                }
+            }
+        }
+
+        // REPRODUCIR SONIDO INCLUSO CON PANTALLA BLOQUEADA
+        function playAlarmForLockedScreen() {
+            try {
+                // Crear un contexto de audio que funcione incluso con pantalla bloqueada
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                alarmaOn = true;
+                
+                function beep() {
+                    if (!alarmaOn) return;
+                    
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+                
+                beep();
+                if (intervalo) clearInterval(intervalo);
+                intervalo = setInterval(beep, 800);
+            } catch (e) {
+                console.error('Error de audio:', e);
+                // Fallback a audio HTML5
+                const audio = $('audio');
+                if (audio) {
+                    audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                    audio.volume = parseFloat(volSlider.value);
+                    audio.loop = true;
+                    audio.play().catch(e => console.log('Error reproduciendo audio:', e));
+                }
             }
         }
 
@@ -1836,7 +1965,7 @@
             cant.value = (parseFloat(cant.value) + 0.25).toFixed(2);
         };
 
-        // Nuevos controles para agregar hora
+        // Nuevos controles para agregar hora CON CANTIDAD
         $('newMenos').onclick = () => {
             $('newCant').value = Math.max(0.25, parseFloat($('newCant').value) - 0.25).toFixed(2);
         };
@@ -2015,7 +2144,7 @@
                     }
                 };
 
-                // Botón + para agregar nueva hora (SIMPLIFICADO)
+                // Botón + para agregar nueva hora CON CANTIDAD
                 li.querySelector('.add-time-btn').onclick = e => {
                     e.stopPropagation();
                     currentMedForAddTime = id;
@@ -2068,7 +2197,7 @@
             });
         }
 
-        // FUNCIÓN SIMPLIFICADA PARA AGREGAR HORA
+        // FUNCIÓN PARA AGREGAR HORA CON CANTIDAD
         function addNewTimeToMed(medId, horaValue, cantidad) {
             const m = meds[medId];
             if (!m) return;
@@ -2084,7 +2213,7 @@
             save();
             render();
             
-            showToast('✅ Hora agregada', `${horaValue} agregada a ${upper(m.nombre)}`, 'success');
+            showToast('✅ Hora agregada', `${horaValue} · ${cantidad}u agregada a ${upper(m.nombre)}`, 'success');
         }
 
         // DIALOGO PARA EDITAR/ELIMINAR HORA
@@ -2148,6 +2277,11 @@
 
             if (!horaValue) {
                 showToast('⏰ Hora requerida', 'Selecciona una hora', 'warning');
+                return;
+            }
+
+            if (!cantidad || parseFloat(cantidad) <= 0) {
+                showToast('⚠️ Cantidad inválida', 'Ingresa una cantidad válida', 'warning');
                 return;
             }
 
@@ -2265,29 +2399,26 @@
                 ? `Hola ${upper(pacientes[0])}` 
                 : `${pacientes.length} pacientes`;
             
-            $('alertTime').innerHTML = `<span>🕐</span><span>${horaActual}</span>`;
+            $('alertTimeDisplay').textContent = horaActual;
+            $('alertTimeHour').textContent = `Hora de medicación`;
 
             const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
             $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
 
-            // UN SOLO BLOQUE CON DESPLAZAMIENTO (Corrección Imagen Neo 10)
-            $('alertBody').innerHTML = `
-                <div class="alert-med-container">
-                    ${medsActuales.map(med => {
-                        const colorClass = getMedColor(med.nombre);
-                        return `
-                            <div class="alert-med-item">
-                                <img class="alert-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
-                                <div class="alert-med-info">
-                                    <div class="alert-med-name">${upper(med.nombre)}</div>
-                                    <div class="alert-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
-                                    <div class="alert-med-patient">${upper(med.paciente)}</div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
+            // UN SOLO BLOQUE CON DESPLAZAMIENTO (Corrección Imagen Neo 12)
+            $('alertBody').innerHTML = medsActuales.map(med => {
+                const colorClass = getMedColor(med.nombre);
+                return `
+                    <div class="alert-med-item">
+                        <img class="alert-med-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
+                        <div class="alert-med-info">
+                            <div class="alert-med-name">${upper(med.nombre)}</div>
+                            <div class="alert-med-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
+                            <div class="alert-med-patient">${upper(med.paciente)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
             alertModal.classList.add('open');
             
@@ -2301,7 +2432,7 @@
         }
 
         async function activateAlarm() {
-            // PRIMERO ACTIVAR VOZ
+            // PRIMERO ACTIVAR VOZ (funciona incluso con pantalla desbloqueada)
             if (vozOn.checked && 'speechSynthesis' in window) {
                 let msg = `Son las ${horaActual}. `;
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
@@ -2350,17 +2481,19 @@
                 });
             }
 
-            // LUEGO ACTIVAR SONIDO
+            // LUEGO ACTIVAR SONIDO (funciona incluso con pantalla bloqueada)
             if (sonidoOn.checked) {
                 setTimeout(() => {
-                    playAlarm();
+                    playAlarmForLockedScreen();
                 }, 500);
             }
         }
 
         function playAlarm() {
             try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 alarmaOn = true;
 
                 function beep() {
@@ -2381,6 +2514,7 @@
                 }
 
                 beep();
+                if (intervalo) clearInterval(intervalo);
                 intervalo = setInterval(beep, 800);
             } catch (e) {
                 console.error('Error de audio:', e);
@@ -2393,6 +2527,13 @@
             if (audioCtx) audioCtx.close().catch(() => {});
             audioCtx = null;
             if ('speechSynthesis' in window) speechSynthesis.cancel();
+            
+            // Detener audio HTML5 si se está usando
+            const audio = $('audio');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
         }
 
         $('alertClose').onclick = () => {
@@ -2571,18 +2712,63 @@
             // Comprobar alarmas cada minuto
             setInterval(check, 60000);
             setTimeout(check, 1000);
+            
+            // Mantener la app activa para alarmas
+            if ('wakeLock' in navigator) {
+                try {
+                    navigator.wakeLock.request('screen').then(wakeLock => {
+                        console.log('Wake Lock activado');
+                    });
+                } catch (err) {
+                    console.log('Wake Lock no soportado:', err);
+                }
+            }
         };
 
         window.onbeforeunload = stopAlarm;
         
-        // Mantener la app activa incluso con pantalla bloqueada
+        // Manejar visibilidad de la app
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                console.log('App en segundo plano - Las alarmas seguirán funcionando');
+                console.log('App en segundo plano - Alarmas activas');
             } else {
                 console.log('App en primer plano');
             }
         });
+        
+        // Solicitar permiso para notificaciones push persistentes
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.pushManager.getSubscription().then(subscription => {
+                    if (!subscription) {
+                        // Solicitar suscripción para notificaciones push
+                        registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array('BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U')
+                        }).then(subscription => {
+                            console.log('Suscripción push exitosa:', subscription);
+                        }).catch(error => {
+                            console.log('Error en suscripción push:', error);
+                        });
+                    }
+                });
+            });
+        }
+        
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+            
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
     </script>
 </body>
 </html>
