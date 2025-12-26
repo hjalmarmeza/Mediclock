@@ -710,7 +710,7 @@
             width: 100%;
         }
 
-        /* CORRECCIÓN 1: Nombre ocupa TODO el ancho de la tarjeta */
+        /* CORRECCIÓN: Nombre en una sola línea siempre que sea posible */
         .med-name {
             font-size: 1.25rem;
             font-weight: 700;
@@ -719,11 +719,9 @@
             letter-spacing: 0.02em;
             display: block;
             width: 100%;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            word-wrap: break-word;
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             line-height: 1.3;
             margin-bottom: 0.35rem;
         }
@@ -1109,7 +1107,6 @@
             padding: 1.75rem 2rem;
         }
 
-        /* CORRECCIÓN 3: Modal de alerta muestra usuario en cada medicamento */
         .alert-modal-content {
             display: flex;
             flex-direction: column;
@@ -1842,30 +1839,73 @@
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // CORRECCIÓN 1: Sistema de alarmas funcional
+        // CORRECCIÓN 1: Sistema de alarmas mejorado
         function initializeAlarmSystem() {
-            console.log('🔔 Inicializando sistema de alarmas...');
+            console.log('🔔 Inicializando sistema de alarmas mejorado...');
             
-            // 1. Configurar verificación cada 10 segundos
-            if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 10000);
-            
-            // 2. Verificar inmediatamente
-            setTimeout(checkAlarms, 2000);
-            
-            // 3. Solicitar permisos
+            // Solicitar permisos de notificación inmediatamente
             requestNotificationPermissions();
             
-            console.log('✅ Sistema de alarmas inicializado');
+            // Configurar Background Sync si está disponible
+            setupBackgroundSync();
+            
+            // Verificar alarmas inmediatamente
+            checkAlarms();
+            
+            // Configurar verificación periódica más agresiva
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(checkAlarms, 30000); // Cada 30 segundos
+            
+            // Configurar visibilidad para detección de bloqueo
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Configurar eventos de sonido
+            document.addEventListener('click', handleUserInteraction);
+            
+            console.log('✅ Sistema de alarmas mejorado inicializado');
+        }
+
+        function setupBackgroundSync() {
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.sync.register('alarm-check').then(() => {
+                        console.log('🔄 Background Sync registrado');
+                    }).catch(err => {
+                        console.log('❌ Background Sync no disponible:', err);
+                    });
+                });
+            }
+        }
+
+        function handleVisibilityChange() {
+            if (!document.hidden) {
+                // Cuando la app vuelve a ser visible, verificar alarmas inmediatamente
+                checkAlarms();
+            }
+        }
+
+        function handleUserInteraction() {
+            // Esta función se ejecuta cuando el usuario interactúa
+            // Ayuda a desbloquear el audio
+            if (medsActuales.length > 0 && alarmaOn) {
+                playAlarmSound();
+            }
         }
 
         function requestNotificationPermissions() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                setTimeout(() => {
+            if ('Notification' in window) {
+                if (Notification.permission === 'default') {
                     Notification.requestPermission().then(permission => {
                         console.log('🔔 Permiso de notificaciones:', permission);
                     });
-                }, 3000);
+                }
+            }
+            
+            // Solicitar permisos de audio también
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', () => {
+                    playAlarmSound();
+                });
             }
         }
 
@@ -1884,7 +1924,9 @@
                 if (!m || !m.horas) return;
                 
                 m.horas.forEach(h => {
-                    if (h.h === currentTime) {
+                    // Permitir margen de 1 minuto para alarmas
+                    const alarmTime = h.h;
+                    if (Math.abs(getMinutesDifference(currentTime, alarmTime)) <= 1) {
                         medsActuales.push({
                             id: id,
                             paciente: m.paciente,
@@ -1906,8 +1948,13 @@
                     console.log(`🚨 ALARMA ACTIVADA: ${currentTime} - ${medsActuales.length} medicamento(s)`);
                     horaActual = currentTime;
                     
+                    // Notificar inmediatamente incluso si el dispositivo está bloqueado
                     showLockScreenNotification();
-                    setTimeout(() => showAlert(), 500);
+                    
+                    // Mostrar alerta si la app está visible
+                    if (!document.hidden) {
+                        setTimeout(() => showAlert(), 500);
+                    }
                     
                     fired[key] = true;
                     localStorage.setItem('alarmsToday', JSON.stringify(fired));
@@ -1915,21 +1962,17 @@
             }
         }
 
-        function showLockScreenNotification() {
-            if (!('Notification' in window)) return;
-            
-            if (Notification.permission === 'granted') {
-                sendPushNotification();
-            } else if (Notification.permission === 'default') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        sendPushNotification();
-                    }
-                });
-            }
+        function getMinutesDifference(time1, time2) {
+            const [h1, m1] = time1.split(':').map(Number);
+            const [h2, m2] = time2.split(':').map(Number);
+            return (h1 * 60 + m1) - (h2 * 60 + m2);
         }
 
-        function sendPushNotification() {
+        function showLockScreenNotification() {
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                return;
+            }
+            
             try {
                 const primeraAlerta = medsActuales[0];
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
@@ -1950,53 +1993,117 @@
                     badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
                     tag: 'mediclock-alarm-' + Date.now(),
                     requireInteraction: true,
-                    vibrate: [200, 100, 200, 100, 200],
-                    data: { time: horaActual, count: medsActuales.length }
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    renotify: true,
+                    silent: false, // Forzar que haga sonido
+                    data: { 
+                        time: horaActual, 
+                        count: medsActuales.length,
+                        meds: medsActuales 
+                    }
                 };
 
+                // Enviar notificación push a través del Service Worker
                 if (navigator.serviceWorker && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.ready.then(registration => {
                         registration.showNotification(title, options);
                     });
                 } else {
-                    new Notification(title, options);
+                    // Fallback a notificación estándar
+                    const notification = new Notification(title, options);
+                    notification.onclick = () => {
+                        window.focus();
+                        showAlert();
+                    };
+                }
+                
+                // Forzar reproducción de sonido incluso si el dispositivo está bloqueado
+                if (sonidoOn.checked) {
+                    setTimeout(() => {
+                        playAlarmSoundForced();
+                    }, 1000);
                 }
             } catch (error) {
                 console.error('Error notificación:', error);
             }
         }
 
-        // CORRECCIÓN 2: Sonido de alarma que funciona
+        function playAlarmSoundForced() {
+            try {
+                console.log('🔊 Forzando sonido de alarma...');
+                
+                // Crear audio en contexto de usuario
+                const audio = new Audio();
+                audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                audio.volume = parseFloat(volSlider.value);
+                audio.loop = false;
+                
+                // Configurar para reproducción en segundo plano
+                audio.setAttribute('data-alarm', 'true');
+                
+                // Intentar reproducir inmediatamente
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log('⚠️ Error en reproducción forzada:', e);
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error en sonido forzado:', error);
+            }
+        }
+
+        // CORRECCIÓN 2: Sonido de alarma mejorado
         function playAlarmSound() {
-            if (!sonidoOn.checked) return;
+            if (!sonidoOn.checked || alarmaOn) return;
             
-            console.log('🔊 Reproduciendo sonido de alarma...');
+            console.log('🔊 Reproduciendo sonido de alarma mejorado...');
             
             stopAlarm();
             
             try {
+                // Usar el elemento audio existente
                 const audio = $('audio');
                 if (audio) {
-                    audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                    // Cambiar la fuente a un sonido más confiable
+                    audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
                     audio.volume = parseFloat(volSlider.value);
                     audio.loop = true;
                     
-                    const playPromise = audio.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            console.log('✅ Sonido de alarma iniciado');
-                            alarmaOn = true;
-                        }).catch(error => {
-                            console.log('⚠️ Audio necesita interacción del usuario');
-                            document.addEventListener('click', function unlockAudio() {
-                                audio.play();
-                                document.removeEventListener('click', unlockAudio);
-                            }, { once: true });
+                    // Configurar metadatos para reproducción en segundo plano
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: 'Alarma MediClock',
+                            artist: 'Sistema de medicación',
+                            artwork: [
+                                { src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }
+                            ]
                         });
                     }
+                    
+                    // Intentar reproducir con manejo de promesa mejorado
+                    const playAudio = () => {
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                console.log('✅ Sonido de alarma iniciado');
+                                alarmaOn = true;
+                            }).catch(error => {
+                                console.log('⚠️ Audio necesita interacción del usuario:', error);
+                                // No agregar listener aquí para evitar duplicados
+                            });
+                        }
+                    };
+                    
+                    // Intentar inmediatamente
+                    playAudio();
+                    
+                    // También intentar con un pequeño retraso
+                    setTimeout(playAudio, 100);
                     return;
                 }
                 
+                // Fallback a Web Audio API
                 if (window.AudioContext || window.webkitAudioContext) {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     audioCtx = new AudioContext();
@@ -2008,17 +2115,18 @@
                             const osc = audioCtx.createOscillator();
                             const gain = audioCtx.createGain();
                             
-                            osc.type = 'sine';
+                            osc.type = 'sawtooth';
                             osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                            osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.2);
                             
                             gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
-                            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
                             
                             osc.connect(gain);
                             gain.connect(audioCtx.destination);
                             
                             osc.start();
-                            osc.stop(audioCtx.currentTime + 0.4);
+                            osc.stop(audioCtx.currentTime + 0.5);
                         } catch (e) {
                             console.error('Error en beep:', e);
                         }
@@ -2028,11 +2136,44 @@
                     playBeep();
                     
                     if (intervalo) clearInterval(intervalo);
-                    intervalo = setInterval(playBeep, 800);
+                    intervalo = setInterval(playBeep, 1000); // Sonido cada segundo
                 }
             } catch (error) {
                 console.error('❌ Error reproduciendo sonido:', error);
+                // Intentar método alternativo
+                tryPlayAlternativeSound();
             }
+        }
+
+        function tryPlayAlternativeSound() {
+            console.log('🔄 Intentando método alternativo de sonido...');
+            
+            // Crear múltiples elementos de audio para mayor compatibilidad
+            const audioElements = [];
+            
+            for (let i = 0; i < 3; i++) {
+                const audio = new Audio();
+                audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                audio.volume = parseFloat(volSlider.value) * 0.5;
+                audio.loop = false;
+                audioElements.push(audio);
+                
+                // Intentar reproducir cada uno con un pequeño retraso
+                setTimeout(() => {
+                    audio.play().catch(e => console.log('Audio alternativo falló'));
+                }, i * 200);
+            }
+            
+            alarmaOn = true;
+            
+            // Configurar intervalo para repetir
+            if (intervalo) clearInterval(intervalo);
+            intervalo = setInterval(() => {
+                audioElements.forEach(audio => {
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {});
+                });
+            }, 3000);
         }
 
         function stopAlarm() {
@@ -2054,15 +2195,22 @@
                 audio.currentTime = 0;
             }
             
+            // Detener todos los elementos de audio alternativos
+            document.querySelectorAll('audio[data-alarm]').forEach(a => {
+                a.pause();
+                a.currentTime = 0;
+            });
+            
             if ('speechSynthesis' in window) {
                 speechSynthesis.cancel();
             }
         }
 
-        // CORRECCIÓN 3: Voz mejorada con saludo adecuado
+        // CORRECCIÓN 3: Voz mejorada con manejo de espera
         async function playVoiceReminder() {
             if (!vozOn.checked || !('speechSynthesis' in window)) return;
             
+            // Cancelar cualquier voz previa
             speechSynthesis.cancel();
             
             const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
@@ -2105,21 +2253,38 @@
                 u.lang = 'es-ES';
                 u.rate = 0.9;
                 u.volume = parseFloat(volSlider.value);
-                u.onend = resolve;
-                u.onerror = resolve;
+                u.onend = () => {
+                    console.log('🗣️ Voz finalizada');
+                    // Iniciar sonido inmediatamente después de la voz
+                    setTimeout(() => {
+                        if (sonidoOn.checked) {
+                            playAlarmSound();
+                        }
+                        resolve();
+                    }, 500);
+                };
+                u.onerror = (e) => {
+                    console.error('❌ Error en voz:', e);
+                    // Iniciar sonido incluso si hay error en la voz
+                    if (sonidoOn.checked) {
+                        playAlarmSound();
+                    }
+                    resolve();
+                };
                 
+                // Pequeño retraso antes de iniciar la voz
                 setTimeout(() => {
                     try {
                         speechSynthesis.speak(u);
                     } catch (e) {
-                        console.error('Error en voz:', e);
+                        console.error('Error al iniciar voz:', e);
                         resolve();
                     }
                 }, 300);
             });
         }
 
-        // CORRECCIÓN 4: Ventana de alerta muestra usuario en cada medicamento
+        // CORRECCIÓN 4: Ventana de alerta con usuario visible
         function showAlert() {
             if (!medsActuales.length) return;
             
@@ -2129,7 +2294,7 @@
             if (pacientes.length === 1) {
                 $('alertGreeting').textContent = `Hola ${upper(pacientes[0])}`;
             } else {
-                $('alertGreeting').textContent = 'Hola';
+                $('alertGreeting').textContent = 'Hola a todos';
             }
             
             $('alertTimeDisplay').textContent = horaActual;
@@ -2156,12 +2321,34 @@
 
             alertModal.classList.add('open');
             
+            // Activar alarma después de mostrar la alerta
             activateAlarm();
         }
 
         async function activateAlarm() {
-            await playVoiceReminder();
-            playAlarmSound();
+            console.log('🔔 Activando alarma completa...');
+            
+            // Primero voz si está activada
+            if (vozOn.checked) {
+                console.log('🗣️ Iniciando voz...');
+                await playVoiceReminder();
+            } else {
+                // Si la voz no está activada, iniciar sonido inmediatamente
+                console.log('🔊 Iniciando sonido directamente...');
+                playAlarmSound();
+            }
+            
+            // Forzar foco en la ventana
+            window.focus();
+            
+            // Intentar vibración si está disponible
+            if ('vibrate' in navigator) {
+                try {
+                    navigator.vibrate([200, 100, 200, 100, 200, 100, 200]);
+                } catch (e) {
+                    console.log('Vibración no disponible');
+                }
+            }
         }
 
         function setupTimeChipListeners(li, id, m) {
@@ -2220,7 +2407,7 @@
                     }
                     <div class="med-info">
                         <div class="med-name-row">
-                            <div class="med-name">${upper(m.nombre)}</div>
+                            <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
                             <div class="med-patient">${upper(m.paciente)}</div>
                         </div>
                         <div class="med-times">
@@ -2396,7 +2583,7 @@
 
             initializeAlarmSystem();
             
-            console.log('✅ MediClock Neo iniciado - Sistema de alarmas activo');
+            console.log('✅ MediClock Neo mejorado iniciado - Sistema de alarmas activo');
         };
 
         $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
