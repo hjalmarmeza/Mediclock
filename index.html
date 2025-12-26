@@ -632,8 +632,10 @@
             list-style: none;
         }
 
+        /* --- FIX VISUAL: .med-item Reestructurado --- */
         .med-item {
             display: flex;
+            flex-wrap: wrap; /* Fix: permite que los elementos salten de fila */
             align-items: flex-start;
             gap: 1rem;
             padding: 1.25rem;
@@ -666,10 +668,6 @@
             box-shadow: var(--glow-cyan);
         }
 
-        .med-item:hover::before {
-            opacity: 1;
-        }
-
         .med-avatar {
             width: 60px;
             height: 60px;
@@ -677,7 +675,7 @@
             object-fit: cover;
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
-            margin-top: 35px;
+            margin-top: 0; /* Reset */
         }
 
         .med-placeholder {
@@ -690,7 +688,7 @@
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
-            margin-top: 35px;
+            margin-top: 0; /* Reset */
         }
 
         .med-info {
@@ -700,9 +698,10 @@
             flex-direction: column;
             justify-content: flex-start;
             height: 100%;
-            padding: 0.25rem 0;
+            padding: 0;
         }
 
+        /* Fix: Nombre y paciente arriba al 100% */
         .med-name-row {
             display: flex;
             flex-direction: column;
@@ -710,7 +709,6 @@
             width: 100%;
         }
 
-        /* CORRECCIÓN: Nombre en una sola línea siempre que sea posible */
         .med-name {
             font-size: 1.25rem;
             font-weight: 700;
@@ -777,18 +775,6 @@
             margin-left: 0.25rem;
         }
 
-        .add-time-btn:hover {
-            background: rgba(0, 245, 255, 0.2);
-            transform: scale(1.1);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .time-chip:hover {
-            background: rgba(0, 245, 255, 0.2);
-            box-shadow: var(--glow-cyan);
-            transform: scale(1.05);
-        }
-
         .med-actions {
             display: flex;
             flex-direction: column;
@@ -796,7 +782,7 @@
             align-items: center;
             justify-content: flex-start;
             flex-shrink: 0;
-            margin-top: 35px;
+            margin-top: 0; /* Reset */
         }
 
         .med-select-btn {
@@ -816,11 +802,6 @@
             flex-shrink: 0;
         }
 
-        .med-select-btn:hover {
-            background: rgba(0, 245, 255, 0.2);
-            transform: scale(1.05);
-        }
-
         .med-delete {
             width: 36px;
             height: 36px;
@@ -834,12 +815,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             flex-shrink: 0;
-        }
-
-        .med-delete:hover {
-            background: rgba(255, 71, 87, 0.15);
-            border-color: rgba(255, 71, 87, 0.3);
-            color: #ff4757;
         }
 
         .empty {
@@ -1011,10 +986,6 @@
             transition: transform 0.2s ease;
         }
 
-        .volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
         .modal-bg {
             display: none;
             position: fixed;
@@ -1057,16 +1028,6 @@
             position: relative;
         }
 
-        .modal-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-        }
-
         .modal-icon {
             width: 72px;
             height: 72px;
@@ -1079,11 +1040,6 @@
             font-size: 2rem;
             box-shadow: var(--glow-cyan), var(--glow-magenta);
             animation: iconFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
         }
 
         .modal-title {
@@ -1291,23 +1247,6 @@
             cursor: pointer;
         }
 
-        .detail-time-item:hover {
-            background: rgba(0, 245, 255, 0.05);
-            transform: translateX(5px);
-        }
-
-        .detail-time-hour {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .detail-time-qty {
-            font-size: 0.9rem;
-            color: var(--neon-cyan);
-            font-weight: 600;
-        }
-
         .cal-item {
             padding: 1.25rem;
             background: rgba(0, 0, 0, 0.3);
@@ -1370,10 +1309,6 @@
             border-radius: 3px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 245, 255, 0.5);
-        }
-
         @keyframes toastIn {
             from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -1422,13 +1357,13 @@
             .med-avatar, .med-placeholder {
                 width: 52px;
                 height: 52px;
-                margin-top: 30px;
+                margin-top: 0; /* Fix */
             }
             .med-name {
                 font-size: 1.15rem;
             }
             .med-actions {
-                margin-top: 30px;
+                margin-top: 0; /* Fix */
             }
             .alert-clock-icon {
                 width: 60px;
@@ -1487,20 +1422,6 @@
         .color-5 { background: linear-gradient(135deg, var(--neon-pink), var(--neon-magenta)); }
         .color-6 { background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan)); }
 
-        .color-1-border { border-color: var(--neon-cyan); }
-        .color-2-border { border-color: var(--neon-magenta); }
-        .color-3-border { border-color: var(--neon-green); }
-        .color-4-border { border-color: var(--neon-orange); }
-        .color-5-border { border-color: var(--neon-pink); }
-        .color-6-border { border-color: var(--neon-violet); }
-
-        .color-1-text { color: var(--neon-cyan); }
-        .color-2-text { color: var(--neon-magenta); }
-        .color-3-text { color: var(--neon-green); }
-        .color-4-text { color: var(--neon-orange); }
-        .color-5-text { color: var(--neon-pink); }
-        .color-6-text { color: var(--neon-violet); }
-
         .time-chip.color-1 { 
             background: rgba(0, 245, 255, 0.1); 
             border-color: rgba(0, 245, 255, 0.3);
@@ -1534,6 +1455,9 @@
     </style>
 </head>
 <body>
+    <!-- FIX iOS Background: Tag de audio silencioso -->
+    <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
+
     <div class="bg-animation"></div>
     <div class="grid-pattern"></div>
     <div class="orb orb-1"></div>
@@ -1822,6 +1746,20 @@
     <audio id="audio" preload="auto" loop></audio>
 
     <script>
+        /* --- FIX iOS Background: Script initAudioHack --- */
+        function initAudioHack() {
+            const silentAudio = document.getElementById('iosWakeAudio');
+            if (silentAudio) {
+                silentAudio.play().then(() => {
+                    console.log("🚀 iOS Background Hack Activado");
+                    window.removeEventListener('touchstart', initAudioHack);
+                    window.removeEventListener('click', initAudioHack);
+                }).catch(err => console.log("Audio Hack bloqueado:", err));
+            }
+        }
+        window.addEventListener('touchstart', initAudioHack, { once: true });
+        window.addEventListener('click', initAudioHack, { once: true });
+
         // Variables globales
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
         let foto = '';
@@ -2401,15 +2339,15 @@
                 li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
 
                 li.innerHTML = `
+                    <div class="med-name-row">
+                        <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
+                        <div class="med-patient">${upper(m.paciente)}</div>
+                    </div>
                     ${m.foto
                         ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23000%22/><text x=%2250%22 y=%2255%22 font-size=%2224%22 text-anchor=%22middle%22 fill=%22%23fff%22>💊</text></svg>';">`
                         : `<div class="med-placeholder ${colorClass}">💊</div>`
                     }
                     <div class="med-info">
-                        <div class="med-name-row">
-                            <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
-                            <div class="med-patient">${upper(m.paciente)}</div>
-                        </div>
                         <div class="med-times">
                             ${m.horas.map(h => `
                                 <span class="time-chip ${colorClass}" data-h="${h.h}" data-cant="${h.cant}">
