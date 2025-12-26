@@ -1,13 +1,40 @@
 self.addEventListener('install', event => {
   self.skipWaiting();
+  console.log('Service Worker instalado');
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(clients.claim());
+  console.log('Service Worker activado');
 });
 
+// Background Sync para verificación de alarmas
+self.addEventListener('sync', event => {
+  if (event.tag === 'alarm-check') {
+    event.waitUntil(checkAlarmsInBackground());
+  }
+});
+
+async function checkAlarmsInBackground() {
+  console.log('🔄 Verificando alarmas en segundo plano');
+  
+  // Obtener medicamentos del almacenamiento
+  const clientsList = await clients.matchAll();
+  for (const client of clientsList) {
+    client.postMessage({ type: 'CHECK_ALARMS' });
+  }
+}
+
+// Notificaciones push
 self.addEventListener('push', event => {
-  const data = event.data ? event.data.json() : {};
+  console.log('Push recibido:', event);
+  
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (e) {
+    console.log('Error parsing push data:', e);
+  }
   
   const options = {
     body: data.body || 'Hora de medicación',
@@ -16,6 +43,8 @@ self.addEventListener('push', event => {
     vibrate: [200, 100, 200, 100, 200],
     tag: 'mediclock-alarm',
     requireInteraction: true,
+    renotify: true,
+    silent: false,
     data: data,
     actions: [
       { action: 'take', title: '✓ Tomado', icon: '/icon-take.png' },
@@ -28,7 +57,9 @@ self.addEventListener('push', event => {
   );
 });
 
+// Manejo de clics en notificaciones
 self.addEventListener('notificationclick', event => {
+  console.log('Notificación clickeada:', event.notification.tag);
   event.notification.close();
   
   const action = event.action;
@@ -39,17 +70,10 @@ self.addEventListener('notificationclick', event => {
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then(clientList => {
           if (clientList.length > 0) {
-            let client = clientList[0];
-            for (let i = 0; i < clientList.length; i++) {
-              if (clientList[i].focused) {
-                client = clientList[i];
-              }
-            }
-            // Enviar mensaje a la ventana
-            client.postMessage({
-              type: 'NOTIFICATION_CLICK',
-              action: 'take',
-              data: event.notification.data
+            const client = clientList[0];
+            client.postMessage({ 
+              type: 'TAKE_MEDICATION', 
+              data: event.notification.data 
             });
             return client.focus();
           }
@@ -57,7 +81,7 @@ self.addEventListener('notificationclick', event => {
         })
     );
   } else {
-    // Abrir la app normalmente
+    // Abrir la app
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then(clientList => {
@@ -73,5 +97,23 @@ self.addEventListener('notificationclick', event => {
           return clients.openWindow('/');
         })
     );
+  }
+});
+
+// Manejo de mensajes desde la app
+self.addEventListener('message', event => {
+  console.log('Mensaje recibido en SW:', event.data);
+  
+  if (event.data && event.data.type === 'TRIGGER_ALARM') {
+    // Mostrar notificación desde la app
+    self.registration.showNotification(event.data.title || 'MediClock Neo', {
+      body: event.data.body || 'Hora de medicación',
+      icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+      badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+      vibrate: [200, 100, 200, 100, 200],
+      tag: 'mediclock-alarm-' + Date.now(),
+      requireInteraction: true,
+      data: event.data
+    });
   }
 });
