@@ -31,19 +31,47 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then(clientList => {
-        if (clientList.length > 0) {
-          let client = clientList[0];
-          for (let i = 0; i < clientList.length; i++) {
-            if (clientList[i].focused) {
-              client = clientList[i];
+  const action = event.action;
+  
+  if (action === 'take') {
+    // Enviar mensaje a la app para registrar la toma
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then(clientList => {
+          if (clientList.length > 0) {
+            let client = clientList[0];
+            for (let i = 0; i < clientList.length; i++) {
+              if (clientList[i].focused) {
+                client = clientList[i];
+              }
             }
+            // Enviar mensaje a la ventana
+            client.postMessage({
+              type: 'NOTIFICATION_CLICK',
+              action: 'take',
+              data: event.notification.data
+            });
+            return client.focus();
           }
-          return client.focus();
-        }
-        return clients.openWindow('/');
-      })
-  );
+          return clients.openWindow('/');
+        })
+    );
+  } else {
+    // Abrir la app normalmente
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then(clientList => {
+          if (clientList.length > 0) {
+            let client = clientList[0];
+            for (let i = 0; i < clientList.length; i++) {
+              if (clientList[i].focused) {
+                client = clientList[i];
+              }
+            }
+            return client.focus();
+          }
+          return clients.openWindow('/');
+        })
+    );
+  }
 });
