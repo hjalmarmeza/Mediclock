@@ -630,7 +630,7 @@
             50% { opacity: 0.8; }
         }
 
-        /* MEDICAMENTOS LISTA - NOMBRE COMPLETO VISIBLE (Corrección Neo.png) */
+        /* MEDICAMENTOS LISTA - CORRECCIÓN: Nombre ajusta automáticamente */
         .med-list {
             list-style: none;
         }
@@ -712,23 +712,23 @@
             flex-direction: column;
             margin-bottom: 0.5rem;
             width: 100%;
+            overflow: hidden;
         }
 
-        /* NOMBRE DEL MEDICAMENTO - COMPLETO Y VISIBLE (Corrección Neo.png) */
+        /* CORRECCIÓN: Nombre ajusta tamaño automáticamente */
         .med-name {
-            font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-primary);
-            white-space: nowrap;
-            overflow: visible;
-            text-overflow: clip;
-            max-width: 100%;
-            margin-bottom: 0.35rem;
-            line-height: 1.3;
-            width: 100%;
             text-transform: uppercase;
             letter-spacing: 0.02em;
             display: block;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            line-height: 1.3;
         }
 
         .med-patient {
@@ -738,6 +738,7 @@
             word-break: break-word;
             width: 100%;
             font-weight: 600;
+            text-align: left;
         }
 
         .med-times {
@@ -1114,7 +1115,7 @@
             padding: 1.75rem 2rem;
         }
 
-        /* MODAL DE ALERTA - CORREGIDO (Neo 3) */
+        /* MODAL DE ALERTA - CORREGIDO PARA MOSTRAR MÚLTIPLES MEDICAMENTOS */
         .alert-modal-content {
             display: flex;
             flex-direction: column;
@@ -1168,13 +1169,21 @@
             background-clip: text;
         }
 
-        /* MEDICAMENTO EN ALERTA - NOMBRE HORIZONTAL SOBRE FOTO (Corrección Neo 3) */
+        /* LISTA DE MEDICAMENTOS EN ALERTA */
+        .alert-medications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
         .alert-medication-container {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(0, 245, 255, 0.3);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
-            margin-bottom: 1rem;
         }
 
         .alert-medication-name-container {
@@ -1182,21 +1191,24 @@
         }
 
         .alert-medication-name {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-primary);
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             white-space: normal;
-            overflow: visible;
-            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             margin-bottom: 0.5rem;
         }
 
         .alert-medication-img {
             width: 100%;
-            height: 180px;
+            height: 120px;
             object-fit: cover;
             border-radius: var(--radius-md);
             border: 2px solid rgba(0, 245, 255, 0.3);
@@ -1213,7 +1225,7 @@
             background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 245, 255, 0.15));
             border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 20px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--neon-green);
             margin: 0 auto;
@@ -1232,60 +1244,30 @@
             margin-bottom: 1.25rem;
         }
 
-        /* MODAL DETALLE - CON FOTO RECTANGULAR (Corrección Neo 2) */
-        .detail-img-container {
-            width: 100%;
+        /* MODAL DETALLE - CON FOTO RECTANGULAR REEMPLAZANDO ICONO */
+        .detail-header-with-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 1.5rem;
         }
 
-        .detail-img {
+        .detail-main-img {
             width: 100%;
+            max-width: 300px;
             height: 200px;
             object-fit: cover;
             border-radius: var(--radius-lg);
             border: 2px solid rgba(0, 245, 255, 0.3);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             box-shadow: var(--glow-cyan);
         }
 
-        .detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .detail-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .detail-text {
-            flex: 1;
-        }
-
-        .detail-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .detail-patient {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+        .detail-info {
+            text-align: center;
         }
 
         .detail-times-title {
@@ -1446,7 +1428,7 @@
                 margin-top: 30px;
             }
             .med-name {
-                font-size: 1.15rem;
+                font-size: clamp(0.9rem, 3.5vw, 1.1rem);
             }
             .med-actions {
                 margin-top: 30px;
@@ -1460,12 +1442,12 @@
                 font-size: 1.2rem;
             }
             .alert-medication-name {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
             .alert-medication-img {
-                height: 150px;
+                height: 100px;
             }
-            .detail-img {
+            .detail-main-img {
                 height: 150px;
             }
             .modal-footer {
@@ -1697,7 +1679,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ALARMA - CORREGIDO (Neo 3) -->
+    <!-- MODAL DE ALARMA - CORREGIDO PARA MOSTRAR MÚLTIPLES MEDICAMENTOS -->
     <div class="modal-bg" id="alertModal">
         <div class="modal">
             <div class="modal-body">
@@ -1705,25 +1687,21 @@
                     <div class="alert-header">
                         <div class="alert-clock-icon">⏰</div>
                         <div class="alert-greeting">
-                            <div class="alert-greeting-text" id="alertGreeting">Hola ISRAEL</div>
-                            <div class="alert-time-display" id="alertTimeDisplay">00:50</div>
+                            <div class="alert-greeting-text" id="alertGreeting">Hora de medicación</div>
+                            <div class="alert-time-display" id="alertTimeDisplay">00:00</div>
                         </div>
                     </div>
 
                     <h2 class="alert-title">Es hora de tu medicación</h2>
 
-                    <div class="alert-medication-container">
-                        <div class="alert-medication-name-container">
-                            <div class="alert-medication-name" id="alertMedicationName">LEVOTIROXINA</div>
-                        </div>
-                        <img class="alert-medication-img" id="alertMedicationImg" src="" alt="Medicamento">
-                        <div class="alert-medication-qty" id="alertMedicationQty">1 pastilla</div>
+                    <div class="alert-medications-list" id="alertMedicationsList">
+                        <!-- Se llena dinámicamente con todos los medicamentos -->
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <p class="modal-total" id="alertTotal">Total: 1 medicamento (1 unidad)</p>
+                <p class="modal-total" id="alertTotal">Total: 0 medicamentos (0 unidades)</p>
                 <div class="btn-group">
                     <button class="btn btn-danger" id="alertClose">Cerrar</button>
                     <button class="btn btn-success" id="alertTake">✓ Tomado</button>
@@ -1732,18 +1710,16 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE - CON FOTO RECTANGULAR (Corrección Neo 2) -->
+    <!-- MODAL DETALLE - CON FOTO PRINCIPAL REEMPLAZANDO ICONO -->
     <div class="modal-bg" id="detailModal">
         <div class="modal">
-            <div class="modal-header">
-                <div class="modal-icon">💊</div>
-                <p class="modal-subtitle" id="detailPatient">ISRAEL</p>
-                <h2 class="modal-title" id="detailName">LEVOTIROXINA</h2>
-            </div>
-
             <div class="modal-body">
-                <div class="detail-img-container">
-                    <img class="detail-img" id="detailImg" src="" alt="Medicamento">
+                <div class="detail-header-with-photo">
+                    <img class="detail-main-img" id="detailMainImg" src="" alt="Medicamento">
+                    <div class="detail-info">
+                        <p class="modal-subtitle" id="detailPatient">PACIENTE</p>
+                        <h2 class="modal-title" id="detailName">MEDICAMENTO</h2>
+                    </div>
                 </div>
                 <div class="detail-times-title">Horarios programados</div>
                 <div id="detailTimes"></div>
@@ -1860,6 +1836,7 @@
         let medColors = {};
         let currentMedForAddTime = null;
         let editingTimeData = null; // Para editar horarios
+        let checkInterval = null; // Intervalo para verificar alarmas
 
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
@@ -1883,8 +1860,8 @@
         const calModal = $('calModal');
         const addTimeModal = $('addTimeModal');
 
-        // 1. CORRECCIÓN: Nombre completo en tarjetas (Neo.png)
-        // Cambiado en CSS: .med-name { overflow: visible; text-overflow: clip; }
+        // 1. SOLUCIÓN: Nombre ajusta automáticamente
+        // Ya implementado en CSS con: font-size: clamp(1rem, 4vw, 1.25rem);
 
         // 2. FUNCIONALIDAD: Editar horario al presionar un chip de hora
         function setupTimeChipListeners(li, id, m) {
@@ -1894,10 +1871,6 @@
                     e.stopPropagation();
                     openEditTimeModal(id, this.dataset.h, this.dataset.cant);
                 });
-
-                // Eliminar clic largo anterior para evitar conflictos
-                chip.removeEventListener('mousedown', () => {});
-                chip.removeEventListener('touchstart', () => {});
             });
         }
 
@@ -1986,7 +1959,7 @@
             editingTimeData = null;
         };
 
-        // 3. CORRECCIÓN: Alarmas que usan hora del celular
+        // 3. SOLUCIÓN MEJORADA: Sistema de alarmas más preciso
         function getCurrentTime() {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
@@ -1994,22 +1967,21 @@
             return `${hours}:${minutes}`;
         }
 
-        // 4. MEJORA: Sistema de alarmas robusto
-        let lastCheckedMinute = -1;
+        function getCurrentSecond() {
+            return new Date().getSeconds();
+        }
 
+        // 4. MEJORA: Verificación de alarmas cada segundo para mayor precisión
         function checkAlarms() {
             const now = new Date();
-            const currentMinute = now.getMinutes();
-            
-            // Solo verificar una vez por minuto
-            if (currentMinute === lastCheckedMinute) return;
-            lastCheckedMinute = currentMinute;
-
-            const today = now.toISOString().slice(0, 10);
             const currentTime = getCurrentTime();
+            const currentSecond = now.getSeconds();
             
-            console.log(`🔔 Verificando alarmas a las ${currentTime}`);
-
+            // Solo verificar en el segundo 0 de cada minuto para eficiencia
+            if (currentSecond !== 0 && currentSecond !== 30) return;
+            
+            const today = now.toISOString().slice(0, 10);
+            
             medsActuales = [];
             let alarmTriggered = false;
 
@@ -2035,14 +2007,14 @@
                 const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
 
                 if (!fired[key]) {
-                    console.log(`🚨 ALARMA ACTIVADA para ${medsActuales.length} medicamento(s)`);
+                    console.log(`🚨 ALARMA ACTIVADA a las ${currentTime} para ${medsActuales.length} medicamento(s)`);
                     horaActual = currentTime;
                     
-                    // Mostrar notificación push primero
+                    // Mostrar notificación push
                     showLockScreenNotification();
                     
-                    // Luego mostrar alerta en la app
-                    setTimeout(() => showAlert(), 500);
+                    // Mostrar alerta en la app
+                    setTimeout(() => showAlert(), 1000);
                     
                     fired[key] = true;
                     localStorage.setItem('alarmsToday', JSON.stringify(fired));
@@ -2050,126 +2022,150 @@
             }
         }
 
-        // 5. MEJORA: Notificaciones con pantalla bloqueada
+        // 5. SOLUCIÓN: Notificaciones push mejoradas
         function showLockScreenNotification() {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                const primeraAlerta = medsActuales[0];
-                const title = '⏰ MediClock Neo - Hora de medicación';
-                const body = `Hola ${upper(primeraAlerta.paciente)}. Es hora de tomar ${upper(primeraAlerta.nombre)}.`;
-
-                const options = {
-                    body: body,
-                    icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                    badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                    tag: 'mediclock-alarm',
-                    requireInteraction: true,
-                    vibrate: [200, 100, 200, 100, 200],
-                    data: {
-                        time: horaActual,
-                        medications: medsActuales
-                    },
-                    actions: [
-                        {
-                            action: 'take',
-                            title: '✓ Tomado',
-                            icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828640.png'
-                        }
-                    ]
-                };
-
-                // Para iOS
-                if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-                    options.silent = false;
-                }
-
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(title, options).then(() => {
-                        console.log('📱 Notificación push enviada');
-                    }).catch(err => {
-                        console.error('Error mostrando notificación:', err);
-                        // Fallback a Notification API
-                        new Notification(title, options);
-                    });
-                }).catch(() => {
-                    // Fallback si Service Worker no está listo
-                    new Notification(title, options);
+            if (!('Notification' in window)) return;
+            
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        sendPushNotification();
+                    }
                 });
+            } else if (Notification.permission === 'granted') {
+                sendPushNotification();
             }
         }
 
-        // 6. MEJORA: Audio y voz más confiables
+        function sendPushNotification() {
+            const primeraAlerta = medsActuales[0];
+            const title = '⏰ MediClock Neo - Hora de medicación';
+            const body = `Hola ${upper(primeraAlerta.paciente)}. Es hora de tomar ${upper(primeraAlerta.nombre)}.`;
+            
+            const options = {
+                body: body,
+                icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                tag: 'mediclock-alarm',
+                requireInteraction: true,
+                vibrate: [200, 100, 200, 100, 200],
+                data: {
+                    time: horaActual,
+                    medications: medsActuales
+                },
+                actions: [
+                    {
+                        action: 'take',
+                        title: '✓ Tomado'
+                    }
+                ]
+            };
+
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, options).then(() => {
+                    console.log('📱 Notificación push enviada');
+                }).catch(err => {
+                    console.error('Error mostrando notificación:', err);
+                });
+            }).catch(() => {
+                // Fallback si Service Worker no está listo
+                if ('Notification' in window) {
+                    new Notification(title, options);
+                }
+            });
+        }
+
+        // 6. SOLUCIÓN MEJORADA: Audio compatible con iOS
         function playAlarmSound() {
             if (!sonidoOn.checked) return;
 
             try {
-                // Usar AudioContext para mejor control
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-
-                // Resumir contexto si está suspendido
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume().then(() => {
-                        console.log('🎵 AudioContext resumido');
-                    }).catch(e => console.error('Error resumiendo audio:', e));
-                }
-
-                alarmaOn = true;
-
-                function playBeep() {
-                    if (!alarmaOn || !audioCtx) return;
-
-                    try {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                        
-                        gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-                        
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        
-                        osc.start();
-                        osc.stop(audioCtx.currentTime + 0.4);
-                    } catch (e) {
-                        console.error('Error en beep:', e);
+                // Detener sonido anterior si existe
+                stopAlarmSound();
+                
+                // Usar AudioContext si está disponible
+                if (window.AudioContext || window.webkitAudioContext) {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     }
-                }
-
-                // Reproducir primer beep inmediatamente
-                playBeep();
-                
-                // Limpiar intervalo anterior si existe
-                if (intervalo) clearInterval(intervalo);
-                
-                // Configurar intervalo para sonido repetitivo
-                intervalo = setInterval(playBeep, 800);
-
-            } catch (e) {
-                console.error('🎵 Error con AudioContext:', e);
-                
-                // Fallback a audio HTML5
-                const audio = $('audio');
-                if (audio) {
-                    audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
-                    audio.volume = parseFloat(volSlider.value);
-                    audio.loop = true;
                     
-                    const playPromise = audio.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            console.log('Error reproduciendo audio:', error);
-                            // Solicitar interacción del usuario
-                            document.addEventListener('click', function unlockAudio() {
-                                audio.play();
-                                document.removeEventListener('click', unlockAudio);
-                            }, { once: true });
-                        });
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    
+                    alarmaOn = true;
+                    
+                    function playBeep() {
+                        if (!alarmaOn || !audioCtx) return;
+                        
+                        try {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                            
+                            gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                            
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            
+                            osc.start();
+                            osc.stop(audioCtx.currentTime + 0.4);
+                        } catch (e) {
+                            console.error('Error en beep:', e);
+                        }
+                    }
+                    
+                    // Reproducir primer beep
+                    playBeep();
+                    
+                    // Limpiar intervalo anterior
+                    if (intervalo) clearInterval(intervalo);
+                    
+                    // Configurar intervalo
+                    intervalo = setInterval(playBeep, 800);
+                    
+                } else {
+                    // Fallback para navegadores antiguos
+                    const audio = $('audio');
+                    if (audio) {
+                        audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                        audio.volume = parseFloat(volSlider.value);
+                        audio.loop = true;
+                        
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.log('Audio necesita interacción del usuario:', error);
+                            });
+                        }
+                        alarmaOn = true;
                     }
                 }
+            } catch (e) {
+                console.error('🎵 Error reproduciendo sonido:', e);
+            }
+        }
+
+        function stopAlarmSound() {
+            alarmaOn = false;
+            
+            if (intervalo) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+            
+            if (audioCtx) {
+                audioCtx.close().catch(() => {});
+                audioCtx = null;
+            }
+            
+            const audio = $('audio');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
             }
         }
 
@@ -2180,36 +2176,45 @@
             speechSynthesis.cancel();
 
             let msg = `Son las ${horaActual}. `;
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-
-            if (pacientes.length === 1) {
-                const paciente = pacientes[0];
+            
+            // Agrupar medicamentos por paciente
+            const pacientes = {};
+            medsActuales.forEach(med => {
+                if (!pacientes[med.paciente]) {
+                    pacientes[med.paciente] = [];
+                }
+                pacientes[med.paciente].push(med);
+            });
+            
+            const pacientesArray = Object.keys(pacientes);
+            
+            if (pacientesArray.length === 1) {
+                const paciente = pacientesArray[0];
+                const medicamentos = pacientes[paciente];
                 msg += `Hola ${paciente}. Te toca tomar `;
                 
-                const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
-                
-                if (medicamentosPaciente.length === 1) {
-                    msg += `${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
+                if (medicamentos.length === 1) {
+                    msg += `${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
                 } else {
-                    msg += medicamentosPaciente.map((med, index) => {
-                        const connector = index === medicamentosPaciente.length - 1 ? ' y ' : 
+                    msg += medicamentos.map((med, index) => {
+                        const connector = index === medicamentos.length - 1 ? ' y ' : 
                                          index === 0 ? '' : ', ';
                         return `${connector}${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
                     }).join('') + '.';
                 }
             } else {
                 msg += 'Atención, es hora de medicación para ';
-                msg += pacientes.map((paciente, index) => {
-                    const medicamentosPaciente = medsActuales.filter(m => m.paciente === paciente);
-                    const connector = index === pacientes.length - 1 ? ' y ' : 
+                msg += pacientesArray.map((paciente, index) => {
+                    const medicamentos = pacientes[paciente];
+                    const connector = index === pacientesArray.length - 1 ? ' y ' : 
                                      index === 0 ? '' : ', ';
                     
-                    if (medicamentosPaciente.length === 1) {
-                        return `${connector}${paciente}: ${medicamentosPaciente[0].nombre}, ${medicamentosPaciente[0].cantidad} ${medicamentosPaciente[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                    if (medicamentos.length === 1) {
+                        return `${connector}${paciente}: ${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
                     } else {
-                        const medicamentosStr = medicamentosPaciente.map(med => 
-                            `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`
-                        ).join(' y ');
+                        const medicamentosStr = medicamentos.map(med => 
+                            `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`)
+                            .join(' y ');
                         return `${connector}${paciente}: ${medicamentosStr}`;
                     }
                 }).join('') + '.';
@@ -2223,25 +2228,46 @@
                 u.onend = resolve;
                 u.onerror = resolve;
                 
-                // Pequeño delay para evitar problemas en iOS
+                // Pequeño delay para evitar problemas
                 setTimeout(() => {
-                    speechSynthesis.speak(u);
-                }, 100);
+                    try {
+                        speechSynthesis.speak(u);
+                    } catch (e) {
+                        console.error('Error en síntesis de voz:', e);
+                        resolve();
+                    }
+                }, 300);
             });
         }
 
-        // 7. FUNCIÓN MEJORADA: Mostrar alerta
+        // 7. SOLUCIÓN: Mostrar TODOS los medicamentos en la alerta
         function showAlert() {
             if (!medsActuales.length) return;
 
-            const primeraAlerta = medsActuales[0];
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            const primerPaciente = pacientes[0];
             
-            // Configurar interfaz (Neo 3)
-            $('alertGreeting').textContent = `Hola ${upper(primeraAlerta.paciente)}`;
+            // Configurar interfaz
+            $('alertGreeting').textContent = `Hola ${upper(primerPaciente)}`;
             $('alertTimeDisplay').textContent = horaActual;
-            $('alertMedicationName').textContent = upper(primeraAlerta.nombre);
-            $('alertMedicationQty').textContent = `${primeraAlerta.cantidad} ${primeraAlerta.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
-            $('alertMedicationImg').src = primeraAlerta.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+            
+            // Limpiar lista anterior
+            const alertMedicationsList = $('alertMedicationsList');
+            alertMedicationsList.innerHTML = '';
+            
+            // Agregar todos los medicamentos
+            medsActuales.forEach(med => {
+                const medElement = document.createElement('div');
+                medElement.className = 'alert-medication-container';
+                medElement.innerHTML = `
+                    <div class="alert-medication-name-container">
+                        <div class="alert-medication-name">${upper(med.nombre)}</div>
+                    </div>
+                    <img class="alert-medication-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}">
+                    <div class="alert-medication-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
+                `;
+                alertMedicationsList.appendChild(medElement);
+            });
 
             const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
             $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
@@ -2253,7 +2279,7 @@
         }
 
         async function activateAlarm() {
-            // Reproducir voz primero
+            // Reproducir voz
             await playVoiceReminder();
             
             // Luego sonido
@@ -2262,26 +2288,7 @@
 
         // 8. FUNCIÓN MEJORADA: Detener alarmas
         function stopAlarm() {
-            alarmaOn = false;
-            
-            // Detener sonido
-            if (intervalo) {
-                clearInterval(intervalo);
-                intervalo = null;
-            }
-            
-            // Cerrar AudioContext
-            if (audioCtx) {
-                audioCtx.close().catch(() => {});
-                audioCtx = null;
-            }
-            
-            // Detener audio HTML5
-            const audio = $('audio');
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
+            stopAlarmSound();
             
             // Detener voz
             if ('speechSynthesis' in window) {
@@ -2321,7 +2328,7 @@
                     }
                     <div class="med-info">
                         <div class="med-name-row">
-                            <!-- NOMBRE COMPLETO VISIBLE -->
+                            <!-- NOMBRE QUE SE AJUSTA AUTOMÁTICAMENTE -->
                             <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
                             <div class="med-patient">${upper(m.paciente)}</div>
                         </div>
@@ -2375,14 +2382,14 @@
             });
         }
 
-        // 11. MOSTRAR DETALLE DEL MEDICAMENTO (Corrección Neo 2)
+        // 11. MOSTRAR DETALLE DEL MEDICAMENTO CON FOTO PRINCIPAL
         function showDetail(id) {
             const m = meds[id];
             if (!m) return;
 
             $('detailPatient').textContent = upper(m.paciente);
             $('detailName').textContent = upper(m.nombre);
-            $('detailImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+            $('detailMainImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
 
             // Generar lista de horarios
             $('detailTimes').innerHTML = m.horas.map(h => `
@@ -2487,7 +2494,7 @@
             }, 3000);
         }
 
-        // 13. EVENT LISTENERS BÁSICOS
+        // 13. INICIALIZACIÓN MEJORADA
         window.onload = function() {
             loadConfig();
             render();
@@ -2508,16 +2515,19 @@
             
             localStorage.setItem('alarmsToday', JSON.stringify(filtered));
 
-            // Solicitar permisos
+            // Solicitar permisos de notificación
             if ('Notification' in window && Notification.permission === 'default') {
                 setTimeout(() => {
-                    Notification.requestPermission();
+                    Notification.requestPermission().then(permission => {
+                        console.log('Permiso de notificación:', permission);
+                    });
                 }, 2000);
             }
 
-            // Configurar intervalo de verificación de alarmas
-            setInterval(checkAlarms, 30000); // Cada 30 segundos
-            checkAlarms(); // Verificar inmediatamente
+            // Configurar intervalo de verificación de alarmas CADA SEGUNDO
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(checkAlarms, 1000); // Verificar cada segundo
+            checkAlarms(); // Verificar inmediatamente al cargar
 
             console.log('✅ MediClock Neo iniciado correctamente');
         };
@@ -2697,6 +2707,7 @@
                 return;
             }
             
+            // Simular múltiples medicamentos para probar
             const testMedicamentos = [];
             const cantidadPrueba = Math.min(keys.length, 3);
             
@@ -2850,7 +2861,10 @@
         }
 
         // Limpiar al cerrar
-        window.onbeforeunload = stopAlarm;
+        window.onbeforeunload = () => {
+            if (checkInterval) clearInterval(checkInterval);
+            stopAlarm();
+        };
     </script>
 </body>
 </html>
