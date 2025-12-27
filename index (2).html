@@ -196,15 +196,34 @@
 
         .form-group { margin-bottom: 1.5rem; }
         .form-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 0.6rem; }
-        .form-input { width: 100%; padding: 1rem 1.25rem; color: var(--text-primary); background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); outline: none; }
+        .form-input { 
+            width: 100%;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+        }
+        .form-input[type="time"] {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            font-size: 1rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
         
         .qty-row { display: flex; gap: 0.75rem; }
         .qty-btn { width: 52px; height: 52px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); color: var(--neon-cyan); font-size: 1.5rem; cursor: pointer; }
 
-        /* FIX VISUAL: .med-item Reestructurado */
         .med-item {
             display: flex;
-            flex-wrap: wrap; /* Fix: permite que los elementos salten de fila */
+            flex-wrap: wrap;
             align-items: center;
             gap: 1rem;
             padding: 1.25rem;
@@ -218,19 +237,26 @@
             min-height: auto;
         }
 
-        /* Nombre y paciente arriba al 100% */
         .med-name-row {
             display: flex;
             flex-direction: column;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             width: 100%;
-            padding-right: 40px; /* Espacio para botón delete */
+            padding-right: 0;
         }
 
         .med-name {
-            font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
-            text-transform: uppercase; letter-spacing: 0.02em; display: block;
-            width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: block;
+            width: 100%;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.3;
+            margin-bottom: 0.25rem;
         }
 
         .med-patient { font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600; }
@@ -244,7 +270,12 @@
         .med-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
         .med-times { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
 
-        .med-actions { position: absolute; top: 1.25rem; right: 1.25rem; }
+        .med-actions {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 10;
+        }
 
         .med-delete {
             width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
@@ -279,7 +310,6 @@
     </style>
 </head>
 <body>
-    <!-- FIX Background: Tag de audio silencioso -->
     <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
 
     <div class="bg-animation"></div>
@@ -325,7 +355,6 @@
                 <div class="empty" id="empty" style="text-align:center; padding:2rem;"><h3>Sin medicamentos</h3></div>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
                     <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
-                    <button class="btn btn-secondary" id="testBtn" style="flex:1">🧪 Probar</button>
                 </div>
             </div>
         </div>
@@ -454,11 +483,15 @@
             });
 
             if (trigger && medsActuales.length > 0) {
-                const fireKey = `fired_${today}_${time}_${medsActuales.map(x=>x.id).join('')}`;
-                if (!localStorage.getItem(fireKey)) {
+                const fireKey = `fired_${today}_${time}`;
+                const lastFired = localStorage.getItem(fireKey);
+                const timeSinceLastFired = lastFired ? Date.now() - parseInt(lastFired) : Infinity;
+                
+                // Solo disparar si no se ha disparado en los últimos 3 minutos
+                if (timeSinceLastFired > 180000) {
                     horaActual = time;
                     showAlert();
-                    localStorage.setItem(fireKey, 'true');
+                    localStorage.setItem(fireKey, Date.now().toString());
                 }
             }
         }
@@ -515,8 +548,12 @@
             $('alertMedicationsList').innerHTML = medsActuales.map(m => `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`).join('');
             
             alertModal.classList.add('open');
-            playAlarmSound();
+            
+            // Primero voz, luego sonido después de 2 segundos
             playVoiceReminder();
+            setTimeout(() => {
+                playAlarmSound();
+            }, 2000);
             
             if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
         }
@@ -534,18 +571,20 @@
                 li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
 
                 li.innerHTML = `
+                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
                     <div class="med-name-row">
                         <div class="med-name">${upper(m.nombre)}</div>
                         <div class="med-patient">${upper(m.paciente)}</div>
                     </div>
-                    ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
-                    <div class="med-info">
-                        <div class="med-times">
-                            ${m.horas.map(h => `<span class="time-chip" onclick="event.stopPropagation(); openEditTimeModal('${id}', '${h.h}', '${h.cant}')">${h.h} · ${h.cant}u</span>`).join('')}
-                            <button class="add-time-btn" onclick="event.stopPropagation(); openAddTimeModal('${id}')">+</button>
+                    <div style="display:flex; gap:1rem; align-items:center; width:100%;">
+                        ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
+                        <div class="med-info">
+                            <div class="med-times">
+                                ${m.horas.map(h => `<span class="time-chip" onclick="event.stopPropagation(); openEditTimeModal('${id}', '${h.h}', '${h.cant}')">${h.h} · ${h.cant}u</span>`).join('')}
+                                <button class="add-time-btn" onclick="event.stopPropagation(); openAddTimeModal('${id}')" style="width:32px;height:32px;background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);border-radius:50%;color:var(--neon-cyan);cursor:pointer;">+</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
                 `;
                 li.onclick = () => showDetail(id);
                 lista.appendChild(li);
@@ -665,12 +704,6 @@
                 </div>
             `).join('') || 'Sin registros';
             calModal.classList.add('open');
-        };
-
-        $('testBtn').onclick = () => {
-            medsActuales = [{nombre: 'MEDICAMENTO TEST', paciente: 'ISRAEL', cantidad: 1, foto: ''}];
-            horaActual = 'TEST';
-            showAlert();
         };
 
         $('menos').onclick = () => { cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2); };
