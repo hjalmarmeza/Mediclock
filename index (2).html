@@ -632,10 +632,10 @@
             list-style: none;
         }
 
-        /* --- FIX VISUAL: .med-item Reestructurado --- */
+        /* FIX VISUAL: .med-item ajustado para Fila Superior 100% */
         .med-item {
             display: flex;
-            flex-wrap: wrap; /* Permite que los elementos bajen a la siguiente fila */
+            flex-wrap: wrap; /* Habilitamos salto de línea */
             align-items: center;
             gap: 1rem;
             padding: 1.25rem;
@@ -646,7 +646,7 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
-            min-height: auto; /* Altura dinámica */
+            min-height: auto;
         }
 
         .med-item::before {
@@ -696,16 +696,17 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
+            height: auto;
             padding: 0;
         }
 
         .med-name-row {
             display: flex;
             flex-direction: column;
-            width: 100%; /* Ocupa el 100% del ancho */
             margin-bottom: 0.75rem;
-            padding-right: 40px; /* Espacio para el botón de borrar */
+            width: 100%; /* Ocupa el 100% superior */
+            padding-right: 45px; /* Espacio para el botón delete absoluto */
         }
 
         .med-name {
@@ -720,7 +721,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             line-height: 1.3;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.35rem;
         }
 
         .med-patient {
@@ -737,22 +738,22 @@
             flex-wrap: wrap;
             gap: 0.4rem;
             align-items: center;
+            margin-top: 0;
             width: 100%;
         }
 
         .med-actions {
-            position: absolute;
+            position: absolute; /* Sacamos del flujo para que el nombre sea 100% */
             top: 1.25rem;
             right: 1.25rem;
             display: flex;
             flex-direction: column;
             gap: 5px;
             align-items: center;
+            justify-content: flex-start;
             flex-shrink: 0;
             margin-top: 0;
         }
-        /* --- FIN FIX VISUAL --- */
-
         .time-chip {
             display: inline-flex;
             align-items: center;
@@ -984,7 +985,7 @@
             color: var(--text-secondary);
         }
 
-        .volume-header .volume-value {
+        .volume-value {
             font-size: 0.85rem;
             color: var(--neon-cyan);
             font-weight: 600;
@@ -1416,13 +1417,20 @@
             }
             .med-item {
                 padding: 1rem;
+                min-height: auto;
             }
             .med-avatar, .med-placeholder {
                 width: 52px;
                 height: 52px;
+                margin-top: 0;
             }
             .med-name {
                 font-size: 1.15rem;
+            }
+            .med-actions {
+                margin-top: 0;
+                top: 1rem;
+                right: 1rem;
             }
             .alert-clock-icon {
                 width: 60px;
@@ -1481,6 +1489,20 @@
         .color-5 { background: linear-gradient(135deg, var(--neon-pink), var(--neon-magenta)); }
         .color-6 { background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan)); }
 
+        .color-1-border { border-color: var(--neon-cyan); }
+        .color-2-border { border-color: var(--neon-magenta); }
+        .color-3-border { border-color: var(--neon-green); }
+        .color-4-border { border-color: var(--neon-orange); }
+        .color-5-border { border-color: var(--neon-pink); }
+        .color-6-border { border-color: var(--neon-violet); }
+
+        .color-1-text { color: var(--neon-cyan); }
+        .color-2-text { color: var(--neon-magenta); }
+        .color-3-text { color: var(--neon-green); }
+        .color-4-text { color: var(--neon-orange); }
+        .color-5-text { color: var(--neon-pink); }
+        .color-6-text { color: var(--neon-violet); }
+
         .time-chip.color-1 { 
             background: rgba(0, 245, 255, 0.1); 
             border-color: rgba(0, 245, 255, 0.3);
@@ -1514,7 +1536,7 @@
     </style>
 </head>
 <body>
-    <!-- FIX iOS Background: Audio base64 silencioso -->
+    <!-- FIX iOS Background: Audio silencioso -->
     <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
 
     <div class="bg-animation"></div>
@@ -1665,7 +1687,6 @@
         </div>
     </div>
 
-    <!-- Modales (Alert, Detail, Edit, Cal, AddTime) -->
     <div class="modal-bg" id="alertModal">
         <div class="modal">
             <div class="modal-body">
@@ -1677,10 +1698,14 @@
                             <div class="alert-time-display" id="alertTimeDisplay">00:00</div>
                         </div>
                     </div>
+
                     <h2 class="alert-title">Es hora de tu medicación</h2>
-                    <div class="alert-medications-list" id="alertMedicationsList"></div>
+
+                    <div class="alert-medications-list" id="alertMedicationsList">
+                    </div>
                 </div>
             </div>
+
             <div class="modal-footer">
                 <p class="modal-total" id="alertTotal">Total: 0 medicamentos (0 unidades)</p>
                 <div class="btn-group">
@@ -1704,6 +1729,7 @@
                 <div class="detail-times-title">Horarios programados</div>
                 <div id="detailTimes"></div>
             </div>
+
             <div class="modal-footer">
                 <div class="btn-group">
                     <button class="btn btn-secondary" id="detailClose">Cerrar</button>
@@ -1719,11 +1745,13 @@
                 <h2 class="modal-title">Editar horario</h2>
                 <p class="modal-subtitle" id="editTimeMedName"></p>
             </div>
+
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Hora</label>
                     <input type="time" id="editHora" class="form-input-time" value="">
                 </div>
+
                 <div class="form-group">
                     <label class="form-label">Cantidad</label>
                     <div class="qty-row">
@@ -1732,11 +1760,13 @@
                         <button class="qty-btn" id="editMas">+</button>
                     </div>
                 </div>
+
                 <div class="edit-time-actions">
                     <button class="btn btn-danger" id="deleteTime">🗑️ Eliminar</button>
                     <button class="btn btn-success" id="saveEditTime">💾 Guardar</button>
                 </div>
             </div>
+
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-full" id="cancelEditTime">Cancelar</button>
             </div>
@@ -1749,7 +1779,9 @@
                 <div class="modal-icon">📅</div>
                 <h2 class="modal-title">Historial de tomas</h2>
             </div>
+
             <div class="modal-body" id="calBody"></div>
+
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-full" id="calClose">Cerrar</button>
             </div>
@@ -1763,11 +1795,13 @@
                 <h2 class="modal-title">Agregar nueva hora</h2>
                 <p class="modal-subtitle" id="addTimeMedName"></p>
             </div>
+
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Hora</label>
                     <input type="time" id="newHora" class="form-input-time" value="">
                 </div>
+
                 <div class="form-group">
                     <label class="form-label">Cantidad</label>
                     <div class="qty-row">
@@ -1775,8 +1809,12 @@
                         <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
                         <button class="qty-btn" id="newMas">+</button>
                     </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Ej: 1.25 para 1¼ pastillas
+                    </div>
                 </div>
             </div>
+
             <div class="modal-footer">
                 <div class="btn-group">
                     <button class="btn btn-secondary" id="cancelAddTime">Cancelar</button>
@@ -1789,7 +1827,7 @@
     <audio id="audio" preload="auto" loop></audio>
 
     <script>
-        /* --- FIX iOS Background: Script initAudioHack --- */
+        // FIX iOS Background: Script initAudioHack
         function initAudioHack() {
             const silentAudio = document.getElementById('iosWakeAudio');
             if (silentAudio) {
@@ -1803,7 +1841,7 @@
         window.addEventListener('touchstart', initAudioHack, { once: true });
         window.addEventListener('click', initAudioHack, { once: true });
 
-        // Variables globales (Inalteradas)
+        // Variables globales e inicio de lógica (Inalterada)
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
         let foto = '';
         let alarmaOn = false;
@@ -1820,37 +1858,63 @@
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // Sistema de alarmas (Inalterado)
+        // CORRECCIÓN 1: Sistema de alarmas mejorado (Inalterado)
         function initializeAlarmSystem() {
+            console.log('🔔 Inicializando sistema de alarmas mejorado...');
             requestNotificationPermissions();
             setupBackgroundSync();
             checkAlarms();
             if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 30000); 
+            checkInterval = setInterval(checkAlarms, 30000); // Cada 30 segundos
             document.addEventListener('visibilitychange', handleVisibilityChange);
             document.addEventListener('click', handleUserInteraction);
+            console.log('✅ Sistema de alarmas mejorado inicializado');
         }
 
         function setupBackgroundSync() {
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
                 navigator.serviceWorker.ready.then(registration => {
-                    registration.sync.register('alarm-check').catch(err => console.log('Sync err:', err));
+                    registration.sync.register('alarm-check').then(() => {
+                        console.log('🔄 Background Sync registrado');
+                    }).catch(err => {
+                        console.log('❌ Background Sync no disponible:', err);
+                    });
                 });
             }
         }
 
-        function handleVisibilityChange() { if (!document.hidden) checkAlarms(); }
-        function handleUserInteraction() { if (medsActuales.length > 0 && alarmaOn) playAlarmSound(); }
+        function handleVisibilityChange() {
+            if (!document.hidden) {
+                checkAlarms();
+            }
+        }
+
+        function handleUserInteraction() {
+            if (medsActuales.length > 0 && alarmaOn) {
+                playAlarmSound();
+            }
+        }
 
         function requestNotificationPermissions() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
+            if ('Notification' in window) {
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then(permission => {
+                        console.log('🔔 Permiso de notificaciones:', permission);
+                    });
+                }
+            }
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', () => {
+                    playAlarmSound();
+                });
             }
         }
 
         function checkAlarms() {
             const now = new Date();
-            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
             medsActuales = [];
             let alarmTriggered = false;
             const today = now.toISOString().slice(0, 10);
@@ -1859,8 +1923,15 @@
                 const m = meds[id];
                 if (!m || !m.horas) return;
                 m.horas.forEach(h => {
-                    if (Math.abs(getMinutesDifference(currentTime, h.h)) <= 1) {
-                        medsActuales.push({id, paciente: m.paciente, nombre: m.nombre, cantidad: h.cant, foto: m.foto});
+                    const alarmTime = h.h;
+                    if (Math.abs(getMinutesDifference(currentTime, alarmTime)) <= 1) {
+                        medsActuales.push({
+                            id: id,
+                            paciente: m.paciente,
+                            nombre: m.nombre,
+                            cantidad: h.cant,
+                            foto: m.foto
+                        });
                         alarmTriggered = true;
                     }
                 });
@@ -1870,10 +1941,14 @@
                 const ids = medsActuales.map(m => m.id).sort();
                 const key = `${today}-${currentTime}-${ids.join('-')}`;
                 const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+
                 if (!fired[key]) {
+                    console.log(`🚨 ALARMA ACTIVADA: ${currentTime}`);
                     horaActual = currentTime;
                     showLockScreenNotification();
-                    if (!document.hidden) setTimeout(() => showAlert(), 500);
+                    if (!document.hidden) {
+                        setTimeout(() => showAlert(), 500);
+                    }
                     fired[key] = true;
                     localStorage.setItem('alarmsToday', JSON.stringify(fired));
                 }
@@ -1887,66 +1962,76 @@
         }
 
         function showLockScreenNotification() {
-            if (!('Notification' in window) || Notification.permission !== 'granted') return;
-            const title = '⏰ MediClock - Medicación';
-            const options = {
-                body: `Es hora de tu medicación (${horaActual})`,
-                icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                vibrate: [200, 100, 200],
-                requireInteraction: true
-            };
-            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.ready.then(reg => reg.showNotification(title, options));
-            } else {
-                new Notification(title, options);
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                return;
             }
-            if (sonidoOn.checked) setTimeout(() => playAlarmSound(), 1000);
+            try {
+                const title = '⏰ MediClock - Hora de medicación';
+                const options = {
+                    body: `Es hora de tu medicación (${horaActual})`,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    tag: 'mediclock-alarm-' + Date.now(),
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200],
+                    renotify: true,
+                    silent: false
+                };
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(title, options);
+                    });
+                } else {
+                    const notification = new Notification(title, options);
+                    notification.onclick = () => { window.focus(); showAlert(); };
+                }
+                if (sonidoOn.checked) {
+                    setTimeout(() => { playAlarmSound(); }, 1000);
+                }
+            } catch (error) { console.error('Error notificación:', error); }
         }
 
         function playAlarmSound() {
             if (!sonidoOn.checked || alarmaOn) return;
+            console.log('🔊 Reproduciendo sonido...');
             stopAlarm();
             try {
                 const audio = $('audio');
                 if (audio) {
                     audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
                     audio.volume = parseFloat(volSlider.value);
-                    audio.play().then(() => alarmaOn = true).catch(() => tryPlayAlternativeSound());
+                    audio.loop = true;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => { alarmaOn = true; }).catch(error => { console.log('Audio bloqueado'); });
+                    }
+                    return;
                 }
-            } catch (e) { tryPlayAlternativeSound(); }
-        }
-
-        function tryPlayAlternativeSound() {
-            alarmaOn = true;
-            if (intervalo) clearInterval(intervalo);
-            intervalo = setInterval(() => {
-                const a = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-                a.volume = parseFloat(volSlider.value);
-                a.play().catch(() => {});
-            }, 3000);
+            } catch (error) { console.error('Error sonido:', error); }
         }
 
         function stopAlarm() {
             alarmaOn = false;
-            if (intervalo) clearInterval(intervalo);
-            intervalo = null;
+            if (intervalo) { clearInterval(intervalo); intervalo = null; }
+            if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
             const audio = $('audio');
             if (audio) { audio.pause(); audio.currentTime = 0; }
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            if ('speechSynthesis' in window) { speechSynthesis.cancel(); }
         }
 
         async function playVoiceReminder() {
             if (!vozOn.checked || !('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
-            let msg = `Atención, es hora de medicación. `;
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            let msg = `Son las ${horaActual}. `;
             medsActuales.forEach(m => msg += `${m.paciente}: ${m.nombre}, ${m.cantidad} unidades. `);
             return new Promise(resolve => {
                 const u = new SpeechSynthesisUtterance(msg);
                 u.lang = 'es-ES';
                 u.volume = parseFloat(volSlider.value);
-                u.onend = () => resolve();
-                u.onerror = () => resolve();
-                speechSynthesis.speak(u);
+                u.onend = () => { setTimeout(() => { if (sonidoOn.checked) playAlarmSound(); resolve(); }, 500); };
+                u.onerror = () => { if (sonidoOn.checked) playAlarmSound(); resolve(); };
+                setTimeout(() => { try { speechSynthesis.speak(u); } catch (e) { resolve(); } }, 300);
             });
         }
 
@@ -1958,17 +2043,17 @@
             const list = $('alertMedicationsList');
             list.innerHTML = '';
             medsActuales.forEach(med => {
-                const div = document.createElement('div');
-                div.className = 'alert-medication-container';
-                div.innerHTML = `
+                const medElement = document.createElement('div');
+                medElement.className = 'alert-medication-container';
+                medElement.innerHTML = `
                     <div class="alert-medication-header">
                         <div class="alert-medication-name">${upper(med.nombre)}</div>
                         <div class="alert-medication-patient">${upper(med.paciente)}</div>
                     </div>
                     <img class="alert-medication-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}">
-                    <div class="alert-medication-qty">${med.cantidad}u</div>
+                    <div class="alert-medication-qty">${med.cantidad} u</div>
                 `;
-                list.appendChild(div);
+                list.appendChild(medElement);
             });
             const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
             $('alertTotal').textContent = `Total: ${medsActuales.length} medicamentos (${total} u)`;
@@ -1977,8 +2062,8 @@
         }
 
         async function activateAlarm() {
-            if (vozOn.checked) await playVoiceReminder();
-            playAlarmSound();
+            if (vozOn.checked) { await playVoiceReminder(); } else { playAlarmSound(); }
+            window.focus();
         }
 
         function render() {
@@ -2008,22 +2093,9 @@
                     </div>
                 `;
                 li.onclick = e => { if (!e.target.closest('.med-delete, .add-time-btn, .time-chip')) showDetail(id); };
-                li.querySelector('.med-delete').onclick = e => { 
-                    e.stopPropagation(); 
-                    if(confirm('¿Eliminar?')){ delete meds[id]; save(); render(); }
-                };
-                li.querySelector('.add-time-btn').onclick = e => {
-                    e.stopPropagation();
-                    currentMedForAddTime = id;
-                    $('addTimeMedName').textContent = upper(m.nombre);
-                    addTimeModal.classList.add('open');
-                };
-                li.querySelectorAll('.time-chip').forEach(chip => {
-                    chip.onclick = e => {
-                        e.stopPropagation();
-                        openEditTimeModal(id, chip.dataset.h, chip.dataset.cant);
-                    };
-                });
+                li.querySelector('.med-delete').onclick = e => { e.stopPropagation(); if (confirm('¿Eliminar?')) { delete meds[id]; save(); render(); } };
+                li.querySelector('.add-time-btn').onclick = e => { e.stopPropagation(); currentMedForAddTime = id; $('addTimeMedName').textContent = upper(m.nombre); addTimeModal.classList.add('open'); };
+                li.querySelectorAll('.time-chip').forEach(chip => { chip.onclick = e => { e.stopPropagation(); openEditTimeModal(id, chip.dataset.h, chip.dataset.cant); }; });
                 lista.appendChild(li);
             });
         }
@@ -2066,15 +2138,7 @@
             localStorage.setItem('mcConfig', JSON.stringify({sound: sonidoOn.checked, voice: vozOn.checked, vol: parseFloat(volSlider.value)}));
         }
 
-        function showToast(t, m, type) {
-            const toast = document.createElement('div');
-            toast.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--neon-blue);padding:1rem;border-radius:10px;z-index:10000;`;
-            toast.innerHTML = `<b>${t}</b><br>${m}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        window.onload = () => {
+        window.onload = function() {
             const c = JSON.parse(localStorage.getItem('mcConfig') || '{}');
             if (c.sound !== undefined) sonidoOn.checked = c.sound;
             if (c.voice !== undefined) vozOn.checked = c.voice;
@@ -2083,7 +2147,6 @@
             initializeAlarmSystem();
         };
 
-        // Eventos de botones y formularios (Inalterados)
         $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
         $('tabMedicamentos').onclick = () => cambiarPestaña('medicamentos');
         $('menos').onclick = () => cant.value = Math.max(0.25, parseFloat(cant.value)-0.25).toFixed(2);
@@ -2093,10 +2156,7 @@
             const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment';
             i.onchange = e => {
                 const reader = new FileReader();
-                reader.onload = ev => {
-                    foto = ev.target.result;
-                    photoPreview.src = foto; photoPreview.style.display='block'; photoZone.style.display='none';
-                };
+                reader.onload = ev => { foto = ev.target.result; photoPreview.src = foto; photoPreview.classList.add('active'); photoZone.style.display='none'; };
                 reader.readAsDataURL(e.target.files[0]);
             };
             i.click();
@@ -2107,7 +2167,7 @@
             const id = Date.now().toString();
             meds[id] = {nombre: upper(nombre.value), paciente: upper(paciente.value), foto, horas: [{h: hora.value, cant: parseFloat(cant.value)}]};
             save(); render(); cambiarPestaña('medicamentos');
-            nombre.value=''; paciente.value=''; foto=''; photoPreview.style.display='none'; photoZone.style.display='block';
+            nombre.value=''; paciente.value=''; foto=''; photoPreview.classList.remove('active'); photoZone.style.display='block';
         };
 
         $('alertTake').onclick = () => {
@@ -2156,7 +2216,7 @@
 
         $('calBtn').onclick = () => {
             const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            calBody.innerHTML = hist.reverse().map(t => `<div class="cal-item"><b>${t.nombre}</b><br>${new Date(t.fecha).toLocaleString()}</div>`).join('') || 'Sin historial';
+            calBody.innerHTML = hist.reverse().map(t => `<div class="cal-item"><b>${t.nombre}</b><br>${new Date(t.fecha).toLocaleString()}</div>`).join('') || 'Sin registros';
             calModal.classList.add('open');
         };
         $('calClose').onclick = () => calModal.classList.remove('open');
