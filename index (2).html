@@ -1,0 +1,2927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <title>MediClock Neo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registrado:', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker error:', err);
+                });
+            });
+        }
+    </script>
+    
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --bg-card: rgba(15, 15, 25, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.02);
+            
+            --neon-cyan: #00f5ff;
+            --neon-magenta: #ff00ea;
+            --neon-violet: #8b5cf6;
+            --neon-blue: #3b82f6;
+            --neon-green: #00ff88;
+            --neon-orange: #ff6b35;
+            --neon-yellow: #ffd700;
+            --neon-pink: #ff1493;
+            --neon-teal: #00ced1;
+            
+            --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
+            --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
+            --glow-violet: 0 0 30px rgba(139, 92, 246, 0.4);
+            
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            
+            --border-glow: rgba(0, 245, 255, 0.2);
+            
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5%, -5%) scale(1.1); }
+            66% { transform: translate(5%, 5%) scale(0.95); }
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-cyan);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-magenta);
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--neon-violet);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(-30px, 30px) rotate(180deg); }
+            75% { transform: translate(20px, 50px) rotate(270deg); }
+        }
+
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.6;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+        }
+
+        .logo-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            vertical-align: super;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab:hover::before {
+            opacity: 1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15));
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: tabGlow 2s infinite;
+        }
+
+        @keyframes tabGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .modo-indicator {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-magenta));
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 9998;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
+            opacity: 0.6;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 245, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), var(--glow-cyan);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.2));
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
+        .form-input-time {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input-time:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
+        .qty-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .qty-btn {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.05);
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .qty-input {
+            flex: 1;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .photo-zone {
+            position: relative;
+            border: 2px dashed rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.02), rgba(255, 0, 234, 0.02));
+        }
+
+        .photo-zone:hover {
+            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(255, 0, 234, 0.05));
+            box-shadow: inset 0 0 30px rgba(0, 245, 255, 0.1);
+        }
+
+        .photo-zone-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .photo-zone-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .photo-zone-hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            display: none;
+        }
+
+        .photo-preview.active {
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: 0.02em;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px rgba(0, 245, 255, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--neon-green), #00d68f);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.875rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn.modo-activo {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .med-list {
+            list-style: none;
+        }
+
+        /* --- FIX VISUAL: .med-item Reestructurado --- */
+        .med-item {
+            display: flex;
+            flex-wrap: wrap; /* Fix: permite que los elementos salten de fila */
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.875rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            min-height: 160px;
+        }
+
+        .med-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 3px 0 0 3px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .med-item:hover {
+            background: rgba(0, 245, 255, 0.05);
+            border-color: rgba(0, 245, 255, 0.3);
+            transform: translateX(8px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .med-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            flex-shrink: 0;
+            margin-top: 0; /* Reset */
+        }
+
+        .med-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(0, 245, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0; /* Reset */
+        }
+
+        .med-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
+            padding: 0;
+        }
+
+        /* Fix: Nombre y paciente arriba al 100% */
+        .med-name-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .med-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+            margin-bottom: 0.35rem;
+        }
+
+        .med-patient {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            margin-bottom: 0.75rem;
+            word-break: break-word;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .med-times {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .add-time-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            color: var(--neon-cyan);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 0.25rem;
+        }
+
+        .med-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-shrink: 0;
+            margin-top: 0; /* Reset */
+        }
+
+        .med-select-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
+
+        .med-delete {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.1));
+            border: 1px dashed rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .settings {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 1.75rem;
+            padding-top: 1.75rem;
+        }
+
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .settings-arrow {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .settings-panel {
+            display: none;
+            padding-top: 1.25rem;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .switch-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            transition: all 0.4s ease;
+        }
+
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            box-shadow: var(--glow-cyan);
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(24px);
+            background: white;
+        }
+
+        .volume-row {
+            padding: 1rem 0;
+        }
+
+        .volume-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .volume-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .volume-value {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal {
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98));
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 80px rgba(0, 245, 255, 0.2), 0 40px 80px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 245, 255, 0.08), transparent);
+            position: relative;
+        }
+
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.75rem 2rem;
+        }
+
+        .alert-modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .alert-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .alert-clock-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: var(--glow-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        .alert-greeting {
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-greeting-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-time-display {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .alert-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .alert-medications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .alert-medication-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .alert-medication-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .alert-medication-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex: 1;
+            margin-right: 1rem;
+            word-break: break-word;
+        }
+
+        .alert-medication-patient {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+            background: rgba(0, 245, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            white-space: nowrap;
+        }
+
+        .alert-medication-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 1rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .alert-medication-qty {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 245, 255, 0.15));
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin: 0 auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-total {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-header-with-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-main-img {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 1rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .detail-info {
+            text-align: center;
+        }
+
+        .detail-times-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-time-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cal-item {
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-green);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.875rem;
+        }
+
+        .cal-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .cal-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cal-item-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cal-item-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .edit-time-modal .modal-header {
+            padding: 1.5rem 2rem;
+        }
+
+        .edit-time-modal .modal-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .edit-time-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .edit-time-actions .btn {
+            flex: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 1.5rem 0.875rem;
+            }
+            .card {
+                padding: 1.5rem;
+                border-radius: var(--radius-lg);
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
+            }
+            .logo-text {
+                font-size: 1.6rem;
+            }
+            .modo-indicator {
+                top: 60px;
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+            .tabs {
+                margin-bottom: 1rem;
+            }
+            .tab {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            .med-item {
+                padding: 1rem;
+                min-height: 150px;
+            }
+            .med-avatar, .med-placeholder {
+                width: 52px;
+                height: 52px;
+                margin-top: 0; /* Fix */
+            }
+            .med-name {
+                font-size: 1.15rem;
+            }
+            .med-actions {
+                margin-top: 0; /* Fix */
+            }
+            .alert-clock-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .alert-greeting-text {
+                font-size: 1.2rem;
+            }
+            .alert-medication-name {
+                font-size: 1rem;
+            }
+            .alert-medication-img {
+                height: 100px;
+            }
+            .detail-main-img {
+                height: 150px;
+            }
+            .modal-footer {
+                padding: 1.25rem 1.5rem;
+            }
+            .modal-body {
+                padding: 1.5rem 1.5rem;
+            }
+            .alert-medication-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .alert-medication-patient {
+                align-self: flex-start;
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            opacity: 0.3;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
+        .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
+        .color-3 { background: linear-gradient(135deg, var(--neon-green), var(--neon-teal)); }
+        .color-4 { background: linear-gradient(135deg, var(--neon-orange), var(--neon-yellow)); }
+        .color-5 { background: linear-gradient(135deg, var(--neon-pink), var(--neon-magenta)); }
+        .color-6 { background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan)); }
+
+        .time-chip.color-1 { 
+            background: rgba(0, 245, 255, 0.1); 
+            border-color: rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+        .time-chip.color-2 { 
+            background: rgba(255, 0, 234, 0.1); 
+            border-color: rgba(255, 0, 234, 0.3);
+            color: var(--neon-magenta);
+        }
+        .time-chip.color-3 { 
+            background: rgba(0, 255, 136, 0.1); 
+            border-color: rgba(0, 255, 136, 0.3);
+            color: var(--neon-green);
+        }
+        .time-chip.color-4 { 
+            background: rgba(255, 107, 53, 0.1); 
+            border-color: rgba(255, 107, 53, 0.3);
+            color: var(--neon-orange);
+        }
+        .time-chip.color-5 { 
+            background: rgba(255, 20, 147, 0.1); 
+            border-color: rgba(255, 20, 147, 0.3);
+            color: var(--neon-pink);
+        }
+        .time-chip.color-6 { 
+            background: rgba(139, 92, 246, 0.1); 
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--neon-violet);
+        }
+    </style>
+</head>
+<body>
+    <!-- FIX iOS Background: Tag de audio silencioso -->
+    <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
+
+    <div class="bg-animation"></div>
+    <div class="grid-pattern"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="scanline"></div>
+
+    <div class="app">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">MediClock</span>
+                <span class="logo-badge">NEO</span>
+            </div>
+            <p class="tagline">Sistema inteligente de medicación</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">
+                <span>✨</span>
+                <span>Nuevo</span>
+            </button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">
+                <span>💊</span>
+                <span>Mis Medicamentos</span>
+            </button>
+        </div>
+
+        <div class="tab-content active" id="tabContentNuevo">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <h2 class="card-title">Nueva medicación</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: María García" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="menos">−</button>
+                        <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="mas">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input-time">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto (opcional)</label>
+                    <div class="photo-zone" id="photoZone">
+                        <div class="photo-zone-icon">📷</div>
+                        <div class="photo-zone-text">Toca para capturar</div>
+                        <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
+                    </div>
+                    <img class="photo-preview" id="photoPreview" src="" alt="Preview">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-full" id="addBtn">
+                        <span>⚡</span>
+                        <span>Agregar</span>
+                    </button>
+                </div>
+
+                <div class="settings">
+                    <div class="settings-toggle" id="settingsToggle">
+                        <div class="settings-label">
+                            <span>⚙️</span>
+                            <span>Configuración de alertas</span>
+                        </div>
+                        <span class="settings-arrow" id="settingsArrow">▼</span>
+                    </div>
+
+                    <div class="settings-panel" id="settingsPanel">
+                        <div class="switch-row">
+                            <span class="switch-text">Sonido de alarma</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sonidoOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span class="switch-text">Recordatorio por voz</span>
+                            <label class="switch">
+                                <input type="checkbox" id="vozOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="volume-row">
+                            <div class="volume-header">
+                                <span class="volume-label">Volumen</span>
+                                <span class="volume-value" id="volValue">70%</span>
+                            </div>
+                            <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
+                            <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tabContentMedicamentos">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💊</div>
+                    <h2 class="card-title">Mis medicamentos</h2>
+                </div>
+
+                <ul class="med-list" id="lista"></ul>
+
+                <div class="empty" id="empty">
+                    <div class="empty-icon">💊</div>
+                    <h3 class="empty-title">Sin medicamentos</h3>
+                    <p class="empty-text">Agrega tu primera medicación en la pestaña "Nuevo"</p>
+                </div>
+
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" id="calBtn">
+                        <span>📅</span>
+                        <span>Historial</span>
+                    </button>
+                    <button class="btn btn-secondary" id="testBtn">
+                        <span>🧪</span>
+                        <span>Probar Alarma</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="alertModal">
+        <div class="modal">
+            <div class="modal-body">
+                <div class="alert-modal-content">
+                    <div class="alert-header">
+                        <div class="alert-clock-icon">⏰</div>
+                        <div class="alert-greeting">
+                            <div class="alert-greeting-text" id="alertGreeting">Hora de medicación</div>
+                            <div class="alert-time-display" id="alertTimeDisplay">00:00</div>
+                        </div>
+                    </div>
+
+                    <h2 class="alert-title">Es hora de tu medicación</h2>
+
+                    <div class="alert-medications-list" id="alertMedicationsList">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <p class="modal-total" id="alertTotal">Total: 0 medicamentos (0 unidades)</p>
+                <div class="btn-group">
+                    <button class="btn btn-danger" id="alertClose">Cerrar</button>
+                    <button class="btn btn-success" id="alertTake">✓ Tomado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="detailModal">
+        <div class="modal">
+            <div class="modal-body">
+                <div class="detail-header-with-photo">
+                    <img class="detail-main-img" id="detailMainImg" src="" alt="Medicamento">
+                    <div class="detail-info">
+                        <p class="modal-subtitle" id="detailPatient">PACIENTE</p>
+                        <h2 class="modal-title" id="detailName">MEDICAMENTO</h2>
+                    </div>
+                </div>
+                <div class="detail-times-title">Horarios programados</div>
+                <div id="detailTimes"></div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="detailClose">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg edit-time-modal" id="editTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">✏️</div>
+                <h2 class="modal-title">Editar horario</h2>
+                <p class="modal-subtitle" id="editTimeMedName"></p>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="editHora" class="form-input-time" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="editMenos">−</button>
+                        <input type="number" id="editCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="editMas">+</button>
+                    </div>
+                </div>
+
+                <div class="edit-time-actions">
+                    <button class="btn btn-danger" id="deleteTime">🗑️ Eliminar</button>
+                    <button class="btn btn-success" id="saveEditTime">💾 Guardar</button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="cancelEditTime">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="calModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">📅</div>
+                <h2 class="modal-title">Historial de tomas</h2>
+            </div>
+
+            <div class="modal-body" id="calBody"></div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="calClose">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="addTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">➕</div>
+                <h2 class="modal-title">Agregar nueva hora</h2>
+                <p class="modal-subtitle" id="addTimeMedName"></p>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="newHora" class="form-input-time" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="newMenos">−</button>
+                        <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="newMas">+</button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Ej: 1.25 para 1¼ pastillas
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="cancelAddTime">Cancelar</button>
+                    <button class="btn btn-success" id="saveAddTime">✓ Agregar Hora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" preload="auto" loop></audio>
+
+    <script>
+        /* --- FIX iOS Background: Script initAudioHack --- */
+        function initAudioHack() {
+            const silentAudio = document.getElementById('iosWakeAudio');
+            if (silentAudio) {
+                silentAudio.play().then(() => {
+                    console.log("🚀 iOS Background Hack Activado");
+                    window.removeEventListener('touchstart', initAudioHack);
+                    window.removeEventListener('click', initAudioHack);
+                }).catch(err => console.log("Audio Hack bloqueado:", err));
+            }
+        }
+        window.addEventListener('touchstart', initAudioHack, { once: true });
+        window.addEventListener('click', initAudioHack, { once: true });
+
+        // Variables globales
+        let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
+        let foto = '';
+        let alarmaOn = false;
+        let medsActuales = [];
+        let horaActual = '';
+        let intervalo = null;
+        let audioCtx = null;
+        let pestañaActual = 'nuevo';
+        let medColors = {};
+        let currentMedForAddTime = null;
+        let editingTimeData = null;
+        let checkInterval = null;
+
+        const $ = id => document.getElementById(id);
+        const upper = t => t ? t.toString().toUpperCase().trim() : '';
+
+        // CORRECCIÓN 1: Sistema de alarmas mejorado
+        function initializeAlarmSystem() {
+            console.log('🔔 Inicializando sistema de alarmas mejorado...');
+            
+            // Solicitar permisos de notificación inmediatamente
+            requestNotificationPermissions();
+            
+            // Configurar Background Sync si está disponible
+            setupBackgroundSync();
+            
+            // Verificar alarmas inmediatamente
+            checkAlarms();
+            
+            // Configurar verificación periódica más agresiva
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(checkAlarms, 30000); // Cada 30 segundos
+            
+            // Configurar visibilidad para detección de bloqueo
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Configurar eventos de sonido
+            document.addEventListener('click', handleUserInteraction);
+            
+            console.log('✅ Sistema de alarmas mejorado inicializado');
+        }
+
+        function setupBackgroundSync() {
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.sync.register('alarm-check').then(() => {
+                        console.log('🔄 Background Sync registrado');
+                    }).catch(err => {
+                        console.log('❌ Background Sync no disponible:', err);
+                    });
+                });
+            }
+        }
+
+        function handleVisibilityChange() {
+            if (!document.hidden) {
+                // Cuando la app vuelve a ser visible, verificar alarmas inmediatamente
+                checkAlarms();
+            }
+        }
+
+        function handleUserInteraction() {
+            // Esta función se ejecuta cuando el usuario interactúa
+            // Ayuda a desbloquear el audio
+            if (medsActuales.length > 0 && alarmaOn) {
+                playAlarmSound();
+            }
+        }
+
+        function requestNotificationPermissions() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then(permission => {
+                        console.log('🔔 Permiso de notificaciones:', permission);
+                    });
+                }
+            }
+            
+            // Solicitar permisos de audio también
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', () => {
+                    playAlarmSound();
+                });
+            }
+        }
+
+        function checkAlarms() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+            
+            medsActuales = [];
+            let alarmTriggered = false;
+            const today = now.toISOString().slice(0, 10);
+
+            Object.keys(meds).forEach(id => {
+                const m = meds[id];
+                if (!m || !m.horas) return;
+                
+                m.horas.forEach(h => {
+                    // Permitir margen de 1 minuto para alarmas
+                    const alarmTime = h.h;
+                    if (Math.abs(getMinutesDifference(currentTime, alarmTime)) <= 1) {
+                        medsActuales.push({
+                            id: id,
+                            paciente: m.paciente,
+                            nombre: m.nombre,
+                            cantidad: h.cant,
+                            foto: m.foto
+                        });
+                        alarmTriggered = true;
+                    }
+                });
+            });
+
+            if (alarmTriggered && medsActuales.length > 0) {
+                const ids = medsActuales.map(m => m.id).sort();
+                const key = `${today}-${currentTime}-${ids.join('-')}`;
+                const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+
+                if (!fired[key]) {
+                    console.log(`🚨 ALARMA ACTIVADA: ${currentTime} - ${medsActuales.length} medicamento(s)`);
+                    horaActual = currentTime;
+                    
+                    // Notificar inmediatamente incluso si el dispositivo está bloqueado
+                    showLockScreenNotification();
+                    
+                    // Mostrar alerta si la app está visible
+                    if (!document.hidden) {
+                        setTimeout(() => showAlert(), 500);
+                    }
+                    
+                    fired[key] = true;
+                    localStorage.setItem('alarmsToday', JSON.stringify(fired));
+                }
+            }
+        }
+
+        function getMinutesDifference(time1, time2) {
+            const [h1, m1] = time1.split(':').map(Number);
+            const [h2, m2] = time2.split(':').map(Number);
+            return (h1 * 60 + m1) - (h2 * 60 + m2);
+        }
+
+        function showLockScreenNotification() {
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                return;
+            }
+            
+            try {
+                const primeraAlerta = medsActuales[0];
+                const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+                
+                let title, body;
+                
+                if (pacientes.length === 1) {
+                    title = '⏰ MediClock - Hora de medicación';
+                    body = `Hola ${upper(pacientes[0])}. Es hora de tomar ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''}.`;
+                } else {
+                    title = '⏰ MediClock - Medicación múltiple';
+                    body = `Es hora de medicación para ${pacientes.length} personas.`;
+                }
+                
+                const options = {
+                    body: body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                    tag: 'mediclock-alarm-' + Date.now(),
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    renotify: true,
+                    silent: false, // Forzar que haga sonido
+                    data: { 
+                        time: horaActual, 
+                        count: medsActuales.length,
+                        meds: medsActuales 
+                    }
+                };
+
+                // Enviar notificación push a través del Service Worker
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(title, options);
+                    });
+                } else {
+                    // Fallback a notificación estándar
+                    const notification = new Notification(title, options);
+                    notification.onclick = () => {
+                        window.focus();
+                        showAlert();
+                    };
+                }
+                
+                // Forzar reproducción de sonido incluso si el dispositivo está bloqueado
+                if (sonidoOn.checked) {
+                    setTimeout(() => {
+                        playAlarmSoundForced();
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error notificación:', error);
+            }
+        }
+
+        function playAlarmSoundForced() {
+            try {
+                console.log('🔊 Forzando sonido de alarma...');
+                
+                // Crear audio en contexto de usuario
+                const audio = new Audio();
+                audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                audio.volume = parseFloat(volSlider.value);
+                audio.loop = false;
+                
+                // Configurar para reproducción en segundo plano
+                audio.setAttribute('data-alarm', 'true');
+                
+                // Intentar reproducir inmediatamente
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log('⚠️ Error en reproducción forzada:', e);
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error en sonido forzado:', error);
+            }
+        }
+
+        // CORRECCIÓN 2: Sonido de alarma mejorado
+        function playAlarmSound() {
+            if (!sonidoOn.checked || alarmaOn) return;
+            
+            console.log('🔊 Reproduciendo sonido de alarma mejorado...');
+            
+            stopAlarm();
+            
+            try {
+                // Usar el elemento audio existente
+                const audio = $('audio');
+                if (audio) {
+                    // Cambiar la fuente a un sonido más confiable
+                    audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
+                    audio.volume = parseFloat(volSlider.value);
+                    audio.loop = true;
+                    
+                    // Configurar metadatos para reproducción en segundo plano
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: 'Alarma MediClock',
+                            artist: 'Sistema de medicación',
+                            artwork: [
+                                { src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }
+                            ]
+                        });
+                    }
+                    
+                    // Intentar reproducir con manejo de promesa mejorado
+                    const playAudio = () => {
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                console.log('✅ Sonido de alarma iniciado');
+                                alarmaOn = true;
+                            }).catch(error => {
+                                console.log('⚠️ Audio necesita interacción del usuario:', error);
+                                // No agregar listener aquí para evitar duplicados
+                            });
+                        }
+                    };
+                    
+                    // Intentar inmediatamente
+                    playAudio();
+                    
+                    // También intentar con un pequeño retraso
+                    setTimeout(playAudio, 100);
+                    return;
+                }
+                
+                // Fallback a Web Audio API
+                if (window.AudioContext || window.webkitAudioContext) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                    
+                    function playBeep() {
+                        if (!alarmaOn || !audioCtx) return;
+                        
+                        try {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                            osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.2);
+                            
+                            gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                            
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            
+                            osc.start();
+                            osc.stop(audioCtx.currentTime + 0.5);
+                        } catch (e) {
+                            console.error('Error en beep:', e);
+                        }
+                    }
+                    
+                    alarmaOn = true;
+                    playBeep();
+                    
+                    if (intervalo) clearInterval(intervalo);
+                    intervalo = setInterval(playBeep, 1000); // Sonido cada segundo
+                }
+            } catch (error) {
+                console.error('❌ Error reproduciendo sonido:', error);
+                // Intentar método alternativo
+                tryPlayAlternativeSound();
+            }
+        }
+
+        function tryPlayAlternativeSound() {
+            console.log('🔄 Intentando método alternativo de sonido...');
+            
+            // Crear múltiples elementos de audio para mayor compatibilidad
+            const audioElements = [];
+            
+            for (let i = 0; i < 3; i++) {
+                const audio = new Audio();
+                audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                audio.volume = parseFloat(volSlider.value) * 0.5;
+                audio.loop = false;
+                audioElements.push(audio);
+                
+                // Intentar reproducir cada uno con un pequeño retraso
+                setTimeout(() => {
+                    audio.play().catch(e => console.log('Audio alternativo falló'));
+                }, i * 200);
+            }
+            
+            alarmaOn = true;
+            
+            // Configurar intervalo para repetir
+            if (intervalo) clearInterval(intervalo);
+            intervalo = setInterval(() => {
+                audioElements.forEach(audio => {
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {});
+                });
+            }, 3000);
+        }
+
+        function stopAlarm() {
+            alarmaOn = false;
+            
+            if (intervalo) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+            
+            if (audioCtx) {
+                audioCtx.close().catch(() => {});
+                audioCtx = null;
+            }
+            
+            const audio = $('audio');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
+            // Detener todos los elementos de audio alternativos
+            document.querySelectorAll('audio[data-alarm]').forEach(a => {
+                a.pause();
+                a.currentTime = 0;
+            });
+            
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+            }
+        }
+
+        // CORRECCIÓN 3: Voz mejorada con manejo de espera
+        async function playVoiceReminder() {
+            if (!vozOn.checked || !('speechSynthesis' in window)) return;
+            
+            // Cancelar cualquier voz previa
+            speechSynthesis.cancel();
+            
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            let msg = `Son las ${horaActual}. `;
+            
+            if (pacientes.length === 1) {
+                const paciente = pacientes[0];
+                const medicamentos = medsActuales.filter(m => m.paciente === paciente);
+                
+                if (medicamentos.length === 1) {
+                    msg += `${upper(paciente)}, te toca tomar ${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}.`;
+                } else {
+                    msg += `${upper(paciente)}, te tocan ${medicamentos.length} medicamentos: `;
+                    msg += medicamentos.map((med, index) => {
+                        const connector = index === medicamentos.length - 1 ? ' y ' : 
+                                         index === 0 ? '' : ', ';
+                        return `${connector}${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                    }).join('') + '.';
+                }
+            } else {
+                msg += 'Atención, es hora de medicación para ';
+                msg += pacientes.map((paciente, index) => {
+                    const medicamentos = medsActuales.filter(m => m.paciente === paciente);
+                    const connector = index === pacientes.length - 1 ? ' y ' : 
+                                     index === 0 ? '' : ', ';
+                    
+                    if (medicamentos.length === 1) {
+                        return `${connector}${paciente}: ${medicamentos[0].nombre}, ${medicamentos[0].cantidad} ${medicamentos[0].cantidad === 1 ? 'pastilla' : 'pastillas'}`;
+                    } else {
+                        const medicamentosStr = medicamentos.map(med => 
+                            `${med.nombre}, ${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}`)
+                            .join(' y ');
+                        return `${connector}${paciente}: ${medicamentosStr}`;
+                    }
+                }).join('') + '.';
+            }
+            
+            return new Promise(resolve => {
+                const u = new SpeechSynthesisUtterance(msg);
+                u.lang = 'es-ES';
+                u.rate = 0.9;
+                u.volume = parseFloat(volSlider.value);
+                u.onend = () => {
+                    console.log('🗣️ Voz finalizada');
+                    // Iniciar sonido inmediatamente después de la voz
+                    setTimeout(() => {
+                        if (sonidoOn.checked) {
+                            playAlarmSound();
+                        }
+                        resolve();
+                    }, 500);
+                };
+                u.onerror = (e) => {
+                    console.error('❌ Error en voz:', e);
+                    // Iniciar sonido incluso si hay error en la voz
+                    if (sonidoOn.checked) {
+                        playAlarmSound();
+                    }
+                    resolve();
+                };
+                
+                // Pequeño retraso antes de iniciar la voz
+                setTimeout(() => {
+                    try {
+                        speechSynthesis.speak(u);
+                    } catch (e) {
+                        console.error('Error al iniciar voz:', e);
+                        resolve();
+                    }
+                }, 300);
+            });
+        }
+
+        // CORRECCIÓN 4: Ventana de alerta con usuario visible
+        function showAlert() {
+            if (!medsActuales.length) return;
+            
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            
+            // Saludo según número de pacientes
+            if (pacientes.length === 1) {
+                $('alertGreeting').textContent = `Hola ${upper(pacientes[0])}`;
+            } else {
+                $('alertGreeting').textContent = 'Hola a todos';
+            }
+            
+            $('alertTimeDisplay').textContent = horaActual;
+            
+            const alertMedicationsList = $('alertMedicationsList');
+            alertMedicationsList.innerHTML = '';
+            
+            medsActuales.forEach(med => {
+                const medElement = document.createElement('div');
+                medElement.className = 'alert-medication-container';
+                medElement.innerHTML = `
+                    <div class="alert-medication-header">
+                        <div class="alert-medication-name" title="${upper(med.nombre)}">${upper(med.nombre)}</div>
+                        <div class="alert-medication-patient">${upper(med.paciente)}</div>
+                    </div>
+                    <img class="alert-medication-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}" alt="${med.nombre}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1237/1237460.png'">
+                    <div class="alert-medication-qty">${med.cantidad} ${med.cantidad === 1 ? 'pastilla' : 'pastillas'}</div>
+                `;
+                alertMedicationsList.appendChild(medElement);
+            });
+
+            const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
+            $('alertTotal').textContent = `Total: ${medsActuales.length} medicamento${medsActuales.length > 1 ? 's' : ''} (${total} unidades)`;
+
+            alertModal.classList.add('open');
+            
+            // Activar alarma después de mostrar la alerta
+            activateAlarm();
+        }
+
+        async function activateAlarm() {
+            console.log('🔔 Activando alarma completa...');
+            
+            // Primero voz si está activada
+            if (vozOn.checked) {
+                console.log('🗣️ Iniciando voz...');
+                await playVoiceReminder();
+            } else {
+                // Si la voz no está activada, iniciar sonido inmediatamente
+                console.log('🔊 Iniciando sonido directamente...');
+                playAlarmSound();
+            }
+            
+            // Forzar foco en la ventana
+            window.focus();
+            
+            // Intentar vibración si está disponible
+            if ('vibrate' in navigator) {
+                try {
+                    navigator.vibrate([200, 100, 200, 100, 200, 100, 200]);
+                } catch (e) {
+                    console.log('Vibración no disponible');
+                }
+            }
+        }
+
+        function setupTimeChipListeners(li, id, m) {
+            li.querySelectorAll('.time-chip').forEach(chip => {
+                chip.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openEditTimeModal(id, this.dataset.h, this.dataset.cant);
+                });
+            });
+        }
+
+        function openEditTimeModal(medId, horaValue, cantidad) {
+            const m = meds[medId];
+            if (!m) return;
+
+            editingTimeData = {
+                medId: medId,
+                oldHora: horaValue,
+                oldCantidad: cantidad
+            };
+
+            $('editTimeMedName').textContent = upper(m.nombre);
+            $('editHora').value = horaValue;
+            $('editCant').value = cantidad;
+
+            editTimeModal.classList.add('open');
+        }
+
+        function getMedColor(medName) {
+            if (!medColors[medName]) {
+                const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6'];
+                const index = Object.keys(medColors).length % colors.length;
+                medColors[medName] = colors[index];
+            }
+            return medColors[medName];
+        }
+
+        function render() {
+            lista.innerHTML = '';
+            const keys = Object.keys(meds);
+            empty.style.display = keys.length ? 'none' : 'block';
+
+            keys.forEach(id => {
+                const m = meds[id];
+                const colorClass = getMedColor(m.nombre);
+
+                const li = document.createElement('li');
+                li.className = 'med-item';
+                li.dataset.id = id;
+                li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
+
+                li.innerHTML = `
+                    <div class="med-name-row">
+                        <div class="med-name" title="${upper(m.nombre)}">${upper(m.nombre)}</div>
+                        <div class="med-patient">${upper(m.paciente)}</div>
+                    </div>
+                    ${m.foto
+                        ? `<img class="med-avatar" src="${m.foto}" alt="${m.nombre}" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23000%22/><text x=%2250%22 y=%2255%22 font-size=%2224%22 text-anchor=%22middle%22 fill=%22%23fff%22>💊</text></svg>';">`
+                        : `<div class="med-placeholder ${colorClass}">💊</div>`
+                    }
+                    <div class="med-info">
+                        <div class="med-times">
+                            ${m.horas.map(h => `
+                                <span class="time-chip ${colorClass}" data-h="${h.h}" data-cant="${h.cant}">
+                                    ${h.h} · ${h.cant}u
+                                </span>
+                            `).join('')}
+                            <button class="add-time-btn" data-id="${id}">+</button>
+                        </div>
+                    </div>
+                    <div class="med-actions">
+                        <button class="med-delete" data-id="${id}">🗑️</button>
+                    </div>
+                `;
+
+                li.onclick = e => {
+                    if (e.target.classList.contains('med-delete') || 
+                        e.target.classList.contains('add-time-btn') || 
+                        e.target.classList.contains('time-chip')) return;
+                    showDetail(id);
+                };
+
+                li.querySelector('.med-delete').onclick = e => {
+                    e.stopPropagation();
+                    if (confirm('¿Eliminar este medicamento?')) {
+                        delete meds[id];
+                        save();
+                        render();
+                        showToast('✅ Medicamento eliminado', 'El medicamento ha sido eliminado', 'success');
+                    }
+                };
+
+                li.querySelector('.add-time-btn').onclick = e => {
+                    e.stopPropagation();
+                    currentMedForAddTime = id;
+                    $('addTimeMedName').textContent = upper(m.nombre);
+                    $('newHora').value = '';
+                    $('newCant').value = '1';
+                    addTimeModal.classList.add('open');
+                };
+
+                setupTimeChipListeners(li, id, m);
+                lista.appendChild(li);
+            });
+        }
+
+        function showDetail(id) {
+            const m = meds[id];
+            if (!m) return;
+
+            $('detailPatient').textContent = upper(m.paciente);
+            $('detailName').textContent = upper(m.nombre);
+            $('detailMainImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+
+            $('detailTimes').innerHTML = m.horas.map(h => `
+                <div class="detail-time-item" data-h="${h.h}" data-cant="${h.cant}">
+                    <span class="detail-time-hour">${h.h}</span>
+                    <span class="detail-time-qty">${h.cant} ${h.cant === 1 ? 'unidad' : 'unidades'}</span>
+                </div>
+            `).join('');
+
+            $('detailTimes').querySelectorAll('.detail-time-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openEditTimeModal(id, this.dataset.h, this.dataset.cant);
+                });
+            });
+
+            detailModal.classList.add('open');
+        }
+
+        function cambiarPestaña(nombrePestaña) {
+            pestañaActual = nombrePestaña;
+            
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            $(`tabContent${nombrePestaña.charAt(0).toUpperCase() + nombrePestaña.slice(1)}`).classList.add('active');
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === nombrePestaña) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            if (nombrePestaña === 'medicamentos') {
+                render();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('medsMC2', JSON.stringify(meds));
+        }
+
+        function saveConfig() {
+            localStorage.setItem('mcConfig', JSON.stringify({
+                sound: sonidoOn.checked,
+                voice: vozOn.checked,
+                vol: parseFloat(volSlider.value)
+            }));
+        }
+
+        function loadConfig() {
+            const c = JSON.parse(localStorage.getItem('mcConfig') || '{}');
+            if (c.sound !== undefined) sonidoOn.checked = c.sound;
+            if (c.voice !== undefined) vozOn.checked = c.voice;
+            if (c.vol !== undefined) {
+                volSlider.value = c.vol;
+                volValue.textContent = Math.round(c.vol * 100) + '%';
+            }
+        }
+
+        function showToast(titulo, mensaje, tipo = 'info') {
+            const toast = document.createElement('div');
+            const color = tipo === 'info' ? 'var(--neon-violet)' : 
+                          tipo === 'success' ? 'var(--neon-green)' : 'var(--neon-orange)';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, ${color}, rgba(139, 92, 246, 0.9));
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 16px;
+                font-weight: 600;
+                z-index: 9999;
+                box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+                animation: toastIn 0.4s ease;
+                font-size: 0.9rem;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                text-align: center;
+                max-width: 85%;
+                backdrop-filter: blur(10px);
+            `;
+            toast.innerHTML = `<strong>${titulo}</strong><br><small>${mensaje}</small>`;
+            toast.id = 'toast-' + Date.now();
+            
+            const existing = document.querySelector('[id^="toast-"]');
+            if (existing) existing.remove();
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                const t = document.getElementById(toast.id);
+                if (t) {
+                    t.style.animation = 'toastOut 0.4s ease forwards';
+                    setTimeout(() => t.remove(), 400);
+                }
+            }, 3000);
+        }
+
+        window.onload = function() {
+            loadConfig();
+            render();
+            
+            Object.values(meds).forEach(m => {
+                getMedColor(m.nombre);
+            });
+
+            const today = new Date().toISOString().slice(0, 10);
+            const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+            const filtered = {};
+            
+            Object.keys(fired).forEach(k => { 
+                if (k.startsWith(today)) filtered[k] = true; 
+            });
+            
+            localStorage.setItem('alarmsToday', JSON.stringify(filtered));
+
+            initializeAlarmSystem();
+            
+            console.log('✅ MediClock Neo mejorado iniciado - Sistema de alarmas activo');
+        };
+
+        $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
+        $('tabMedicamentos').onclick = () => cambiarPestaña('medicamentos');
+
+        nombre.oninput = function() { this.value = upper(this.value); };
+        paciente.oninput = function() { this.value = upper(this.value); };
+
+        $('menos').onclick = () => {
+            cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2);
+        };
+        
+        $('mas').onclick = () => {
+            cant.value = (parseFloat(cant.value) + 0.25).toFixed(2);
+        };
+
+        $('newMenos').onclick = () => {
+            $('newCant').value = Math.max(0.25, parseFloat($('newCant').value) - 0.25).toFixed(2);
+        };
+        
+        $('newMas').onclick = () => {
+            $('newCant').value = (parseFloat($('newCant').value) + 0.25).toFixed(2);
+        };
+
+        photoZone.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = 600 / img.width;
+                        canvas.width = 600;
+                        canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        foto = canvas.toDataURL('image/jpeg', 0.6);
+                        photoPreview.src = foto;
+                        photoPreview.classList.add('active');
+                        photoZone.style.display = 'none';
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+
+        $('settingsToggle').onclick = () => {
+            const panel = $('settingsPanel');
+            const arrow = $('settingsArrow');
+            panel.classList.toggle('open');
+            arrow.classList.toggle('open');
+        };
+
+        volSlider.oninput = function() {
+            volValue.textContent = Math.round(this.value * 100) + '%';
+            saveConfig();
+        };
+
+        sonidoOn.onchange = saveConfig;
+        vozOn.onchange = saveConfig;
+
+        $('addBtn').onclick = () => {
+            const n = upper(nombre.value);
+            const p = upper(paciente.value);
+            
+            if (!n || !cant.value || !hora.value || !p) {
+                alert('Completa todos los campos');
+                return;
+            }
+
+            const id = Date.now().toString();
+            meds[id] = {
+                nombre: n,
+                paciente: p,
+                foto: foto,
+                horas: [{ h: hora.value, cant: parseFloat(cant.value) }]
+            };
+
+            save();
+            
+            nombre.value = '';
+            paciente.value = '';
+            cant.value = '1';
+            hora.value = '';
+            foto = '';
+            photoPreview.classList.remove('active');
+            photoZone.style.display = 'block';
+            
+            showToast('✅ Medicamento agregado', `${upper(n)} agregado para ${upper(p)}`, 'success');
+            setTimeout(() => {
+                cambiarPestaña('medicamentos');
+                render();
+            }, 800);
+        };
+
+        $('detailClose').onclick = () => detailModal.classList.remove('open');
+
+        $('calBtn').onclick = () => {
+            const tomas = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+            const body = $('calBody');
+
+            if (!tomas.length) {
+                body.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">📅</div>
+                        <p class="empty-text">Sin registros aún</p>
+                    </div>
+                `;
+            } else {
+                tomas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                body.innerHTML = tomas.map(t => {
+                    const fecha = new Date(t.fecha).toLocaleDateString('es-ES', {
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short', 
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+                    return `
+                        <div class="cal-item">
+                            <div class="cal-item-header">
+                                <span class="cal-item-name">${upper(t.pastilla)}</span>
+                                <span class="cal-item-date">${fecha}</span>
+                            </div>
+                            <div class="cal-item-detail">${upper(t.paciente)} · ${t.cantidad}u a las ${t.hora}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            calModal.classList.add('open');
+        };
+
+        $('calClose').onclick = () => calModal.classList.remove('open');
+
+        $('alertClose').onclick = () => {
+            alertModal.classList.remove('open');
+            stopAlarm();
+        };
+
+        $('alertTake').onclick = () => {
+            medsActuales.forEach(med => {
+                const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+                hist.push({
+                    fecha: new Date().toISOString(),
+                    paciente: med.paciente,
+                    pastilla: med.nombre,
+                    cantidad: med.cantidad,
+                    hora: horaActual
+                });
+                localStorage.setItem('tomasMC', JSON.stringify(hist));
+            });
+
+            alertModal.classList.remove('open');
+            stopAlarm();
+            
+            showToast('✓ Registrado en historial', 'La toma ha sido registrada correctamente', 'success');
+        };
+
+        $('testBtn').onclick = () => {
+            const keys = Object.keys(meds);
+            if (!keys.length) {
+                alert('Agrega un medicamento primero');
+                return;
+            }
+            
+            const testMedicamentos = [];
+            const usuarios = ['ISRAEL', 'MARIA', 'JUAN'];
+            
+            for (let i = 0; i < Math.min(keys.length, 3); i++) {
+                const m = meds[keys[i]];
+                if (m.horas.length) {
+                    const usuario = usuarios[i] || m.paciente;
+                    testMedicamentos.push({
+                        paciente: usuario,
+                        nombre: m.nombre,
+                        cantidad: m.horas[0].cant,
+                        foto: m.foto
+                    });
+                }
+            }
+            
+            if (testMedicamentos.length === 0) {
+                alert('Los medicamentos necesitan horarios configurados');
+                return;
+            }
+            
+            medsActuales = testMedicamentos;
+            const now = new Date();
+            horaActual = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            console.log('🧪 Probando alarma con:', testMedicamentos);
+            showAlert();
+        };
+
+        $('testSound').onclick = () => {
+            if (!sonidoOn.checked) {
+                alert('Activa el sonido primero');
+                return;
+            }
+            
+            console.log('🔊 Probando sonido...');
+            
+            const audio = $('audio');
+            if (audio) {
+                audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
+                audio.volume = parseFloat(volSlider.value);
+                audio.loop = false;
+                
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log('✅ Sonido de prueba iniciado');
+                    }).catch(error => {
+                        console.log('⚠️ Necesita interacción del usuario');
+                        const unlock = () => {
+                            audio.play();
+                            document.removeEventListener('click', unlock);
+                        };
+                        document.addEventListener('click', unlock, { once: true });
+                    });
+                }
+            }
+        };
+
+        $('testVoice').onclick = () => {
+            if (!vozOn.checked) {
+                alert('Activa la voz primero');
+                return;
+            }
+            
+            const u = new SpeechSynthesisUtterance(
+                'Prueba de voz. Sistema MediClock Neo activado.'
+            );
+            u.lang = 'es-ES';
+            u.volume = parseFloat(volSlider.value);
+            speechSynthesis.speak(u);
+        };
+
+        $('cancelAddTime').onclick = () => {
+            addTimeModal.classList.remove('open');
+            currentMedForAddTime = null;
+        };
+
+        $('saveAddTime').onclick = () => {
+            const horaValue = $('newHora').value;
+            const cantidad = $('newCant').value;
+
+            if (!horaValue) {
+                showToast('⏰ Hora requerida', 'Selecciona una hora', 'warning');
+                return;
+            }
+
+            if (!cantidad || parseFloat(cantidad) <= 0) {
+                showToast('⚠️ Cantidad inválida', 'Ingresa una cantidad válida', 'warning');
+                return;
+            }
+
+            if (currentMedForAddTime) {
+                const m = meds[currentMedForAddTime];
+                if (m.horas.some(x => x.h === horaValue)) {
+                    showToast('⚠️ Hora duplicada', 'Esta hora ya existe', 'warning');
+                    return;
+                }
+
+                m.horas.push({ h: horaValue, cant: parseFloat(cantidad) });
+                m.horas.sort((a, b) => a.h.localeCompare(b.h));
+                
+                save();
+                render();
+                addTimeModal.classList.remove('open');
+                currentMedForAddTime = null;
+                
+                showToast('✅ Hora agregada', `${horaValue} · ${cantidad}u`, 'success');
+            }
+        };
+
+        $('editMenos').onclick = () => {
+            $('editCant').value = Math.max(0.25, parseFloat($('editCant').value) - 0.25).toFixed(2);
+        };
+
+        $('editMas').onclick = () => {
+            $('editCant').value = (parseFloat($('editCant').value) + 0.25).toFixed(2);
+        };
+
+        $('saveEditTime').onclick = () => {
+            if (!editingTimeData) return;
+
+            const newHora = $('editHora').value;
+            const newCant = $('editCant').value;
+            const m = meds[editingTimeData.medId];
+
+            if (!newHora || !newCant) {
+                showToast('⚠️ Campos requeridos', 'Completa hora y cantidad', 'warning');
+                return;
+            }
+
+            const idx = m.horas.findIndex(x => x.h === editingTimeData.oldHora);
+            if (idx === -1) return;
+
+            if (newHora !== editingTimeData.oldHora && m.horas.some(x => x.h === newHora)) {
+                showToast('⚠️ Hora duplicada', 'Esta hora ya existe', 'warning');
+                return;
+            }
+
+            m.horas[idx].h = newHora;
+            m.horas[idx].cant = parseFloat(newCant);
+            m.horas.sort((a, b) => a.h.localeCompare(b.h));
+            
+            save();
+            render();
+            editTimeModal.classList.remove('open');
+            editingTimeData = null;
+            
+            showToast('✅ Horario actualizado', `${editingTimeData.oldHora} → ${newHora}`, 'success');
+        };
+
+        $('deleteTime').onclick = () => {
+            if (!editingTimeData) return;
+
+            if (confirm(`¿Eliminar el horario ${editingTimeData.oldHora}?`)) {
+                const m = meds[editingTimeData.medId];
+                const idx = m.horas.findIndex(x => x.h === editingTimeData.oldHora);
+                
+                if (idx !== -1) {
+                    m.horas.splice(idx, 1);
+                    save();
+                    render();
+                    editTimeModal.classList.remove('open');
+                    editingTimeData = null;
+                    
+                    showToast('✅ Horario eliminado', `Hora ${editingTimeData.oldHora} eliminada`, 'success');
+                }
+            }
+        };
+
+        $('cancelEditTime').onclick = () => {
+            editTimeModal.classList.remove('open');
+            editingTimeData = null;
+        };
+
+        [alertModal, detailModal, editTimeModal, calModal, addTimeModal].forEach(modal => {
+            modal.onclick = e => {
+                if (e.target === modal) {
+                    modal.classList.remove('open');
+                    if (modal === alertModal) stopAlarm();
+                    if (modal === editTimeModal) editingTimeData = null;
+                    if (modal === addTimeModal) currentMedForAddTime = null;
+                }
+            };
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
+                    if (event.data.action === 'take') {
+                        medsActuales.forEach(med => {
+                            const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+                            hist.push({
+                                fecha: new Date().toISOString(),
+                                paciente: med.paciente,
+                                pastilla: med.nombre,
+                                cantidad: med.cantidad,
+                                hora: horaActual
+                            });
+                            localStorage.setItem('tomasMC', JSON.stringify(hist));
+                        });
+                        stopAlarm();
+                        showToast('✓ Toma registrada', 'Desde notificación', 'success');
+                    }
+                }
+            });
+        }
+
+        if ('wakeLock' in navigator) {
+            try {
+                navigator.wakeLock.request('screen').then(wakeLock => {
+                    console.log('🔋 Wake Lock activado');
+                }).catch(err => {
+                    console.log('Wake Lock no disponible:', err);
+                });
+            } catch (err) {
+                console.log('Wake Lock no soportado:', err);
+            }
+        }
+
+        window.onbeforeunload = () => {
+            if (checkInterval) clearInterval(checkInterval);
+            stopAlarm();
+        };
+    </script>
+</body>
+</html>
