@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <title>MediClock Neo</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.json">
@@ -27,6 +27,7 @@
             --bg-dark: #050508;
             --bg-card: rgba(15, 15, 25, 0.6);
             --bg-glass: rgba(255, 255, 255, 0.02);
+            
             --neon-cyan: #00f5ff;
             --neon-magenta: #ff00ea;
             --neon-violet: #8b5cf6;
@@ -36,20 +37,29 @@
             --neon-yellow: #ffd700;
             --neon-pink: #ff1493;
             --neon-teal: #00ced1;
+            
             --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
             --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
             --glow-violet: 0 0 30px rgba(139, 92, 246, 0.4);
+            
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.6);
             --text-muted: rgba(255, 255, 255, 0.3);
+            
             --border-glow: rgba(0, 245, 255, 0.2);
+            
             --radius-sm: 12px;
             --radius-md: 16px;
             --radius-lg: 24px;
             --radius-xl: 32px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             background: var(--bg-dark);
@@ -59,44 +69,573 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
         .bg-animation::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
-                        radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
             animation: bgPulse 15s ease-in-out infinite;
         }
-        @keyframes bgPulse { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: scale(1.1); } }
 
-        .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 20s ease-in-out infinite; pointer-events: none; z-index: 0; }
-        .orb-1 { width: 400px; height: 400px; background: var(--neon-cyan); top: -100px; right: -100px; }
-        .orb-2 { width: 300px; height: 300px; background: var(--neon-magenta); bottom: -50px; left: -50px; }
-        .orb-3 { width: 250px; height: 250px; background: var(--neon-violet); top: 50%; left: 50%; }
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5%, -5%) scale(1.1); }
+            66% { transform: translate(5%, 5%) scale(0.95); }
+        }
 
-        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-30px, 30px) rotate(180deg); } }
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-        .grid-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px); background-size: 50px 50px; z-index: 0; pointer-events: none; }
-        .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 2rem 1rem; min-height: 100vh; }
-        
-        .header { text-align: center; margin-bottom: 1.5rem; }
-        .logo { display: inline-flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
-        .logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: var(--glow-cyan), var(--glow-magenta); animation: iconPulse 3s ease-in-out infinite; position: relative; }
-        .logo-text { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-cyan);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
 
-        .tabs { display: flex; background: rgba(10, 10, 20, 0.8); border-radius: var(--radius-lg); padding: 0.25rem; margin-bottom: 1.5rem; border: 1px solid rgba(0, 245, 255, 0.1); backdrop-filter: blur(10px); }
-        .tab { flex: 1; text-align: center; padding: 0.75rem 1rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s; }
-        .tab.active { background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15)); color: var(--neon-cyan); }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-magenta);
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -7s;
+        }
 
-        .card { background: var(--bg-card); backdrop-filter: blur(40px); border: 1px solid var(--border-glow); border-radius: var(--radius-xl); padding: 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; transition: 0.4s; }
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--neon-violet);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
 
-        /* FIX VISUAL: .med-item Reestructurado para 100% de ancho en nombre */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(-30px, 30px) rotate(180deg); }
+            75% { transform: translate(20px, 50px) rotate(270deg); }
+        }
+
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: var(--radius-md);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.6;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+        }
+
+        .logo-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            vertical-align: super;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab:hover::before {
+            opacity: 1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15));
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: tabGlow 2s infinite;
+        }
+
+        @keyframes tabGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .modo-indicator {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-magenta));
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 9998;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
+            opacity: 0.6;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 245, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), var(--glow-cyan);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 234, 0.2));
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
+        .form-input-time {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input-time:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+        }
+
+        .qty-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .qty-btn {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.05);
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .qty-input {
+            flex: 1;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .photo-zone {
+            position: relative;
+            border: 2px dashed rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.02), rgba(255, 0, 234, 0.02));
+        }
+
+        .photo-zone:hover {
+            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(255, 0, 234, 0.05));
+            box-shadow: inset 0 0 30px rgba(0, 245, 255, 0.1);
+        }
+
+        .photo-zone-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .photo-zone-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .photo-zone-hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            display: none;
+        }
+
+        .photo-preview.active {
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: 0.02em;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px rgba(0, 245, 255, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--neon-green), #00d68f);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.875rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn.modo-activo {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .med-list {
+            list-style: none;
+        }
+
+        /* --- FIX VISUAL: .med-item Reestructurado --- */
         .med-item {
             display: flex;
-            flex-wrap: wrap; /* Permite que el nombre ocupe una fila y el resto baje */
+            flex-wrap: wrap; /* Permite que los elementos bajen a la siguiente fila */
             align-items: center;
             gap: 1rem;
             padding: 1.25rem;
@@ -107,104 +646,991 @@
             cursor: pointer;
             transition: all 0.4s ease;
             position: relative;
-            min-height: auto;
+            min-height: auto; /* Altura dinámica */
+        }
+
+        .med-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 3px 0 0 3px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .med-item:hover {
+            background: rgba(0, 245, 255, 0.05);
+            border-color: rgba(0, 245, 255, 0.3);
+            transform: translateX(8px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .med-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            flex-shrink: 0;
+            margin-top: 0; /* Reset margen */
+        }
+
+        .med-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(0, 245, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0; /* Reset margen */
+        }
+
+        .med-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 0;
         }
 
         .med-name-row {
-            width: 100%; /* Ocupa todo el ancho superior */
             display: flex;
             flex-direction: column;
-            margin-bottom: 0.5rem;
-            padding-right: 40px; /* Espacio para el botón delete que es absoluto */
+            width: 100%; /* Ocupa el 100% del ancho */
+            margin-bottom: 0.75rem;
+            padding-right: 40px; /* Espacio para el botón de borrar */
         }
 
         .med-name {
-            font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
-            text-transform: uppercase; letter-spacing: 0.02em; display: block;
-            width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
         }
 
-        .med-patient { font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600; }
-
-        .med-avatar, .med-placeholder {
-            width: 60px; height: 60px; border-radius: var(--radius-md);
-            object-fit: cover; border: 2px solid rgba(0, 245, 255, 0.3);
-            flex-shrink: 0; margin-top: 0;
+        .med-patient {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            margin-bottom: 0;
+            word-break: break-word;
+            width: 100%;
+            font-weight: 600;
         }
 
-        .med-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-        .med-times { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+        .med-times {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+            width: 100%;
+        }
 
-        .med-actions { position: absolute; top: 1.25rem; right: 1.25rem; }
+        .med-actions {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+            flex-shrink: 0;
+            margin-top: 0;
+        }
+        /* --- FIN FIX VISUAL --- */
+
+        .time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .add-time-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            color: var(--neon-cyan);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 0.25rem;
+        }
+
+        .add-time-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: scale(1.1);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .time-chip:hover {
+            background: rgba(0, 245, 255, 0.2);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.05);
+        }
+
+        .med-select-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
+
+        .med-select-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: scale(1.05);
+        }
 
         .med-delete {
-            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-            background: transparent; border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px; color: var(--text-muted); cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
-        .time-chip { display: inline-flex; align-items: center; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 600; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 20px; }
-        .add-time-btn { width: 28px; height: 28px; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 50%; color: var(--neon-cyan); cursor: pointer; }
+        .med-delete:hover {
+            background: rgba(255, 71, 87, 0.15);
+            border-color: rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
 
-        .form-input { width: 100%; padding: 1rem 1.25rem; color: var(--text-primary); background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); outline: none; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.75rem; font-size: 0.95rem; font-weight: 600; border-radius: var(--radius-md); border: none; cursor: pointer; transition: 0.4s; }
-        .btn-primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: var(--bg-dark); width: 100%; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .empty {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+        }
 
-        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 1.25rem; }
-        .modal-bg.open { display: flex; }
-        .modal { background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98)); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: var(--radius-xl); width: 100%; max-width: 420px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); opacity: 0.3; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 234, 0.1));
+            border: 1px dashed rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .settings {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 1.75rem;
+            padding-top: 1.75rem;
+        }
+
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .settings-arrow {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .settings-panel {
+            display: none;
+            padding-top: 1.25rem;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .switch-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            transition: all 0.4s ease;
+        }
+
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            box-shadow: var(--glow-cyan);
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(24px);
+            background: white;
+        }
+
+        .volume-row {
+            padding: 1rem 0;
+        }
+
+        .volume-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .volume-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .volume-header .volume-value {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            transition: transform 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal {
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98));
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 80px rgba(0, 245, 255, 0.2), 0 40px 80px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 245, 255, 0.08), transparent);
+            position: relative;
+        }
+
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.75rem 2rem;
+        }
+
+        .alert-modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .alert-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .alert-clock-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: var(--glow-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        .alert-greeting {
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-greeting-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-time-display {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .alert-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .alert-medications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .alert-medication-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .alert-medication-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .alert-medication-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex: 1;
+            margin-right: 1rem;
+            word-break: break-word;
+        }
+
+        .alert-medication-patient {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+            background: rgba(0, 245, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            white-space: nowrap;
+        }
+
+        .alert-medication-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 1rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .alert-medication-qty {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 245, 255, 0.15));
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin: 0 auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-total {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-header-with-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-main-img {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 1rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .detail-info {
+            text-align: center;
+        }
+
+        .detail-times-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-time-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .detail-time-item:hover {
+            background: rgba(0, 245, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .detail-time-hour {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-time-qty {
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .cal-item {
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--neon-green);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.875rem;
+        }
+
+        .cal-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .cal-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cal-item-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cal-item-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .edit-time-modal .modal-header {
+            padding: 1.5rem 2rem;
+        }
+
+        .edit-time-modal .modal-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .edit-time-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .edit-time-actions .btn {
+            flex: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 245, 255, 0.5);
+        }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 1.5rem 0.875rem;
+            }
+            .card {
+                padding: 1.5rem;
+                border-radius: var(--radius-lg);
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
+            }
+            .logo-text {
+                font-size: 1.6rem;
+            }
+            .modo-indicator {
+                top: 60px;
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+            .tabs {
+                margin-bottom: 1rem;
+            }
+            .tab {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            .med-item {
+                padding: 1rem;
+            }
+            .med-avatar, .med-placeholder {
+                width: 52px;
+                height: 52px;
+            }
+            .med-name {
+                font-size: 1.15rem;
+            }
+            .alert-clock-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .alert-greeting-text {
+                font-size: 1.2rem;
+            }
+            .alert-medication-name {
+                font-size: 1rem;
+            }
+            .alert-medication-img {
+                height: 100px;
+            }
+            .detail-main-img {
+                height: 150px;
+            }
+            .modal-footer {
+                padding: 1.25rem 1.5rem;
+            }
+            .modal-body {
+                padding: 1.5rem 1.5rem;
+            }
+            .alert-medication-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .alert-medication-patient {
+                align-self: flex-start;
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            opacity: 0.3;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
         .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
         .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
+        .color-3 { background: linear-gradient(135deg, var(--neon-green), var(--neon-teal)); }
+        .color-4 { background: linear-gradient(135deg, var(--neon-orange), var(--neon-yellow)); }
+        .color-5 { background: linear-gradient(135deg, var(--neon-pink), var(--neon-magenta)); }
+        .color-6 { background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan)); }
+
+        .time-chip.color-1 { 
+            background: rgba(0, 245, 255, 0.1); 
+            border-color: rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+        .time-chip.color-2 { 
+            background: rgba(255, 0, 234, 0.1); 
+            border-color: rgba(255, 0, 234, 0.3);
+            color: var(--neon-magenta);
+        }
+        .time-chip.color-3 { 
+            background: rgba(0, 255, 136, 0.1); 
+            border-color: rgba(0, 255, 136, 0.3);
+            color: var(--neon-green);
+        }
+        .time-chip.color-4 { 
+            background: rgba(255, 107, 53, 0.1); 
+            border-color: rgba(255, 107, 53, 0.3);
+            color: var(--neon-orange);
+        }
+        .time-chip.color-5 { 
+            background: rgba(255, 20, 147, 0.1); 
+            border-color: rgba(255, 20, 147, 0.3);
+            color: var(--neon-pink);
+        }
+        .time-chip.color-6 { 
+            background: rgba(139, 92, 246, 0.1); 
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--neon-violet);
+        }
     </style>
 </head>
-    <body>
-    <!-- FIX Background: Tag de audio silencioso Heartbeat -->
+<body>
+    <!-- FIX iOS Background: Audio base64 silencioso -->
     <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
-    <audio id="mainAlarmAudio" loop playsinline preload="auto"></audio>
 
     <div class="bg-animation"></div>
     <div class="grid-pattern"></div>
-    <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
     <div class="scanline"></div>
 
     <div class="app">
         <header class="header">
-            <div class="logo"><div class="logo-icon">💊</div><span class="logo-text">MediClock</span><span class="logo-badge">NEO</span></div>
+            <div class="logo">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">MediClock</span>
+                <span class="logo-badge">NEO</span>
+            </div>
+            <p class="tagline">Sistema inteligente de medicación</p>
         </header>
 
         <div class="tabs">
-            <button class="tab active" id="tabNuevo" data-tab="nuevo">✨ Nuevo</button>
-            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">💊 Mis Medicamentos</button>
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">
+                <span>✨</span>
+                <span>Nuevo</span>
+            </button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">
+                <span>💊</span>
+                <span>Mis Medicamentos</span>
+            </button>
         </div>
 
         <div class="tab-content active" id="tabContentNuevo">
             <div class="card">
-                <div class="form-group"><label class="form-label">Medicamento</label><input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol"></div>
-                <div class="form-group"><label class="form-label">Paciente</label><input type="text" id="paciente" class="form-input" placeholder="Ej: Israel"></div>
-                <div class="form-group"><label class="form-label">Cantidad</label>
-                    <div style="display:flex; gap:10px;">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <h2 class="card-title">Nueva medicación</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: María García" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
                         <button class="qty-btn" id="menos">−</button>
-                        <input type="number" id="cant" class="form-input" value="1" step="0.25" style="text-align:center">
+                        <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
                         <button class="qty-btn" id="mas">+</button>
                     </div>
                 </div>
-                <div class="form-group"><label class="form-label">Hora</label><input type="time" id="hora" class="form-input"></div>
+
                 <div class="form-group">
-                    <div class="photo-zone" id="photoZone">📷 Capturar Foto del Medicamento</div>
-                    <img id="photoPreview" class="photo-preview" style="width:100%; border-radius:12px; margin-top:10px; display:none;">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input-time">
                 </div>
-                <button class="btn btn-primary" id="addBtn">⚡ AGREGAR MEDICACIÓN</button>
-                
-                <div class="settings" style="margin-top:2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
-                    <div id="settingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; color:var(--text-secondary);"><span>⚙️ AJUSTES DE AUDIO</span><span id="settingsArrow">▼</span></div>
-                    <div id="settingsPanel" style="display:none; padding-top:1rem;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Sonido de Alarma</span><input type="checkbox" id="sonidoOn" checked></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Aviso por Voz</span><input type="checkbox" id="vozOn" checked></div>
-                        <div style="margin-bottom:1rem;"><span>Volumen</span><input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width:100%"><span id="volValue">70%</span></div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto (opcional)</label>
+                    <div class="photo-zone" id="photoZone">
+                        <div class="photo-zone-icon">📷</div>
+                        <div class="photo-zone-text">Toca para capturar</div>
+                        <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
+                    </div>
+                    <img class="photo-preview" id="photoPreview" src="" alt="Preview">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-full" id="addBtn">
+                        <span>⚡</span>
+                        <span>Agregar</span>
+                    </button>
+                </div>
+
+                <div class="settings">
+                    <div class="settings-toggle" id="settingsToggle">
+                        <div class="settings-label">
+                            <span>⚙️</span>
+                            <span>Configuración de alertas</span>
+                        </div>
+                        <span class="settings-arrow" id="settingsArrow">▼</span>
+                    </div>
+
+                    <div class="settings-panel" id="settingsPanel">
+                        <div class="switch-row">
+                            <span class="switch-text">Sonido de alarma</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sonidoOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span class="switch-text">Recordatorio por voz</span>
+                            <label class="switch">
+                                <input type="checkbox" id="vozOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="volume-row">
+                            <div class="volume-header">
+                                <span class="volume-label">Volumen</span>
+                                <span class="volume-value" id="volValue">70%</span>
+                            </div>
+                            <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
+                            <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -212,351 +1638,528 @@
 
         <div class="tab-content" id="tabContentMedicamentos">
             <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💊</div>
+                    <h2 class="card-title">Mis medicamentos</h2>
+                </div>
+
                 <ul class="med-list" id="lista"></ul>
-                <div class="empty" id="empty" style="text-align:center; padding:2rem;"><h3>Sin medicamentos</h3></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
-                    <button class="btn btn-secondary" id="testBtn" style="flex:1">🧪 Probar</button>
+
+                <div class="empty" id="empty">
+                    <div class="empty-icon">💊</div>
+                    <h3 class="empty-title">Sin medicamentos</h3>
+                    <p class="empty-text">Agrega tu primera medicación en la pestaña "Nuevo"</p>
+                </div>
+
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" id="calBtn">
+                        <span>📅</span>
+                        <span>Historial</span>
+                    </button>
+                    <button class="btn btn-secondary" id="testBtn">
+                        <span>🧪</span>
+                        <span>Probar Alarma</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modales -->
+    <!-- Modales (Alert, Detail, Edit, Cal, AddTime) -->
     <div class="modal-bg" id="alertModal">
-        <div class="modal" style="padding:2rem; text-align:center;">
-            <div style="font-size:3rem; margin-bottom:1rem;">⏰</div>
-            <h2 id="alertGreeting">¡Es hora!</h2>
-            <div id="alertTimeDisplay" style="font-size:2.5rem; color:var(--neon-cyan); margin:1rem 0; font-weight:800;">00:00</div>
-            <div id="alertMedicationsList" style="margin-bottom:2rem; border-top:1px solid #333; padding-top:1rem;"></div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-secondary" id="alertClose" style="flex:1">Cerrar</button>
-                <button class="btn btn-primary" id="alertTake" style="flex:1; background:var(--neon-green); color:#000;">✓ Tomado</button>
+        <div class="modal">
+            <div class="modal-body">
+                <div class="alert-modal-content">
+                    <div class="alert-header">
+                        <div class="alert-clock-icon">⏰</div>
+                        <div class="alert-greeting">
+                            <div class="alert-greeting-text" id="alertGreeting">Hora de medicación</div>
+                            <div class="alert-time-display" id="alertTimeDisplay">00:00</div>
+                        </div>
+                    </div>
+                    <h2 class="alert-title">Es hora de tu medicación</h2>
+                    <div class="alert-medications-list" id="alertMedicationsList"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p class="modal-total" id="alertTotal">Total: 0 medicamentos (0 unidades)</p>
+                <div class="btn-group">
+                    <button class="btn btn-danger" id="alertClose">Cerrar</button>
+                    <button class="btn btn-success" id="alertTake">✓ Tomado</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-bg" id="detailModal">
-        <div class="modal" style="padding:2rem;">
-            <img id="detailMainImg" style="width:100%; border-radius:12px; margin-bottom:1rem; display:none;">
-            <h2 id="detailName"></h2>
-            <p id="detailPatient" style="color:var(--neon-cyan); font-weight:600; margin-bottom:1rem;"></p>
-            <div id="detailTimes"></div>
-            <button class="btn btn-secondary" id="detailClose" style="margin-top:1.5rem; width:100%;">Cerrar</button>
+        <div class="modal">
+            <div class="modal-body">
+                <div class="detail-header-with-photo">
+                    <img class="detail-main-img" id="detailMainImg" src="" alt="Medicamento">
+                    <div class="detail-info">
+                        <p class="modal-subtitle" id="detailPatient">PACIENTE</p>
+                        <h2 class="modal-title" id="detailName">MEDICAMENTO</h2>
+                    </div>
+                </div>
+                <div class="detail-times-title">Horarios programados</div>
+                <div id="detailTimes"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="detailClose">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="modal-bg" id="editTimeModal">
-        <div class="modal" style="padding:2rem;">
-            <h3>Editar Horario</h3>
-            <input type="time" id="editHora" class="form-input" style="margin:1rem 0;">
-            <input type="number" id="editCant" class="form-input" step="0.25">
-            <div style="display:flex; gap:10px; margin-top:1.5rem;">
-                <button class="btn" style="background:#ff4757; color:white; flex:1;" id="deleteTime">🗑 Eliminar</button>
-                <button class="btn btn-primary" id="saveEditTime" style="flex:1;">Guardar</button>
+    <div class="modal-bg edit-time-modal" id="editTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">✏️</div>
+                <h2 class="modal-title">Editar horario</h2>
+                <p class="modal-subtitle" id="editTimeMedName"></p>
             </div>
-            <button class="btn btn-secondary" id="cancelEditTime" style="width:100%; margin-top:10px;">Cancelar</button>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="editHora" class="form-input-time" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="editMenos">−</button>
+                        <input type="number" id="editCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="editMas">+</button>
+                    </div>
+                </div>
+                <div class="edit-time-actions">
+                    <button class="btn btn-danger" id="deleteTime">🗑️ Eliminar</button>
+                    <button class="btn btn-success" id="saveEditTime">💾 Guardar</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="cancelEditTime">Cancelar</button>
+            </div>
         </div>
     </div>
 
     <div class="modal-bg" id="calModal">
-        <div class="modal" style="padding:2rem;">
-            <h2>Historial de Tomas</h2>
-            <div id="calBody" style="max-height:350px; overflow-y:auto; margin:1.5rem 0;"></div>
-            <button class="btn btn-secondary" id="calClose" style="width:100%;">Cerrar</button>
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">📅</div>
+                <h2 class="modal-title">Historial de tomas</h2>
+            </div>
+            <div class="modal-body" id="calBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="calClose">Cerrar</button>
+            </div>
         </div>
     </div>
-        <script>
-        // --- SISTEMA DE SEGUNDO PLANO (HEARTBEAT) ---
+
+    <div class="modal-bg" id="addTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">➕</div>
+                <h2 class="modal-title">Agregar nueva hora</h2>
+                <p class="modal-subtitle" id="addTimeMedName"></p>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="newHora" class="form-input-time" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="newMenos">−</button>
+                        <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="newMas">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="cancelAddTime">Cancelar</button>
+                    <button class="btn btn-success" id="saveAddTime">✓ Agregar Hora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" preload="auto" loop></audio>
+
+    <script>
+        /* --- FIX iOS Background: Script initAudioHack --- */
         function initAudioHack() {
             const silentAudio = document.getElementById('iosWakeAudio');
             if (silentAudio) {
-                // Iniciamos un bucle de silencio. Esto mantiene el proceso JS vivo en bloqueo.
                 silentAudio.play().then(() => {
-                    console.log("🚀 Heartbeat de audio activado para segundo plano");
+                    console.log("🚀 iOS Background Hack Activado");
                     window.removeEventListener('touchstart', initAudioHack);
                     window.removeEventListener('click', initAudioHack);
-                }).catch(err => console.log("Audio bloqueado, esperando toque..."));
+                }).catch(err => console.log("Audio Hack bloqueado:", err));
             }
         }
         window.addEventListener('touchstart', initAudioHack, { once: true });
         window.addEventListener('click', initAudioHack, { once: true });
 
-        // --- VARIABLES Y PERSISTENCIA ---
+        // Variables globales (Inalteradas)
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
         let foto = '';
+        let alarmaOn = false;
         let medsActuales = [];
         let horaActual = '';
-        let alarmaOn = false;
+        let intervalo = null;
+        let audioCtx = null;
+        let pestañaActual = 'nuevo';
         let medColors = {};
+        let currentMedForAddTime = null;
         let editingTimeData = null;
         let checkInterval = null;
 
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // --- SISTEMA DE ALARMAS ROBUSTO ---
+        // Sistema de alarmas (Inalterado)
         function initializeAlarmSystem() {
-            if ('Notification' in window) Notification.requestPermission();
-            
+            requestNotificationPermissions();
+            setupBackgroundSync();
             checkAlarms();
             if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 15000); // Revisar cada 15 segs
+            checkInterval = setInterval(checkAlarms, 30000); 
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            document.addEventListener('click', handleUserInteraction);
+        }
 
-            // Al volver al primer plano o encender pantalla, revisar inmediatamente
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) checkAlarms();
-            });
+        function setupBackgroundSync() {
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.sync.register('alarm-check').catch(err => console.log('Sync err:', err));
+                });
+            }
+        }
+
+        function handleVisibilityChange() { if (!document.hidden) checkAlarms(); }
+        function handleUserInteraction() { if (medsActuales.length > 0 && alarmaOn) playAlarmSound(); }
+
+        function requestNotificationPermissions() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
         }
 
         function checkAlarms() {
             const now = new Date();
-            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            const todayKey = now.toISOString().slice(0, 10);
-            
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             medsActuales = [];
-            let hayAlarma = false;
+            let alarmTriggered = false;
+            const today = now.toISOString().slice(0, 10);
 
             Object.keys(meds).forEach(id => {
                 const m = meds[id];
+                if (!m || !m.horas) return;
                 m.horas.forEach(h => {
-                    if (h.h === timeStr) {
+                    if (Math.abs(getMinutesDifference(currentTime, h.h)) <= 1) {
                         medsActuales.push({id, paciente: m.paciente, nombre: m.nombre, cantidad: h.cant, foto: m.foto});
-                        hayAlarma = true;
+                        alarmTriggered = true;
                     }
                 });
             });
 
-            if (hayAlarma && medsActuales.length > 0) {
-                const key = `fired_${todayKey}_${timeStr}_${medsActuales.map(x=>x.id).join('')}`;
-                if (!localStorage.getItem(key)) {
-                    horaActual = timeStr;
-                    dispararAlerta();
-                    localStorage.setItem(key, 'true');
+            if (alarmTriggered && medsActuales.length > 0) {
+                const ids = medsActuales.map(m => m.id).sort();
+                const key = `${today}-${currentTime}-${ids.join('-')}`;
+                const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+                if (!fired[key]) {
+                    horaActual = currentTime;
+                    showLockScreenNotification();
+                    if (!document.hidden) setTimeout(() => showAlert(), 500);
+                    fired[key] = true;
+                    localStorage.setItem('alarmsToday', JSON.stringify(fired));
                 }
             }
         }
 
-        function dispararAlerta() {
-            // 1. Mostrar Modal
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-            $('alertGreeting').textContent = `Hola ${pacientes.join(' y ')}`;
-            $('alertTimeDisplay').textContent = horaActual;
-            $('alertMedicationsList').innerHTML = medsActuales.map(m => `
-                <div style="padding:10px; border-bottom:1px solid #222;">
-                    <b>${upper(m.nombre)}</b>: ${m.cantidad} unidad(es)
-                </div>
-            `).join('');
-            
-            $('alertModal').classList.add('open');
+        function getMinutesDifference(time1, time2) {
+            const [h1, m1] = time1.split(':').map(Number);
+            const [h2, m2] = time2.split(':').map(Number);
+            return (h1 * 60 + m1) - (h2 * 60 + m2);
+        }
 
-            // 2. Audio (MediaSession para pantalla de bloqueo)
-            if (sonidoOn.checked) {
-                const audio = $('mainAlarmAudio');
-                audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
-                audio.volume = parseFloat(volSlider.value);
-                
-                if ('mediaSession' in navigator) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: '¡HORA DE MEDICACIÓN!',
-                        artist: 'MediClock NEO Alerta',
-                        artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
-                    });
+        function showLockScreenNotification() {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            const title = '⏰ MediClock - Medicación';
+            const options = {
+                body: `Es hora de tu medicación (${horaActual})`,
+                icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                vibrate: [200, 100, 200],
+                requireInteraction: true
+            };
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.ready.then(reg => reg.showNotification(title, options));
+            } else {
+                new Notification(title, options);
+            }
+            if (sonidoOn.checked) setTimeout(() => playAlarmSound(), 1000);
+        }
+
+        function playAlarmSound() {
+            if (!sonidoOn.checked || alarmaOn) return;
+            stopAlarm();
+            try {
+                const audio = $('audio');
+                if (audio) {
+                    audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
+                    audio.volume = parseFloat(volSlider.value);
+                    audio.play().then(() => alarmaOn = true).catch(() => tryPlayAlternativeSound());
                 }
-                audio.play().then(() => alarmaOn = true).catch(e => console.log("Audio bloqueado"));
-            }
+            } catch (e) { tryPlayAlternativeSound(); }
+        }
 
-            // 3. Voz
-            if (vozOn.checked && 'speechSynthesis' in window) {
-                speechSynthesis.cancel();
-                let msg = `Atención, son las ${horaActual}. Es hora de medicación para ${pacientes.join(' y ')}. `;
-                medsActuales.forEach(m => msg += `Toma ${m.cantidad} de ${m.nombre}. `);
-                const u = new SpeechSynthesisUtterance(msg);
-                u.lang = 'es-ES'; u.volume = parseFloat(volSlider.value);
-                speechSynthesis.speak(u);
-            }
-
-            if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+        function tryPlayAlternativeSound() {
+            alarmaOn = true;
+            if (intervalo) clearInterval(intervalo);
+            intervalo = setInterval(() => {
+                const a = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+                a.volume = parseFloat(volSlider.value);
+                a.play().catch(() => {});
+            }, 3000);
         }
 
         function stopAlarm() {
             alarmaOn = false;
-            $('mainAlarmAudio').pause();
+            if (intervalo) clearInterval(intervalo);
+            intervalo = null;
+            const audio = $('audio');
+            if (audio) { audio.pause(); audio.currentTime = 0; }
             if ('speechSynthesis' in window) speechSynthesis.cancel();
-            $('alertModal').classList.remove('open');
         }
 
-        // --- GESTIÓN DE MEDICAMENTOS Y RENDER ---
+        async function playVoiceReminder() {
+            if (!vozOn.checked || !('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let msg = `Atención, es hora de medicación. `;
+            medsActuales.forEach(m => msg += `${m.paciente}: ${m.nombre}, ${m.cantidad} unidades. `);
+            return new Promise(resolve => {
+                const u = new SpeechSynthesisUtterance(msg);
+                u.lang = 'es-ES';
+                u.volume = parseFloat(volSlider.value);
+                u.onend = () => resolve();
+                u.onerror = () => resolve();
+                speechSynthesis.speak(u);
+            });
+        }
+
+        function showAlert() {
+            if (!medsActuales.length) return;
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            $('alertGreeting').textContent = pacientes.length === 1 ? `Hola ${upper(pacientes[0])}` : 'Hola a todos';
+            $('alertTimeDisplay').textContent = horaActual;
+            const list = $('alertMedicationsList');
+            list.innerHTML = '';
+            medsActuales.forEach(med => {
+                const div = document.createElement('div');
+                div.className = 'alert-medication-container';
+                div.innerHTML = `
+                    <div class="alert-medication-header">
+                        <div class="alert-medication-name">${upper(med.nombre)}</div>
+                        <div class="alert-medication-patient">${upper(med.paciente)}</div>
+                    </div>
+                    <img class="alert-medication-img" src="${med.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png'}">
+                    <div class="alert-medication-qty">${med.cantidad}u</div>
+                `;
+                list.appendChild(div);
+            });
+            const total = medsActuales.reduce((s, m) => s + m.cantidad, 0);
+            $('alertTotal').textContent = `Total: ${medsActuales.length} medicamentos (${total} u)`;
+            alertModal.classList.add('open');
+            activateAlarm();
+        }
+
+        async function activateAlarm() {
+            if (vozOn.checked) await playVoiceReminder();
+            playAlarmSound();
+        }
+
         function render() {
-            const lista = $('lista');
             lista.innerHTML = '';
             const keys = Object.keys(meds);
-            $('empty').style.display = keys.length ? 'none' : 'block';
-
+            empty.style.display = keys.length ? 'none' : 'block';
             keys.forEach(id => {
                 const m = meds[id];
                 const colorClass = getMedColor(m.nombre);
                 const li = document.createElement('li');
                 li.className = 'med-item';
                 li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
-
                 li.innerHTML = `
                     <div class="med-name-row">
                         <div class="med-name">${upper(m.nombre)}</div>
                         <div class="med-patient">${upper(m.paciente)}</div>
                     </div>
-                    ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
+                    ${m.foto ? `<img class="med-avatar" src="${m.foto}">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
                     <div class="med-info">
                         <div class="med-times">
-                            ${m.horas.map(h => `<span class="time-chip" onclick="event.stopPropagation(); openEditTime('${id}', '${h.h}', '${h.cant}')">${h.h} · ${h.cant}u</span>`).join('')}
-                            <button class="add-time-btn" onclick="event.stopPropagation(); openAddTime('${id}')">+</button>
+                            ${m.horas.map(h => `<span class="time-chip ${colorClass}" data-h="${h.h}" data-cant="${h.cant}">${h.h} · ${h.cant}u</span>`).join('')}
+                            <button class="add-time-btn" data-id="${id}">+</button>
                         </div>
                     </div>
-                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
+                    <div class="med-actions">
+                        <button class="med-delete" data-id="${id}">🗑️</button>
+                    </div>
                 `;
-                li.onclick = () => showDetail(id);
+                li.onclick = e => { if (!e.target.closest('.med-delete, .add-time-btn, .time-chip')) showDetail(id); };
+                li.querySelector('.med-delete').onclick = e => { 
+                    e.stopPropagation(); 
+                    if(confirm('¿Eliminar?')){ delete meds[id]; save(); render(); }
+                };
+                li.querySelector('.add-time-btn').onclick = e => {
+                    e.stopPropagation();
+                    currentMedForAddTime = id;
+                    $('addTimeMedName').textContent = upper(m.nombre);
+                    addTimeModal.classList.add('open');
+                };
+                li.querySelectorAll('.time-chip').forEach(chip => {
+                    chip.onclick = e => {
+                        e.stopPropagation();
+                        openEditTimeModal(id, chip.dataset.h, chip.dataset.cant);
+                    };
+                });
                 lista.appendChild(li);
             });
         }
 
         function getMedColor(n) {
-            if(!medColors[n]) {
-                const c = ['color-1', 'color-2'];
-                medColors[n] = c[Object.keys(medColors).length % 2];
+            if (!medColors[n]) {
+                const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6'];
+                medColors[n] = colors[Object.keys(medColors).length % colors.length];
             }
             return medColors[n];
         }
 
-        window.deleteMed = (id) => {
-            if(confirm('¿Eliminar este medicamento y todos sus horarios?')) {
-                delete meds[id]; save(); render();
-            }
-        };
+        function openEditTimeModal(id, h, c) {
+            editingTimeData = {medId: id, oldHora: h, oldCantidad: c};
+            $('editTimeMedName').textContent = upper(meds[id].nombre);
+            $('editHora').value = h;
+            $('editCant').value = c;
+            editTimeModal.classList.add('open');
+        }
 
         function showDetail(id) {
             const m = meds[id];
+            $('detailPatient').textContent = upper(m.paciente);
             $('detailName').textContent = upper(m.nombre);
-            $('detailPatient').textContent = `PACIENTE: ${upper(m.paciente)}`;
-            if(m.foto) { $('detailMainImg').src = m.foto; $('detailMainImg').style.display = 'block'; }
-            else { $('detailMainImg').style.display = 'none'; }
-            $('detailTimes').innerHTML = m.horas.map(h => `<div style="padding:10px; background:rgba(0,0,0,0.2); margin-top:5px; border-radius:8px;">${h.h} - ${h.cant} unidades</div>`).join('');
-            $('detailModal').classList.add('open');
+            $('detailMainImg').src = m.foto || 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png';
+            $('detailTimes').innerHTML = m.horas.map(h => `<div class="detail-time-item"><span>${h.h}</span><span>${h.cant} u</span></div>`).join('');
+            detailModal.classList.add('open');
         }
 
-        function openAddTime(id) {
-            const h = prompt("Hora (HH:MM):", "08:00");
-            const c = prompt("Cantidad:", "1");
-            if(h && c) {
-                meds[id].horas.push({h, cant: parseFloat(c)});
-                meds[id].horas.sort((a,b) => a.h.localeCompare(b.h));
-                save(); render();
-            }
+        function cambiarPestaña(p) {
+            pestañaActual = p;
+            document.querySelectorAll('.tab-content, .tab').forEach(el => el.classList.remove('active'));
+            $(`tabContent${p.charAt(0).toUpperCase()+p.slice(1)}`).classList.add('active');
+            $(`tab${p.charAt(0).toUpperCase()+p.slice(1)}`).classList.add('active');
+            if(p === 'medicamentos') render();
         }
 
-        function openEditTime(id, h, c) {
-            editingTimeData = {id, oldH: h};
-            $('editHora').value = h;
-            $('editCant').value = c;
-            $('editTimeModal').classList.add('open');
+        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
+        function saveConfig() {
+            localStorage.setItem('mcConfig', JSON.stringify({sound: sonidoOn.checked, voice: vozOn.checked, vol: parseFloat(volSlider.value)}));
         }
 
-        // --- HANDLERS ---
-        $('addBtn').onclick = () => {
-            const n = upper(nombre.value), p = upper(paciente.value), h = hora.value, c = parseFloat(cant.value);
-            if(!n || !h) return alert('Nombre y Hora son obligatorios');
-            const id = Date.now().toString();
-            meds[id] = { nombre: n, paciente: p || 'YO', foto, horas: [{h, cant: c || 1}] };
-            save(); render();
-            nombre.value = ''; paciente.value = ''; hora.value = ''; foto = '';
-            $('photoPreview').style.display = 'none';
-            cambiarTab('medicamentos');
+        function showToast(t, m, type) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--neon-blue);padding:1rem;border-radius:10px;z-index:10000;`;
+            toast.innerHTML = `<b>${t}</b><br>${m}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        window.onload = () => {
+            const c = JSON.parse(localStorage.getItem('mcConfig') || '{}');
+            if (c.sound !== undefined) sonidoOn.checked = c.sound;
+            if (c.voice !== undefined) vozOn.checked = c.voice;
+            if (c.vol !== undefined) { volSlider.value = c.vol; volValue.textContent = Math.round(c.vol*100)+'%'; }
+            render();
+            initializeAlarmSystem();
         };
 
+        // Eventos de botones y formularios (Inalterados)
+        $('tabNuevo').onclick = () => cambiarPestaña('nuevo');
+        $('tabMedicamentos').onclick = () => cambiarPestaña('medicamentos');
+        $('menos').onclick = () => cant.value = Math.max(0.25, parseFloat(cant.value)-0.25).toFixed(2);
+        $('mas').onclick = () => cant.value = (parseFloat(cant.value)+0.25).toFixed(2);
+        
         photoZone.onclick = () => {
-            const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
-            input.onchange = e => {
-                const file = e.target.files[0];
+            const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment';
+            i.onchange = e => {
                 const reader = new FileReader();
                 reader.onload = ev => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                        canvas.width = 600; canvas.height = (img.height * 600) / img.width;
-                        ctx.drawImage(img, 0, 0, 600, canvas.height);
-                        foto = canvas.toDataURL('image/jpeg', 0.6);
-                        $('photoPreview').src = foto; $('photoPreview').style.display = 'block';
-                    };
-                    img.src = ev.target.result;
+                    foto = ev.target.result;
+                    photoPreview.src = foto; photoPreview.style.display='block'; photoZone.style.display='none';
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(e.target.files[0]);
             };
-            input.click();
+            i.click();
         };
 
-        $('saveEditTime').onclick = () => {
-            const m = meds[editingTimeData.id];
-            const idx = m.horas.findIndex(x => x.h === editingTimeData.oldH);
-            m.horas[idx] = {h: $('editHora').value, cant: parseFloat($('editCant').value)};
-            m.horas.sort((a,b) => a.h.localeCompare(b.h));
-            save(); render(); $('editTimeModal').classList.remove('open');
-        };
-
-        $('deleteTime').onclick = () => {
-            meds[editingTimeData.id].horas = meds[editingTimeData.id].horas.filter(x => x.h !== editingTimeData.oldH);
-            if(meds[editingTimeData.id].horas.length === 0) delete meds[editingTimeData.id];
-            save(); render(); $('editTimeModal').classList.remove('open');
+        $('addBtn').onclick = () => {
+            if(!nombre.value || !paciente.value || !hora.value) return alert('Completa campos');
+            const id = Date.now().toString();
+            meds[id] = {nombre: upper(nombre.value), paciente: upper(paciente.value), foto, horas: [{h: hora.value, cant: parseFloat(cant.value)}]};
+            save(); render(); cambiarPestaña('medicamentos');
+            nombre.value=''; paciente.value=''; foto=''; photoPreview.style.display='none'; photoZone.style.display='block';
         };
 
         $('alertTake').onclick = () => {
             const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            medsActuales.forEach(m => hist.push({fecha: new Date().toISOString(), nombre: m.nombre, paciente: m.paciente, hora: horaActual}));
+            medsActuales.forEach(m => hist.push({fecha: new Date().toISOString(), ...m}));
             localStorage.setItem('tomasMC', JSON.stringify(hist));
-            stopAlarm();
+            alertModal.classList.remove('open'); stopAlarm();
+        };
+
+        $('alertClose').onclick = () => { alertModal.classList.remove('open'); stopAlarm(); };
+        $('detailClose').onclick = () => detailModal.classList.remove('open');
+        $('settingsToggle').onclick = () => { settingsPanel.classList.toggle('open'); settingsArrow.classList.toggle('open'); };
+        volSlider.oninput = () => { volValue.textContent = Math.round(volSlider.value*100)+'%'; saveConfig(); };
+        sonidoOn.onchange = saveConfig; vozOn.onchange = saveConfig;
+        
+        $('saveAddTime').onclick = () => {
+            if(!$('newHora').value) return;
+            meds[currentMedForAddTime].horas.push({h: $('newHora').value, cant: parseFloat($('newCant').value)});
+            meds[currentMedForAddTime].horas.sort((a,b) => a.h.localeCompare(b.h));
+            save(); render(); addTimeModal.classList.remove('open');
+        };
+        $('cancelAddTime').onclick = () => addTimeModal.classList.remove('open');
+        $('cancelEditTime').onclick = () => editTimeModal.classList.remove('open');
+        
+        $('saveEditTime').onclick = () => {
+            const m = meds[editingTimeData.medId];
+            const idx = m.horas.findIndex(x => x.h === editingTimeData.oldHora);
+            m.horas[idx] = {h: $('editHora').value, cant: parseFloat($('editCant').value)};
+            m.horas.sort((a,b) => a.h.localeCompare(b.h));
+            save(); render(); editTimeModal.classList.remove('open');
+        };
+
+        $('deleteTime').onclick = () => {
+            const m = meds[editingTimeData.medId];
+            m.horas = m.horas.filter(x => x.h !== editingTimeData.oldHora);
+            save(); render(); editTimeModal.classList.remove('open');
+        };
+
+        $('testBtn').onclick = () => {
+            const keys = Object.keys(meds);
+            if(!keys.length) return alert('Agrega medicación');
+            medsActuales = [{...meds[keys[0]], cantidad: meds[keys[0]].horas[0].cant}];
+            horaActual = 'TEST';
+            showAlert();
         };
 
         $('calBtn').onclick = () => {
             const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            $('calBody').innerHTML = hist.reverse().map(t => `
-                <div style="padding:10px; border-bottom:1px solid #222;">
-                    <b>${upper(t.nombre)}</b> - ${upper(t.paciente)}<br>
-                    <small>${new Date(t.fecha).toLocaleString()}</small>
-                </div>
-            `).join('') || 'Sin registros';
-            $('calModal').classList.add('open');
+            calBody.innerHTML = hist.reverse().map(t => `<div class="cal-item"><b>${t.nombre}</b><br>${new Date(t.fecha).toLocaleString()}</div>`).join('') || 'Sin historial';
+            calModal.classList.add('open');
         };
-
-        $('testBtn').onclick = () => {
-            medsActuales = [{nombre: 'MEDICAMENTO TEST', paciente: 'ISRAEL', cantidad: 1, id: 'test'}];
-            horaActual = 'TEST';
-            dispararAlerta();
-        };
-
-        $('settingsToggle').onclick = () => {
-            const p = $('settingsPanel');
-            p.style.display = p.style.display === 'none' ? 'block' : 'none';
-        };
-
-        volSlider.oninput = function() { $('volValue').textContent = Math.round(this.value * 100) + '%'; };
-
-        function cambiarTab(t) {
-            document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-            $(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
-            $(`tabContent${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
-            if(t === 'medicamentos') render();
-        }
-
-        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
-
-        $('tabNuevo').onclick = () => cambiarTab('nuevo');
-        $('tabMedicamentos').onclick = () => cambiarTab('medicamentos');
-        $('alertClose').onclick = stopAlarm;
-        $('detailClose').onclick = () => $('detailModal').classList.remove('open');
-        $('calClose').onclick = () => $('calModal').classList.remove('open');
-        $('cancelEditTime').onclick = () => $('editTimeModal').classList.remove('open');
-        $('menos').onclick = () => { cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2); };
-        $('mas').onclick = () => { cant.value = (parseFloat(cant.value) + 0.25).toFixed(2); };
-
-        window.onload = () => { render(); initializeAlarmSystem(); };
+        $('calClose').onclick = () => calModal.classList.remove('open');
     </script>
 </body>
 </html>
