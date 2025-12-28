@@ -1,119 +1,96 @@
+// sw.js - Service Worker para MediClock Neo
+const CACHE_NAME = 'mediclock-neo-v2';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
+
+// Instalación: cachear recursos esenciales
 self.addEventListener('install', event => {
-  self.skipWaiting();
-  console.log('Service Worker instalado');
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
-  console.log('Service Worker activado');
-});
-
-// Background Sync para verificación de alarmas
-self.addEventListener('sync', event => {
-  if (event.tag === 'alarm-check') {
-    event.waitUntil(checkAlarmsInBackground());
-  }
-});
-
-async function checkAlarmsInBackground() {
-  console.log('🔄 Verificando alarmas en segundo plano');
-  
-  // Obtener medicamentos del almacenamiento
-  const clientsList = await clients.matchAll();
-  for (const client of clientsList) {
-    client.postMessage({ type: 'CHECK_ALARMS' });
-  }
-}
-
-// Notificaciones push
-self.addEventListener('push', event => {
-  console.log('Push recibido:', event);
-  
-  let data = {};
-  try {
-    data = event.data ? event.data.json() : {};
-  } catch (e) {
-    console.log('Error parsing push data:', e);
-  }
-  
-  const options = {
-    body: data.body || 'Hora de medicación',
-    icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-    badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-    vibrate: [200, 100, 200, 100, 200],
-    tag: 'mediclock-alarm',
-    requireInteraction: true,
-    renotify: true,
-    silent: false,
-    data: data,
-    actions: [
-      { action: 'take', title: '✓ Tomado', icon: '/icon-take.png' },
-      { action: 'close', title: 'Cerrar', icon: '/icon-close.png' }
-    ]
-  };
-
+  console.log('[SW] Instalando...');
   event.waitUntil(
-    self.registration.showNotification(data.title || 'MediClock Neo', options)
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('[SW] Caché abierto, agregando recursos');
+        return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        console.log('[SW] Instalación completa');
+        return self.skipWaiting(); // Activar inmediatamente
+      })
   );
 });
 
-// Manejo de clics en notificaciones
-self.addEventListener('notificationclick', event => {
-  console.log('Notificación clickeada:', event.notification.tag);
-  event.notification.close();
-  
-  const action = event.action;
-  
-  if (action === 'take') {
-    // Enviar mensaje a la app para registrar la toma
-    event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true })
-        .then(clientList => {
-          if (clientList.length > 0) {
-            const client = clientList[0];
-            client.postMessage({ 
-              type: 'TAKE_MEDICATION', 
-              data: event.notification.data 
-            });
-            return client.focus();
+// Activación: limpiar cachés antiguos
+self.addEventListener('activate', event => {
+  console.log('[SW] Activando...');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Borrando caché antiguo:', cacheName);
+            return caches.delete(cacheName);
           }
-          return clients.openWindow('/');
         })
-    );
-  } else {
-    // Abrir la app
-    event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true })
-        .then(clientList => {
-          if (clientList.length > 0) {
-            let client = clientList[0];
-            for (let i = 0; i < clientList.length; i++) {
-              if (clientList[i].focused) {
-                client = clientList[i];
-              }
-            }
-            return client.focus();
-          }
-          return clients.openWindow('/');
-        })
-    );
-  }
+      );
+    }).then(() => {
+      console.log('[SW] Listo para controlar clientes');
+      return self.clients.claim(); // Tomar control inmediato
+    })
+  );
 });
 
-// Manejo de mensajes desde la app
-self.addEventListener('message', event => {
-  console.log('Mensaje recibido en SW:', event.data);
-  
-  if (event.data && event.data.type === 'TRIGGER_ALARM') {
-    // Mostrar notificación desde la app
-    self.registration.showNotification(event.data.title || 'MediClock Neo', {
-      body: event.data.body || 'Hora de medicación',
-      icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-      badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-      vibrate: [200, 100, 200, 100, 200],
-      tag: 'mediclock-alarm-' + Date.now(),
-      requireInteraction: true,
-      data: event.data
-    });
+// Estrategia: cache-first con fallback a red
+self.addEventListener('fetch', event => {
+  // Ignorar solicitudes no-GET
+  if (event.request.method !== 'GET') return;
+
+  // Ignorar solicitudes a APIs externas (sonidos, imágenes, etc.)
+  if (event.request.url.startsWith('http') && !event.request.url.startsWith(self.location.origin)) {
+    return;
   }
+
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Si está en caché, devolverlo
+        if (response) {
+          return response;
+        }
+
+        // Si no, ir a red
+        return fetch(event.request).then(networkResponse => {
+          // No cachear errores o respuestas no válidas
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+
+          // Cachear respuesta válida
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, responseToCache))
+            .catch(err => console.warn('[SW] Error al cachear:', err));
+
+          return networkResponse;
+        }).catch(() => {
+          // Si falla red y no hay caché, devolver index.html (offline fallback)
+          if (event.request.destination === 'document') {
+            return caches.match('/index.html');
+          }
+        });
+      })
+  );
 });
+
+// 👇 Opcional: si en el futuro usas notificaciones push, descomenta esto
+/*
+self.addEventListener('push', event => {
+  // ... tu lógica de push aquí
+});
+
+self.addEventListener('notificationclick', event => {
+  // ... tu lógica de clic aquí
+});
+*/
