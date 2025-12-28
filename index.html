@@ -157,7 +157,7 @@
         .logo-icon {
             width: 56px;
             height: 56px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
             border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: center;
             font-size: 1.75rem; box-shadow: var(--glow-cyan), var(--glow-magenta);
@@ -421,60 +421,18 @@
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // ==============================================
-        // CAMBIO 1: SISTEMA DE ALARMAS MEJORADO
-        // ==============================================
+        // Sistema de alarmas mejorado
         function initializeAlarmSystem() {
             if ('Notification' in window) Notification.requestPermission();
             
             checkAlarms();
-            
-            // REEMPLAZADO: setInterval por función recursiva + visibility change
-            // Esto funciona MEJOR en segundo plano
-            function scheduleNextCheck() {
-                // Revisar alarmas ahora
-                checkAlarms();
-                
-                // Programar próxima revisión
-                setTimeout(() => {
-                    if (!document.hidden) {
-                        scheduleNextCheck();
-                    }
-                }, 30000); // Cada 30 segundos
-            }
-            
-            // Iniciar sistema de revisiones
-            scheduleNextCheck();
-            
-            // IMPORTANTE: Revisar inmediatamente cuando la app vuelve a primer plano
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(checkAlarms, 20000); // Revisar cada 20 segundos
+
+            // Al volver del segundo plano, revisar inmediatamente
             document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    checkAlarms();
-                    // Reiniciar el schedule si estaba pausado
-                    scheduleNextCheck();
-                }
+                if (!document.hidden) checkAlarms();
             });
-            
-            // ==============================================
-            // CAMBIO 2: USAR BACKGROUND SYNC SI ESTÁ DISPONIBLE
-            // ==============================================
-            if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                navigator.serviceWorker.ready.then(registration => {
-                    // Registrar sync para revisar alarmas periódicamente
-                    setInterval(() => {
-                        registration.sync.register('check-meds-background').catch(console.error);
-                    }, 60 * 60 * 1000); // Cada hora
-                });
-            }
-            
-            // Escuchar mensajes del Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.addEventListener('message', event => {
-                    if (event.data && event.data.type === 'TRIGGER_ALARM_CHECK') {
-                        checkAlarms();
-                    }
-                });
-            }
         }
 
         function checkAlarms() {
@@ -501,17 +459,6 @@
                     horaActual = time;
                     showAlert();
                     localStorage.setItem(fireKey, 'true');
-                    
-                    // Enviar notificación push si está disponible
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-                        new Notification('💊 MediClock NEO - Hora de Medicación', {
-                            body: `${pacientes.join(' y ')}: ${medsActuales.map(m => `${m.nombre} (${m.cantidad}u)`).join(', ')}`,
-                            icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-                            requireInteraction: true,
-                            vibrate: [200, 100, 200, 100, 200]
-                        });
-                    }
                 }
             }
         }
