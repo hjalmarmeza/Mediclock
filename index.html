@@ -5,7 +5,7 @@
     <title>MediClock Neo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Mejor práctica -->
     <meta name="theme-color" content="#00f5ff">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -653,6 +653,9 @@
     <audio id="audio" preload="auto" loop playsinline></audio>
 
     <script>
+        // Función $ para simplificar document.getElementById
+        const $ = id => document.getElementById(id);
+
         // Audio hack para iOS background
         function initAudioHack() {
             const silentAudio = document.getElementById('iosWakeAudio');
@@ -681,7 +684,6 @@
         let checkInterval = null;
         let lastAlertTimestamp = 0;
 
-        const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
         // Sistema de alarmas
