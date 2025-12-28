@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8"/>
     <title>MediClock Neo</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#00f5ff">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -160,7 +161,8 @@
             background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
             border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.75rem; box-shadow: var(--glow-cyan), var(--glow-magenta);
+            font-size: 1.75rem; 
+            box-shadow: var(--glow-cyan), var(--glow-magenta);
             animation: iconPulse 3s ease-in-out infinite;
             position: relative;
         }
@@ -168,34 +170,70 @@
         .logo-text {
             font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
             background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
         }
 
         .tabs {
-            display: flex; background: rgba(10, 10, 20, 0.8); border-radius: var(--radius-lg);
-            padding: 0.25rem; margin-bottom: 1.5rem; border: 1px solid rgba(0, 245, 255, 0.1);
+            display: flex; 
+            background: rgba(10, 10, 20, 0.8); 
+            border-radius: var(--radius-lg);
+            padding: 0.25rem; 
+            margin-bottom: 1.5rem; 
+            border: 1px solid rgba(0, 245, 255, 0.1);
             backdrop-filter: blur(10px);
         }
 
         .tab {
-            flex: 1; text-align: center; padding: 0.75rem 1rem; font-size: 0.9rem;
-            font-weight: 600; color: var(--text-secondary); background: transparent;
-            border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s;
+            flex: 1; 
+            text-align: center; 
+            padding: 0.75rem 1rem; 
+            font-size: 0.9rem;
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            background: transparent;
+            border: none; 
+            border-radius: var(--radius-md); 
+            cursor: pointer; 
+            transition: 0.3s;
         }
 
-        .tab.active { background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15)); color: var(--neon-cyan); }
+        .tab.active { 
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15)); 
+            color: var(--neon-cyan); 
+        }
 
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
+        .tab-content { 
+            display: none; 
+            animation: fadeIn 0.4s ease; 
+        }
+        .tab-content.active { 
+            display: block; 
+        }
 
         .card {
-            background: var(--bg-card); backdrop-filter: blur(40px);
-            border: 1px solid var(--border-glow); border-radius: var(--radius-xl);
-            padding: 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
+            background: var(--bg-card); 
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border-glow); 
+            border-radius: var(--radius-xl);
+            padding: 1.75rem; 
+            margin-bottom: 1.5rem; 
+            position: relative; 
+            overflow: hidden;
         }
 
-        .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 0.6rem; }
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        .form-label { 
+            display: block; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            color: var(--neon-cyan); 
+            text-transform: uppercase; 
+            margin-bottom: 0.6rem; 
+        }
         .form-input { 
             width: 100%; 
             padding: 1rem 1.25rem; 
@@ -208,18 +246,35 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        /* Corrección para iPhone: input time */
         .form-input[type="time"] {
             -webkit-appearance: none;
             appearance: none;
             min-height: 52px;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
         }
-        
-        .qty-row { display: flex; gap: 0.75rem; }
-        .qty-btn { width: 52px; height: 52px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); color: var(--neon-cyan); font-size: 1.5rem; cursor: pointer; }
+
+        .qty-row { 
+            display: flex; 
+            gap: 0.75rem; 
+            align-items: center;
+        }
+        .qty-btn { 
+            width: 52px; 
+            height: 52px; 
+            background: rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: var(--radius-md); 
+            color: var(--neon-cyan); 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+        }
 
         .med-item {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             align-items: flex-start;
             gap: 0.75rem;
             padding: 1.25rem;
@@ -233,12 +288,20 @@
             min-height: auto;
         }
 
+        .med-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
         .med-name-row {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            width: calc(100% - 50px);
-            order: 1;
             gap: 0.25rem;
+            min-width: 0;
+            padding-right: 10px;
         }
 
         .med-name {
@@ -249,7 +312,8 @@
             letter-spacing: 0.02em;
             word-wrap: break-word;
             white-space: normal;
-            line-height: 1.2;
+            line-height: 1.3;
+            width: 100%;
         }
 
         .med-patient { 
@@ -265,15 +329,15 @@
             object-fit: cover; 
             border: 2px solid rgba(0, 245, 255, 0.3);
             flex-shrink: 0;
-            order: 3;
+            align-self: flex-end;
+            margin-top: 0.5rem;
         }
 
         .med-info { 
-            flex: 1; 
-            min-width: 200px;
+            width: 100%;
             display: flex; 
             flex-direction: column;
-            order: 4;
+            margin-top: 0.5rem;
         }
 
         .med-times { 
@@ -303,44 +367,155 @@
             cursor: pointer;
         }
 
-        .time-chip { display: inline-flex; align-items: center; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 600; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 20px; }
+        .time-chip { 
+            display: inline-flex; 
+            align-items: center; 
+            padding: 0.35rem 0.8rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            background: rgba(0, 245, 255, 0.1); 
+            border: 1px solid rgba(0, 245, 255, 0.3); 
+            border-radius: 20px; 
+        }
 
-        .photo-zone { border: 2px dashed rgba(0, 245, 255, 0.3); border-radius: var(--radius-lg); padding: 2rem; text-align: center; cursor: pointer; }
-        .photo-preview { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-lg); border: 2px solid var(--neon-cyan); display: none; }
-        .photo-preview.active { display: block; }
+        .photo-zone { 
+            border: 2px dashed rgba(0, 245, 255, 0.3); 
+            border-radius: var(--radius-lg); 
+            padding: 2rem; 
+            text-align: center; 
+            cursor: pointer; 
+        }
+        .photo-preview { 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            object-fit: cover; 
+            border-radius: var(--radius-lg); 
+            border: 2px solid var(--neon-cyan); 
+            display: none; 
+        }
+        .photo-preview.active { 
+            display: block; 
+        }
 
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.75rem; font-size: 0.95rem; font-weight: 600; border-radius: var(--radius-md); border: none; cursor: pointer; transition: 0.4s; }
-        .btn-primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: var(--bg-dark); width: 100%; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-danger { background: #ff4757; color: white; }
-        .btn-success { background: var(--neon-green); color: var(--bg-dark); }
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1rem 1.75rem; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            border-radius: var(--radius-md); 
+            border: none; 
+            cursor: pointer; 
+            transition: 0.4s; 
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); 
+            color: var(--bg-dark); 
+            width: 100%; 
+        }
+        .btn-secondary { 
+            background: rgba(255, 255, 255, 0.05); 
+            color: var(--text-primary); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .btn-danger { 
+            background: #ff4757; 
+            color: white; 
+        }
+        .btn-success { 
+            background: var(--neon-green); 
+            color: var(--bg-dark); 
+        }
 
-        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 1.25rem; }
-        .modal-bg.open { display: flex; }
-        .modal { background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98)); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: var(--radius-xl); width: 100%; max-width: 420px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+        .modal-bg { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(5, 5, 8, 0.95); 
+            backdrop-filter: blur(20px); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1.25rem; 
+        }
+        .modal-bg.open { 
+            display: flex; 
+        }
+        .modal { 
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98)); 
+            border: 1px solid rgba(0, 245, 255, 0.2); 
+            border-radius: var(--radius-xl); 
+            width: 100%; 
+            max-width: 420px; 
+            max-height: 85vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
-        .alert-clock-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        .alert-clock-icon { 
+            width: 80px; 
+            height: 80px; 
+            margin: 0 auto 1.5rem; 
+            background: var(--neon-cyan); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2.5rem; 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(1.1); opacity: 0.7; } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
 
-        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); opacity: 0.3; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .scanline { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 2px; 
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); 
+            opacity: 0.3; 
+            animation: scan 8s linear infinite; 
+            pointer-events: none; 
+            z-index: 9999; 
+        }
+        @keyframes scan { 
+            0% { top: 0; } 
+            100% { top: 100%; } 
+        }
 
         .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
         .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <!-- FIX Background: Tag de audio silencioso -->
-    <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
+    <!-- Audio silencioso para iOS background -->
+    <audio id="iosWakeAudio" loop playsinline muted preload="auto" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
 
     <div class="bg-animation"></div>
     <div class="grid-pattern"></div>
-    <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
     <div class="scanline"></div>
 
     <div class="app">
         <header class="header">
-            <div class="logo"><div class="logo-icon">💊</div><span class="logo-text">MediClock</span><span class="logo-badge">NEO</span></div>
+            <div class="logo">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">MediClock</span>
+                <span class="logo-badge" style="font-size:0.9em; opacity:0.7;">NEO</span>
+            </div>
         </header>
 
         <div class="tabs">
@@ -350,21 +525,51 @@
 
         <div class="tab-content active" id="tabContentNuevo">
             <div class="card">
-                <div class="form-group"><label class="form-label">Medicamento</label><input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol"></div>
-                <div class="form-group"><label class="form-label">Paciente</label><input type="text" id="paciente" class="form-input" placeholder="Ej: Israel"></div>
-                <div class="form-group"><label class="form-label">Cantidad</label>
-                    <div class="qty-row"><button class="qty-btn" id="menos">−</button><input type="number" id="cant" class="form-input" value="1" step="0.25" style="text-align:center"><button class="qty-btn" id="mas">+</button></div>
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol">
                 </div>
-                <div class="form-group"><label class="form-label">Hora</label><input type="time" id="hora" class="form-input"></div>
-                <div class="form-group"><div class="photo-zone" id="photoZone">📷 Capturar Foto</div><img id="photoPreview" class="photo-preview"></div>
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: Israel">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="menos">−</button>
+                        <input type="number" id="cant" class="form-input" value="1" step="0.25" style="text-align:center">
+                        <button class="qty-btn" id="mas">+</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input">
+                </div>
+                <div class="form-group">
+                    <div class="photo-zone" id="photoZone">📷 Capturar Foto</div>
+                    <img id="photoPreview" class="photo-preview">
+                </div>
                 <button class="btn btn-primary" id="addBtn">⚡ AGREGAR</button>
                 
                 <div class="settings" style="margin-top:2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
-                    <div id="settingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary);"><span>⚙️ AJUSTES DE ALERTA</span><span id="settingsArrow">▼</span></div>
+                    <div id="settingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary);">
+                        <span>⚙️ AJUSTES DE ALERTA</span>
+                        <span id="settingsArrow">▼</span>
+                    </div>
                     <div id="settingsPanel" style="display:none; padding-top:1rem;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Sonido</span><input type="checkbox" id="sonidoOn" checked></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Voz</span><input type="checkbox" id="vozOn" checked></div>
-                        <div style="margin-bottom:1rem;"><span>Volumen</span><input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width:100%"><span id="volValue" style="font-size:0.7rem">70%</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                            <span>Sonido</span>
+                            <input type="checkbox" id="sonidoOn" checked>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                            <span>Voz</span>
+                            <input type="checkbox" id="vozOn" checked>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <span>Volumen</span>
+                            <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width:100%">
+                            <span id="volValue" style="font-size:0.7rem">70%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -373,9 +578,12 @@
         <div class="tab-content" id="tabContentMedicamentos">
             <div class="card">
                 <ul class="med-list" id="lista"></ul>
-                <div class="empty" id="empty" style="text-align:center; padding:2rem;"><h3>Sin medicamentos</h3></div>
+                <div class="empty" id="empty" style="text-align:center; padding:2rem;">
+                    <h3>Sin medicamentos</h3>
+                </div>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
                     <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
+                    <!-- ❌ Botón "Probar alarma" ELIMINADO -->
                 </div>
             </div>
         </div>
@@ -438,25 +646,25 @@
         </div>
     </div>
 
-    <audio id="audio" preload="auto" loop></audio>
+    <audio id="audio" preload="auto" loop playsinline></audio>
 
     <script>
-        // Lógica de Heartbeat para evitar que iOS suspenda la app
+        // Audio hack para iOS background
         function initAudioHack() {
             const silentAudio = document.getElementById('iosWakeAudio');
             if (silentAudio) {
+                silentAudio.muted = false;
                 silentAudio.play().then(() => {
-                    console.log("🚀 Latido de audio iniciado para segundo plano");
-                    // Una vez activado, eliminamos los listeners para evitar repeticiones
+                    console.log("🔊 Audio background activado para iOS");
                     window.removeEventListener('touchstart', initAudioHack);
                     window.removeEventListener('click', initAudioHack);
-                }).catch(err => console.log("Audio bloqueado:", err));
+                }).catch(err => console.warn("🔇 Audio background bloqueado:", err));
             }
         }
         window.addEventListener('touchstart', initAudioHack, { once: true });
         window.addEventListener('click', initAudioHack, { once: true });
 
-        // Variables globales
+        // Variables
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
         let foto = '';
         let alarmaOn = false;
@@ -467,20 +675,18 @@
         let currentMedForAddTime = null;
         let editingTimeData = null;
         let checkInterval = null;
-        let lastAlertTime = '';
+        let lastAlertTimestamp = 0; // ✅ Ahora usamos timestamp para evitar reinicios
 
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // Sistema de alarmas mejorado
+        // Sistema de alarmas
         function initializeAlarmSystem() {
             if ('Notification' in window) Notification.requestPermission();
-            
             checkAlarms();
             if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 20000); // Revisar cada 20 segundos
+            checkInterval = setInterval(checkAlarms, 15000); // Cada 15 segundos
 
-            // Al volver del segundo plano, revisar inmediatamente
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) checkAlarms();
             });
@@ -488,17 +694,19 @@
 
         function checkAlarms() {
             const now = new Date();
-            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            
-            if (time === lastAlertTime) return;
-            
+            const timeKey = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const currentMinuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0).getTime();
+
+            // Evitar alertas repetidas en el mismo minuto
+            if (lastAlertTimestamp >= currentMinuteStart) return;
+
             medsActuales = [];
             let trigger = false;
 
             Object.keys(meds).forEach(id => {
                 const m = meds[id];
                 m.horas.forEach(h => {
-                    if (h.h === time) {
+                    if (h.h === timeKey) {
                         medsActuales.push({id, paciente: m.paciente, nombre: m.nombre, cantidad: h.cant, foto: m.foto});
                         trigger = true;
                     }
@@ -506,10 +714,30 @@
             });
 
             if (trigger && medsActuales.length > 0) {
-                lastAlertTime = time;
-                horaActual = time;
+                lastAlertTimestamp = currentMinuteStart;
+                horaActual = timeKey;
                 showAlert();
             }
+        }
+
+        async function playVoiceReminder() {
+            if (!vozOn.checked || !('speechSynthesis' in window)) return true;
+
+            return new Promise((resolve) => {
+                speechSynthesis.cancel();
+                const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+                let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
+                medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `);
+
+                const u = new SpeechSynthesisUtterance(msg);
+                u.lang = 'es-ES';
+                u.volume = parseFloat(volSlider.value);
+                u.rate = 0.85;
+
+                u.onend = u.onerror = () => resolve();
+                speechSynthesis.speak(u);
+                setTimeout(resolve, 12000); // Timeout de seguridad
+            });
         }
 
         function playAlarmSound() {
@@ -519,7 +747,6 @@
             audio.loop = true;
             audio.volume = parseFloat(volSlider.value);
             
-            // Configurar MediaSession para pantalla de bloqueo
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: 'MediClock NEO: ¡Hora de medicación!',
@@ -531,40 +758,12 @@
             audio.play().then(() => {
                 alarmaOn = true;
             }).catch(() => {
+                // Fallback simple si el loop falla
                 intervalo = setInterval(() => {
-                    new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3').play();
-                }, 2000);
-            });
-        }
-
-        function stopAlarm() {
-            alarmaOn = false;
-            if (intervalo) clearInterval(intervalo);
-            $('audio').pause();
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-        }
-
-        async function playVoiceReminder() {
-            if (!vozOn.checked || !('speechSynthesis' in window)) return;
-            
-            return new Promise((resolve) => {
-                speechSynthesis.cancel();
-                
-                const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-                let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
-                medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `);
-                
-                const u = new SpeechSynthesisUtterance(msg);
-                u.lang = 'es-ES';
-                u.volume = parseFloat(volSlider.value);
-                u.rate = 0.9;
-                
-                u.onend = () => resolve();
-                u.onerror = () => resolve();
-                
-                speechSynthesis.speak(u);
-                
-                setTimeout(() => resolve(), 15000);
+                    const fallback = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+                    fallback.volume = parseFloat(volSlider.value);
+                    fallback.play().catch(() => {});
+                }, 3000);
             });
         }
 
@@ -572,14 +771,25 @@
             const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
             $('alertGreeting').textContent = `Hola ${pacientes.join(' y ')}`;
             $('alertTimeDisplay').textContent = horaActual;
-            $('alertMedicationsList').innerHTML = medsActuales.map(m => `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`).join('');
-            
+            $('alertMedicationsList').innerHTML = medsActuales.map(m => 
+                `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`
+            ).join('');
+
             alertModal.classList.add('open');
-            
+
+            // ✅ Primero voz, luego sonido
             await playVoiceReminder();
             playAlarmSound();
-            
+
             if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+        }
+
+        function stopAlarm() {
+            alarmaOn = false;
+            if (intervalo) clearInterval(intervalo);
+            $('audio').pause();
+            $('audio').currentTime = 0;
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
         }
 
         function render() {
@@ -592,13 +802,16 @@
                 const colorClass = getMedColor(m.nombre);
                 const li = document.createElement('li');
                 li.className = 'med-item';
-                li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
 
                 li.innerHTML = `
-                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
-                    <div class="med-name-row">
-                        <div class="med-name">${upper(m.nombre)}</div>
-                        <div class="med-patient">${upper(m.paciente)}</div>
+                    <div class="med-header">
+                        <div class="med-name-row">
+                            <div class="med-name">${upper(m.nombre)}</div>
+                            <div class="med-patient">${upper(m.paciente)}</div>
+                        </div>
+                        <div class="med-actions">
+                            <button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button>
+                        </div>
                     </div>
                     ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
                     <div class="med-info">
@@ -614,15 +827,15 @@
         }
 
         function getMedColor(n) {
-            if(!medColors[n]) {
-                const c = ['color-1', 'color-2'];
-                medColors[n] = c[Object.keys(medColors).length % 2];
+            if (!medColors[n]) {
+                const classes = ['color-1', 'color-2'];
+                medColors[n] = classes[Object.keys(medColors).length % 2];
             }
             return medColors[n];
         }
 
         window.deleteMed = (id) => {
-            if(confirm('¿Eliminar medicamento?')) {
+            if (confirm('¿Eliminar medicamento?')) {
                 delete meds[id];
                 save();
                 render();
@@ -647,16 +860,20 @@
             $('detailPatient').textContent = upper(m.paciente);
             $('detailMainImg').src = m.foto || '';
             $('detailMainImg').style.display = m.foto ? 'block' : 'none';
-            $('detailTimes').innerHTML = m.horas.map(h => `<div style="padding:10px; background:rgba(0,0,0,0.3); margin-bottom:5px; border-radius:8px;">${h.h} - ${h.cant}u</div>`).join('');
+            $('detailTimes').innerHTML = m.horas.map(h => 
+                `<div style="padding:10px; background:rgba(0,0,0,0.3); margin-bottom:5px; border-radius:8px;">${h.h} - ${h.cant}u</div>`
+            ).join('');
             detailModal.classList.add('open');
         }
 
-        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
+        function save() {
+            localStorage.setItem('medsMC2', JSON.stringify(meds));
+        }
 
         // Handlers
         $('addBtn').onclick = () => {
             const n = upper(nombre.value), p = upper(paciente.value), h = hora.value, c = parseFloat(cant.value);
-            if(!n || !h) return alert('Faltan datos');
+            if (!n || !h) return alert('Faltan datos');
             const id = Date.now().toString();
             meds[id] = { nombre: n, paciente: p, foto, horas: [{h, cant: c}] };
             save(); render();
@@ -669,16 +886,19 @@
             input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
             input.onchange = e => {
                 const file = e.target.files[0];
+                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = ev => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        canvas.width = 600; canvas.height = (img.height * 600) / img.width;
-                        ctx.drawImage(img, 0, 0, 600, canvas.height);
-                        foto = canvas.toDataURL('image/jpeg', 0.6);
-                        photoPreview.src = foto; photoPreview.classList.add('active');
+                        canvas.width = 400;
+                        canvas.height = (img.height * 400) / img.width;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        foto = canvas.toDataURL('image/jpeg', 0.7);
+                        photoPreview.src = foto;
+                        photoPreview.classList.add('active');
                     };
                     img.src = ev.target.result;
                 };
@@ -689,7 +909,7 @@
 
         $('saveAddTime').onclick = () => {
             const h = $('newHora').value, c = parseFloat($('newCant').value);
-            if(!h) return;
+            if (!h) return;
             meds[currentMedForAddTime].horas.push({h, cant: c});
             meds[currentMedForAddTime].horas.sort((a,b) => a.h.localeCompare(b.h));
             save(); render(); addTimeModal.classList.remove('open');
@@ -706,30 +926,43 @@
         $('deleteTime').onclick = () => {
             const m = meds[editingTimeData.id];
             m.horas = m.horas.filter(x => x.h !== editingTimeData.oldH);
-            if(m.horas.length === 0) delete meds[editingTimeData.id];
+            if (m.horas.length === 0) delete meds[editingTimeData.id];
             save(); render(); editTimeModal.classList.remove('open');
         };
 
         $('alertTake').onclick = () => {
             const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            medsActuales.forEach(m => hist.push({fecha: new Date().toISOString(), nombre: m.nombre, paciente: m.paciente, hora: horaActual}));
+            medsActuales.forEach(m => hist.push({
+                fecha: new Date().toISOString(),
+                nombre: m.nombre,
+                paciente: m.paciente,
+                hora: horaActual
+            }));
             localStorage.setItem('tomasMC', JSON.stringify(hist));
-            alertModal.classList.remove('open'); stopAlarm();
+            alertModal.classList.remove('open');
+            stopAlarm();
         };
 
         $('calBtn').onclick = () => {
             const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            $('calBody').innerHTML = hist.reverse().map(t => `
-                <div style="padding:10px; border-bottom:1px solid #222;">
-                    <b>${upper(t.nombre)}</b> - ${upper(t.paciente)}<br>
-                    <small>${new Date(t.fecha).toLocaleString()}</small>
-                </div>
-            `).join('') || 'Sin registros';
+            $('calBody').innerHTML = hist.length ? 
+                hist.reverse().map(t => `
+                    <div style="padding:10px; border-bottom:1px solid #222;">
+                        <b>${upper(t.nombre)}</b> - ${upper(t.paciente)}<br>
+                        <small>${new Date(t.fecha).toLocaleString()}</small>
+                    </div>
+                `).join('') : 'Sin registros';
             calModal.classList.add('open');
         };
 
-        $('menos').onclick = () => { cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2); };
-        $('mas').onclick = () => { cant.value = (parseFloat(cant.value) + 0.25).toFixed(2); };
+        $('menos').onclick = () => { 
+            const val = parseFloat(cant.value) || 1;
+            cant.value = Math.max(0.25, val - 0.25).toFixed(2); 
+        };
+        $('mas').onclick = () => { 
+            const val = parseFloat(cant.value) || 1;
+            cant.value = (val + 0.25).toFixed(2); 
+        };
         
         $('settingsToggle').onclick = () => {
             const p = $('settingsPanel');
@@ -737,13 +970,15 @@
             $('settingsArrow').textContent = p.style.display === 'none' ? '▼' : '▲';
         };
 
-        volSlider.oninput = function() { $('volValue').textContent = Math.round(this.value * 100) + '%'; };
+        volSlider.oninput = function() { 
+            $('volValue').textContent = Math.round(this.value * 100) + '%'; 
+        };
 
         function cambiarTab(t) {
             document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
             $(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
             $(`tabContent${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
-            if(t === 'medicamentos') render();
+            if (t === 'medicamentos') render();
         }
 
         $('tabNuevo').onclick = () => cambiarTab('nuevo');
@@ -754,7 +989,10 @@
         $('cancelAddTime').onclick = () => addTimeModal.classList.remove('open');
         $('cancelEditTime').onclick = () => editTimeModal.classList.remove('open');
 
-        window.onload = () => { render(); initializeAlarmSystem(); };
+        window.onload = () => { 
+            render(); 
+            initializeAlarmSystem(); 
+        };
     </script>
 </body>
 </html>
