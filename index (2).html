@@ -250,10 +250,12 @@
         .form-input[type="time"] {
             -webkit-appearance: none;
             appearance: none;
-            min-height: 52px;
             width: 100%;
             padding: 0.75rem 1rem;
             font-size: 1rem;
+            box-sizing: border-box;
+            max-width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .qty-row { 
@@ -293,6 +295,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 0.5rem;
         }
 
         .med-name-row {
@@ -314,6 +317,7 @@
             white-space: normal;
             line-height: 1.3;
             width: 100%;
+            overflow-wrap: break-word;
         }
 
         .med-patient { 
@@ -675,7 +679,7 @@
         let currentMedForAddTime = null;
         let editingTimeData = null;
         let checkInterval = null;
-        let lastAlertTimestamp = 0; // ✅ Ahora usamos timestamp para evitar reinicios
+        let lastAlertTimestamp = 0;
 
         const $ = id => document.getElementById(id);
         const upper = t => t ? t.toString().toUpperCase().trim() : '';
@@ -685,7 +689,7 @@
             if ('Notification' in window) Notification.requestPermission();
             checkAlarms();
             if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 15000); // Cada 15 segundos
+            checkInterval = setInterval(checkAlarms, 15000);
 
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) checkAlarms();
@@ -697,7 +701,6 @@
             const timeKey = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             const currentMinuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0).getTime();
 
-            // Evitar alertas repetidas en el mismo minuto
             if (lastAlertTimestamp >= currentMinuteStart) return;
 
             medsActuales = [];
@@ -727,7 +730,7 @@
                 speechSynthesis.cancel();
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
                 let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
-                medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `);
+                medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `;
 
                 const u = new SpeechSynthesisUtterance(msg);
                 u.lang = 'es-ES';
@@ -736,7 +739,7 @@
 
                 u.onend = u.onerror = () => resolve();
                 speechSynthesis.speak(u);
-                setTimeout(resolve, 12000); // Timeout de seguridad
+                setTimeout(resolve, 12000);
             });
         }
 
@@ -758,7 +761,6 @@
             audio.play().then(() => {
                 alarmaOn = true;
             }).catch(() => {
-                // Fallback simple si el loop falla
                 intervalo = setInterval(() => {
                     const fallback = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
                     fallback.volume = parseFloat(volSlider.value);
@@ -777,7 +779,6 @@
 
             alertModal.classList.add('open');
 
-            // ✅ Primero voz, luego sonido
             await playVoiceReminder();
             playAlarmSound();
 
