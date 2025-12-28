@@ -2,20 +2,56 @@
 <html lang="es">
 <head>
     <meta charset="utf-8"/>
-    <title>MediClock Alarmas</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MediClock Neo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registrado:', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker error:', err);
+                });
+            });
+        }
+    </script>
     
     <style>
         :root {
-            --primary: #00a8ff;
-            --secondary: #9c88ff;
-            --success: #00d2d3;
-            --danger: #ff6b6b;
-            --dark: #1a1a2e;
-            --light: #f5f6fa;
-            --card-bg: rgba(255, 255, 255, 0.1);
+            --bg-dark: #050508;
+            --bg-card: rgba(15, 15, 25, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.02);
+            
+            --neon-cyan: #00f5ff;
+            --neon-magenta: #ff00ea;
+            --neon-violet: #8b5cf6;
+            --neon-blue: #3b82f6;
+            --neon-green: #00ff88;
+            --neon-orange: #ff6b35;
+            --neon-yellow: #ffd700;
+            --neon-pink: #ff1493;
+            --neon-teal: #00ced1;
+            
+            --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
+            --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
+            --glow-violet: 0 0 30px rgba(139, 92, 246, 0.4);
+            
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            
+            --border-glow: rgba(0, 245, 255, 0.2);
+            
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
         }
 
         * {
@@ -25,1013 +61,698 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .time-input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .time-input-group input {
-            flex: 1;
-        }
-
-        .btn {
-            padding: 15px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #0097e6;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .med-list {
-            list-style: none;
-        }
-
-        .med-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .med-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .med-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .med-patient {
-            color: var(--secondary);
-            font-size: 0.9rem;
-        }
-
-        .med-times {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .time-chip {
-            background: rgba(0, 168, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #aaa;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .modal {
-            display: none;
+        .bg-animation {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            z-index: 0;
+            overflow: hidden;
         }
 
-        .modal.active {
-            display: flex;
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            animation: bgPulse 15s ease-in-out infinite;
         }
 
-        .modal-content {
-            background: var(--dark);
-            border-radius: 15px;
-            padding: 25px;
-            max-width: 400px;
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5%, -5%) scale(1.1); }
+            66% { transform: translate(5%, 5%) scale(0.95); }
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--neon-cyan); top: -100px; right: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: var(--neon-magenta); bottom: -50px; left: -50px; animation-delay: -7s; }
+        .orb-3 { width: 250px; height: 250px; background: var(--neon-violet); top: 50%; left: 50%; animation-delay: -14s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(-30px, 30px) rotate(180deg); }
+            75% { transform: translate(20px, 50px) rotate(270deg); }
+        }
+
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-height: 80vh;
-            overflow-y: auto;
+            height: 100%;
+            background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
         }
 
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .instructions {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .instructions ol {
-            padding-left: 20px;
-            margin-top: 10px;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        .alert-icon {
+        .header {
             text-align: center;
-            font-size: 4rem;
-            margin: 20px 0;
-            animation: pulse 2s infinite;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
         }
 
-        .action-buttons {
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem; box-shadow: var(--glow-cyan), var(--glow-magenta);
+            animation: iconPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .tabs {
+            display: flex; background: rgba(10, 10, 20, 0.8); border-radius: var(--radius-lg);
+            padding: 0.25rem; margin-bottom: 1.5rem; border: 1px solid rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1; text-align: center; padding: 0.75rem 1rem; font-size: 0.9rem;
+            font-weight: 600; color: var(--text-secondary); background: transparent;
+            border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s;
+        }
+
+        .tab.active { background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15)); color: var(--neon-cyan); }
+
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: var(--bg-card); backdrop-filter: blur(40px);
+            border: 1px solid var(--border-glow); border-radius: var(--radius-xl);
+            padding: 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 0.6rem; }
+        .form-input { width: 100%; padding: 1rem 1.25rem; color: var(--text-primary); background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); outline: none; }
+        
+        .qty-row { display: flex; gap: 0.75rem; }
+        .qty-btn { width: 52px; height: 52px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); color: var(--neon-cyan); font-size: 1.5rem; cursor: pointer; }
+
+        /* FIX VISUAL: .med-item Reestructurado */
+        .med-item {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .status-bar {
+            flex-wrap: wrap; /* Fix: permite que los elementos salten de fila */
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
             background: rgba(0, 0, 0, 0.3);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.875rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            min-height: auto;
         }
 
-        .status-item {
+        /* Nombre y paciente arriba al 100% */
+        .med-name-row {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            flex-direction: column;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            padding-right: 40px; /* Espacio para botón delete */
         }
 
-        .status-value {
-            color: var(--primary);
-            font-weight: 600;
+        .med-name {
+            font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
+            text-transform: uppercase; letter-spacing: 0.02em; display: block;
+            width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
+
+        .med-patient { font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600; }
+
+        .med-avatar, .med-placeholder {
+            width: 60px; height: 60px; border-radius: var(--radius-md);
+            object-fit: cover; border: 2px solid rgba(0, 245, 255, 0.3);
+            flex-shrink: 0; margin-top: 0;
+        }
+
+        .med-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .med-times { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+
+        .med-actions { position: absolute; top: 1.25rem; right: 1.25rem; }
+
+        .med-delete {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; color: var(--text-muted); cursor: pointer;
+        }
+
+        .time-chip { display: inline-flex; align-items: center; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 600; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 20px; }
+
+        .photo-zone { border: 2px dashed rgba(0, 245, 255, 0.3); border-radius: var(--radius-lg); padding: 2rem; text-align: center; cursor: pointer; }
+        .photo-preview { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-lg); border: 2px solid var(--neon-cyan); display: none; }
+        .photo-preview.active { display: block; }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.75rem; font-size: 0.95rem; font-weight: 600; border-radius: var(--radius-md); border: none; cursor: pointer; transition: 0.4s; }
+        .btn-primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: var(--bg-dark); width: 100%; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-danger { background: #ff4757; color: white; }
+        .btn-success { background: var(--neon-green); color: var(--bg-dark); }
+
+        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 1.25rem; }
+        .modal-bg.open { display: flex; }
+        .modal { background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98)); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: var(--radius-xl); width: 100%; max-width: 420px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .alert-clock-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); opacity: 0.3; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
+        .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">💊</div>
-            <h1>MediClock Alarmas</h1>
-            <div class="subtitle">Recordatorios confiables de medicación</div>
+    <!-- FIX Background: Tag de audio silencioso -->
+    <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
+
+    <div class="bg-animation"></div>
+    <div class="grid-pattern"></div>
+    <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+    <div class="scanline"></div>
+
+    <div class="app">
+        <header class="header">
+            <div class="logo"><div class="logo-icon">💊</div><span class="logo-text">MediClock</span><span class="logo-badge">NEO</span></div>
         </header>
 
-        <div class="status-bar">
-            <div class="status-item">
-                <span>Alarmas activas:</span>
-                <span class="status-value" id="alarmCount">0</span>
-            </div>
-            <div class="status-item">
-                <span>Estado:</span>
-                <span class="status-value" id="appStatus">Activo</span>
-            </div>
+        <div class="tabs">
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">✨ Nuevo</button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">💊 Mis Medicamentos</button>
         </div>
 
-        <div class="tab-buttons">
-            <button class="tab-btn active" id="tabNuevo">➕ Nuevo</button>
-            <button class="tab-btn" id="tabMedicamentos">📋 Mis Medicamentos</button>
-            <button class="tab-btn" id="tabConfig">⚙️ Configuración</button>
-        </div>
-
-        <div id="contentNuevo" class="tab-content active card">
-            <div class="form-group">
-                <label for="medName">Nombre del medicamento</label>
-                <input type="text" id="medName" placeholder="Ej: Paracetamol, Metformina...">
-            </div>
-            
-            <div class="form-group">
-                <label for="patientName">¿Para quién es?</label>
-                <input type="text" id="patientName" placeholder="Ej: Yo, Mamá, Papá...">
-            </div>
-            
-            <div class="form-group">
-                <label for="medTime">Horario</label>
-                <div class="time-input-group">
-                    <input type="time" id="medTime">
-                    <button class="btn-secondary" onclick="addAnotherTime()" style="width: auto; padding: 12px 15px;">+</button>
+        <div class="tab-content active" id="tabContentNuevo">
+            <div class="card">
+                <div class="form-group"><label class="form-label">Medicamento</label><input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol"></div>
+                <div class="form-group"><label class="form-label">Paciente</label><input type="text" id="paciente" class="form-input" placeholder="Ej: Israel"></div>
+                <div class="form-group"><label class="form-label">Cantidad</label>
+                    <div class="qty-row"><button class="qty-btn" id="menos">−</button><input type="number" id="cant" class="form-input" value="1" step="0.25" style="text-align:center"><button class="qty-btn" id="mas">+</button></div>
                 </div>
-                <div id="extraTimes"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="medDose">Dosis (unidades)</label>
-                <input type="number" id="medDose" min="0.25" step="0.25" value="1">
-            </div>
-            
-            <button class="btn btn-primary" onclick="saveMedication()">💾 Guardar y Programar Alarma</button>
-            
-            <div class="instructions">
-                <strong>💡 Importante:</strong> Para que las alarmas funcionen siempre:
-                <ol>
-                    <li>Instala esta app en tu pantalla principal</li>
-                    <li>Acepta los permisos de notificaciones</li>
-                    <li>Mantén la app abierta en segundo plano</li>
-                </ol>
-            </div>
-        </div>
-
-        <div id="contentMedicamentos" class="tab-content card">
-            <div id="medicationsList"></div>
-            
-            <div id="emptyState" class="empty-state">
-                <div>💊</div>
-                <h3>No hay medicamentos</h3>
-                <p>Agrega tu primer medicamento usando la pestaña "Nuevo"</p>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-secondary" onclick="testAlarm()">🔔 Probar Alarma</button>
-                <button class="btn btn-secondary" onclick="showHistory()">📅 Ver Historial</button>
-            </div>
-        </div>
-
-        <div id="contentConfig" class="tab-content card">
-            <h3>Configuración de Alarmas</h3>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="soundEnabled" checked> Sonido de alarma
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="vibrationEnabled" checked> Vibración
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label for="volume">Volumen de alarma</label>
-                <input type="range" id="volume" min="0" max="100" value="70">
-                <span id="volumeValue">70%</span>
-            </div>
-            
-            <div class="form-group">
-                <label for="snoozeTime">Tiempo de repetición (minutos)</label>
-                <select id="snoozeTime">
-                    <option value="5">5 minutos</option>
-                    <option value="10">10 minutos</option>
-                    <option value="15">15 minutos</option>
-                    <option value="30">30 minutos</option>
-                </select>
-            </div>
-            
-            <button class="btn btn-primary" onclick="saveSettings()">💾 Guardar Configuración</button>
-            
-            <div class="instructions" style="margin-top: 20px;">
-                <strong>⚠️ Para mejor funcionamiento:</strong>
-                <button class="btn btn-secondary" onclick="showInstallInstructions()" style="width: 100%; margin-top: 10px;">
-                    📱 Mostrar Instrucciones de Instalación
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Alarma Activa -->
-    <div id="alarmModal" class="modal">
-        <div class="modal-content">
-            <div class="alert-icon">⏰</div>
-            <h2 style="text-align: center; margin-bottom: 20px;">¡Hora de Medicación!</h2>
-            
-            <div id="alarmDetails" style="text-align: center; margin-bottom: 30px;">
-                <!-- Aquí se mostrarán los medicamentos -->
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-danger" onclick="closeAlarm()">✗ Cancelar</button>
-                <button class="btn btn-success" onclick="markAsTaken()">✓ Marcar como Tomado</button>
-            </div>
-            
-            <button class="btn btn-secondary" onclick="snoozeAlarm()" style="width: 100%; margin-top: 10px;">
-                ⏰ Recordar en <span id="snoozeMinutes">5</span> minutos
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal de Instrucciones -->
-    <div id="instructionsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📱 Instalar como App</h3>
-                <button class="close-btn" onclick="closeModal('instructionsModal')">&times;</button>
-            </div>
-            
-            <div class="instructions">
-                <p><strong>Para que las alarmas funcionen SIEMPRE (incluso con pantalla bloqueada):</strong></p>
+                <div class="form-group"><label class="form-label">Hora</label><input type="time" id="hora" class="form-input"></div>
+                <div class="form-group"><div class="photo-zone" id="photoZone">📷 Capturar Foto</div><img id="photoPreview" class="photo-preview"></div>
+                <button class="btn btn-primary" id="addBtn">⚡ AGREGAR</button>
                 
-                <h4>📲 En Android (Chrome):</h4>
-                <ol>
-                    <li>Abre el menú (⋮) en la esquina superior derecha</li>
-                    <li>Selecciona "Instalar app" o "Añadir a pantalla principal"</li>
-                    <li>Confirma la instalación</li>
-                    <li>La app aparecerá en tu pantalla de inicio</li>
-                </ol>
-                
-                <h4>📱 En iOS (Safari):</h4>
-                <ol>
-                    <li>Toca el ícono de compartir (📤)</li>
-                    <li>Desplázate y selecciona "Añadir a pantalla de inicio"</li>
-                    <li>Pon un nombre y toca "Añadir"</li>
-                    <li>Usa la app desde el ícono en tu pantalla</li>
-                </ol>
-                
-                <p style="margin-top: 15px; color: var(--primary); font-weight: 600;">
-                    ✅ Una vez instalada, las notificaciones funcionarán mejor
-                </p>
+                <div class="settings" style="margin-top:2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
+                    <div id="settingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary);"><span>⚙️ AJUSTES DE ALERTA</span><span id="settingsArrow">▼</span></div>
+                    <div id="settingsPanel" style="display:none; padding-top:1rem;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Sonido</span><input type="checkbox" id="sonidoOn" checked></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Voz</span><input type="checkbox" id="vozOn" checked></div>
+                        <div style="margin-bottom:1rem;"><span>Volumen</span><input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width:100%"><span id="volValue" style="font-size:0.7rem">70%</span></div>
+                    </div>
+                </div>
             </div>
-            
-            <button class="btn btn-primary" onclick="closeModal('instructionsModal')" style="width: 100%;">
-                Entendido
-            </button>
+        </div>
+
+        <div class="tab-content" id="tabContentMedicamentos">
+            <div class="card">
+                <ul class="med-list" id="lista"></ul>
+                <div class="empty" id="empty" style="text-align:center; padding:2rem;"><h3>Sin medicamentos</h3></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
+                    <button class="btn btn-secondary" id="testBtn" style="flex:1">🧪 Probar</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modal de Historial -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📅 Historial de Tomas</h3>
-                <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
+    <!-- Modales -->
+    <div class="modal-bg" id="alertModal">
+        <div class="modal" style="padding:2rem; text-align:center;">
+            <div class="alert-clock-icon">⏰</div>
+            <h2 id="alertGreeting">Hola</h2>
+            <div id="alertTimeDisplay" style="font-size:2rem; color:var(--neon-cyan); margin:1rem 0;">00:00</div>
+            <div id="alertMedicationsList" style="margin-bottom:2rem;"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-danger" id="alertClose" style="flex:1">Cerrar</button>
+                <button class="btn btn-success" id="alertTake" style="flex:1">✓ Tomado</button>
             </div>
-            
-            <div id="historyList" style="max-height: 300px; overflow-y: auto; margin: 20px 0;">
-                <!-- Historial se carga aquí -->
-            </div>
-            
-            <button class="btn btn-danger" onclick="clearHistory()" style="width: 100%;">
-                🗑️ Limpiar Historial
-            </button>
         </div>
     </div>
+
+    <div class="modal-bg" id="detailModal">
+        <div class="modal" style="padding:2rem;">
+            <img id="detailMainImg" class="photo-preview active" style="margin-bottom:1rem;">
+            <h2 id="detailName"></h2>
+            <p id="detailPatient" style="color:var(--neon-cyan); margin-bottom:1rem;"></p>
+            <div id="detailTimes"></div>
+            <button class="btn btn-secondary" id="detailClose" style="margin-top:1rem; width:100%;">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="addTimeModal">
+        <div class="modal" style="padding:2rem;">
+            <h3>Añadir horario</h3>
+            <input type="time" id="newHora" class="form-input" style="margin:1rem 0;">
+            <input type="number" id="newCant" class="form-input" value="1" step="0.25">
+            <div style="display:flex; gap:10px; margin-top:1rem;">
+                <button class="btn btn-secondary" id="cancelAddTime" style="flex:1">Cancelar</button>
+                <button class="btn btn-primary" id="saveAddTime" style="flex:1">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="editTimeModal">
+        <div class="modal" style="padding:2rem;">
+            <h3>Editar horario</h3>
+            <input type="time" id="editHora" class="form-input" style="margin:1rem 0;">
+            <input type="number" id="editCant" class="form-input" step="0.25">
+            <div style="display:flex; gap:10px; margin-top:1rem;">
+                <button class="btn btn-danger" id="deleteTime" style="flex:1">Eliminar</button>
+                <button class="btn btn-primary" id="saveEditTime" style="flex:1">Guardar</button>
+            </div>
+            <button class="btn btn-secondary" id="cancelEditTime" style="width:100%; margin-top:10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="calModal">
+        <div class="modal" style="padding:2rem;">
+            <h2>Historial de tomas</h2>
+            <div id="calBody" style="max-height:300px; overflow-y:auto; margin:1rem 0; font-size:0.8rem;"></div>
+            <button class="btn btn-secondary" id="calClose" style="width:100%;">Cerrar</button>
+        </div>
+    </div>
+
+    <audio id="audio" preload="auto" loop></audio>
 
     <script>
+        // Lógica de Heartbeat para evitar que iOS suspenda la app
+        function initAudioHack() {
+            const silentAudio = document.getElementById('iosWakeAudio');
+            if (silentAudio) {
+                silentAudio.play().then(() => {
+                    console.log("🚀 Latido de audio iniciado para segundo plano");
+                    // Una vez activado, eliminamos los listeners para evitar repeticiones
+                    window.removeEventListener('touchstart', initAudioHack);
+                    window.removeEventListener('click', initAudioHack);
+                }).catch(err => console.log("Audio bloqueado:", err));
+            }
+        }
+        window.addEventListener('touchstart', initAudioHack, { once: true });
+        window.addEventListener('click', initAudioHack, { once: true });
+
         // Variables globales
-        let medications = JSON.parse(localStorage.getItem('medications') || '{}');
-        let settings = JSON.parse(localStorage.getItem('settings') || '{}');
-        let history = JSON.parse(localStorage.getItem('medHistory') || '[]');
-        let activeAlarms = new Map();
-        let alarmTimeouts = new Map();
+        let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
+        let foto = '';
+        let alarmaOn = false;
+        let medsActuales = [];
+        let horaActual = '';
+        let intervalo = null;
+        let medColors = {};
+        let currentMedForAddTime = null;
+        let editingTimeData = null;
+        let checkInterval = null;
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSettings();
-            renderMedications();
-            updateAlarmCount();
-            
-            // Configurar tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabId = this.id.replace('tab', '').toLowerCase();
-                    showTab(tabId);
-                });
-            });
-            
-            // Configurar controles
-            document.getElementById('volume').addEventListener('input', function() {
-                document.getElementById('volumeValue').textContent = this.value + '%';
-            });
-            
-            // Iniciar sistema de alarmas
-            scheduleAllAlarms();
-            
-            // Verificar si ya es hora de alguna alarma
-            checkCurrentAlarms();
-            
-            // Actualizar estado cada minuto
-            setInterval(checkCurrentAlarms, 60000);
-        });
+        const $ = id => document.getElementById(id);
+        const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // Funciones principales
-        function saveMedication() {
-            const name = document.getElementById('medName').value.trim();
-            const patient = document.getElementById('patientName').value.trim();
-            const time = document.getElementById('medTime').value;
-            const dose = parseFloat(document.getElementById('medDose').value);
+        // ==============================================
+        // CAMBIO 1: SISTEMA DE ALARMAS MEJORADO
+        // ==============================================
+        function initializeAlarmSystem() {
+            if ('Notification' in window) Notification.requestPermission();
             
-            if (!name || !patient || !time) {
-                alert('Por favor completa todos los campos');
-                return;
+            checkAlarms();
+            
+            // REEMPLAZADO: setInterval por función recursiva + visibility change
+            // Esto funciona MEJOR en segundo plano
+            function scheduleNextCheck() {
+                // Revisar alarmas ahora
+                checkAlarms();
+                
+                // Programar próxima revisión
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        scheduleNextCheck();
+                    }
+                }, 30000); // Cada 30 segundos
             }
             
-            const id = Date.now().toString();
-            const times = [{time, dose}];
+            // Iniciar sistema de revisiones
+            scheduleNextCheck();
             
-            // Obtener horas adicionales si las hay
-            const extraTimes = document.querySelectorAll('.extra-time');
-            extraTimes.forEach(input => {
-                if (input.value) {
-                    times.push({time: input.value, dose});
+            // IMPORTANTE: Revisar inmediatamente cuando la app vuelve a primer plano
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    checkAlarms();
+                    // Reiniciar el schedule si estaba pausado
+                    scheduleNextCheck();
                 }
             });
             
-            medications[id] = {
-                id,
-                name,
-                patient,
-                times,
-                createdAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('medications', JSON.stringify(medications));
-            
-            // Programar alarmas para este medicamento
-            scheduleAlarmForMedication(id);
-            
-            // Limpiar formulario
-            document.getElementById('medName').value = '';
-            document.getElementById('patientName').value = '';
-            document.getElementById('medTime').value = '';
-            document.getElementById('medDose').value = '1';
-            document.getElementById('extraTimes').innerHTML = '';
-            
-            // Actualizar interfaz
-            renderMedications();
-            updateAlarmCount();
-            showTab('medicamentos');
-            
-            alert('✅ Medicamento guardado y alarma programada');
-        }
-
-        function scheduleAlarmForMedication(medId) {
-            const med = medications[medId];
-            if (!med) return;
-            
-            med.times.forEach(timeObj => {
-                const alarmTime = parseTime(timeObj.time);
-                const now = new Date();
-                let triggerTime = alarmTime;
-                
-                // Si la hora ya pasó hoy, programar para mañana
-                if (triggerTime < now) {
-                    triggerTime.setDate(triggerTime.getDate() + 1);
-                }
-                
-                const timeUntilAlarm = triggerTime.getTime() - now.getTime();
-                const alarmKey = `${medId}_${timeObj.time}`;
-                
-                // Cancelar alarma anterior si existe
-                if (alarmTimeouts.has(alarmKey)) {
-                    clearTimeout(alarmTimeouts.get(alarmKey));
-                }
-                
-                // Programar nueva alarma
-                const timeoutId = setTimeout(() => {
-                    triggerAlarm(medId, timeObj);
-                    // Reprogramar para el próximo día
-                    scheduleAlarmForMedication(medId);
-                }, timeUntilAlarm);
-                
-                alarmTimeouts.set(alarmKey, timeoutId);
-                activeAlarms.set(alarmKey, {
-                    medication: med.name,
-                    patient: med.patient,
-                    time: timeObj.time,
-                    dose: timeObj.dose,
-                    nextTrigger: triggerTime
-                });
-            });
-        }
-
-        function scheduleAllAlarms() {
-            Object.keys(medications).forEach(scheduleAlarmForMedication);
-        }
-
-        function parseTime(timeString) {
-            const [hours, minutes] = timeString.split(':').map(Number);
-            const date = new Date();
-            date.setHours(hours, minutes, 0, 0);
-            return date;
-        }
-
-        function triggerAlarm(medId, timeObj) {
-            const med = medications[medId];
-            if (!med) return;
-            
-            // Mostrar notificación nativa si está permitido
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('💊 Hora de Medicación', {
-                    body: `${med.patient}: Toma ${timeObj.dose} de ${med.name}`,
-                    icon: '/icon.png',
-                    requireInteraction: true,
-                    vibrate: settings.vibrationEnabled ? [200, 100, 200] : undefined
+            // ==============================================
+            // CAMBIO 2: USAR BACKGROUND SYNC SI ESTÁ DISPONIBLE
+            // ==============================================
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then(registration => {
+                    // Registrar sync para revisar alarmas periódicamente
+                    setInterval(() => {
+                        registration.sync.register('check-meds-background').catch(console.error);
+                    }, 60 * 60 * 1000); // Cada hora
                 });
             }
             
-            // Mostrar modal de alarma
-            showAlarmModal([{
-                id: medId,
-                name: med.name,
-                patient: med.patient,
-                time: timeObj.time,
-                dose: timeObj.dose
-            }]);
-            
-            // Sonar alarma si está activado
-            if (settings.soundEnabled !== false) {
-                playAlarmSound();
+            // Escuchar mensajes del Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data && event.data.type === 'TRIGGER_ALARM_CHECK') {
+                        checkAlarms();
+                    }
+                });
             }
         }
 
-        function showAlarmModal(medsToTake) {
-            const details = document.getElementById('alarmDetails');
-            details.innerHTML = medsToTake.map(med => `
-                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
-                    <div style="font-size: 1.2rem; font-weight: bold;">${med.name}</div>
-                    <div style="color: var(--primary);">${med.patient}</div>
-                    <div style="margin-top: 5px;">Hora: <strong>${med.time}</strong></div>
-                    <div>Dosis: <strong>${med.dose} unidad(es)</strong></div>
-                </div>
-            `).join('');
-            
-            document.getElementById('alarmModal').classList.add('active');
-            document.getElementById('snoozeMinutes').textContent = settings.snoozeTime || 5;
-        }
-
-        function checkCurrentAlarms() {
+        function checkAlarms() {
             const now = new Date();
-            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const today = now.toISOString().slice(0, 10);
             
-            const medsDue = [];
-            
-            Object.values(medications).forEach(med => {
-                med.times.forEach(timeObj => {
-                    if (timeObj.time === currentTime) {
-                        medsDue.push({
-                            id: med.id,
-                            name: med.name,
-                            patient: med.patient,
-                            time: timeObj.time,
-                            dose: timeObj.dose
-                        });
+            medsActuales = [];
+            let trigger = false;
+
+            Object.keys(meds).forEach(id => {
+                const m = meds[id];
+                m.horas.forEach(h => {
+                    if (h.h === time) {
+                        medsActuales.push({id, paciente: m.paciente, nombre: m.nombre, cantidad: h.cant, foto: m.foto});
+                        trigger = true;
                     }
                 });
             });
-            
-            if (medsDue.length > 0) {
-                // Verificar si ya mostramos esta alarma hoy
-                const today = now.toISOString().split('T')[0];
-                const alarmKey = `${today}_${currentTime}`;
-                
-                if (!localStorage.getItem(`alarm_${alarmKey}`)) {
-                    localStorage.setItem(`alarm_${alarmKey}`, 'true');
-                    showAlarmModal(medsDue);
+
+            if (trigger && medsActuales.length > 0) {
+                const fireKey = `fired_${today}_${time}_${medsActuales.map(x=>x.id).join('')}`;
+                if (!localStorage.getItem(fireKey)) {
+                    horaActual = time;
+                    showAlert();
+                    localStorage.setItem(fireKey, 'true');
+                    
+                    // Enviar notificación push si está disponible
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+                        new Notification('💊 MediClock NEO - Hora de Medicación', {
+                            body: `${pacientes.join(' y ')}: ${medsActuales.map(m => `${m.nombre} (${m.cantidad}u)`).join(', ')}`,
+                            icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+                            requireInteraction: true,
+                            vibrate: [200, 100, 200, 100, 200]
+                        });
+                    }
                 }
             }
-            
-            updateAppStatus();
-        }
-
-        function markAsTaken() {
-            const alarmModal = document.getElementById('alarmModal');
-            const details = document.getElementById('alarmDetails');
-            
-            // Obtener medicamentos de la alarma
-            const medElements = details.querySelectorAll('div[style*="background: rgba(0,0,0,0.3)"]');
-            
-            medElements.forEach(element => {
-                const name = element.querySelector('div[style*="font-size: 1.2rem"]').textContent;
-                const patient = element.querySelector('div[style*="color: var(--primary)"]').textContent;
-                const time = element.querySelector('div:contains("Hora:") strong').textContent;
-                const dose = element.querySelector('div:contains("Dosis:") strong').textContent;
-                
-                history.push({
-                    date: new Date().toISOString(),
-                    medication: name,
-                    patient: patient,
-                    time: time,
-                    dose: dose,
-                    status: 'taken'
-                });
-            });
-            
-            localStorage.setItem('medHistory', JSON.stringify(history));
-            alarmModal.classList.remove('active');
-            
-            // Detener sonido de alarma
-            stopAlarmSound();
-        }
-
-        function closeAlarm() {
-            document.getElementById('alarmModal').classList.remove('active');
-            stopAlarmSound();
-        }
-
-        function snoozeAlarm() {
-            const minutes = parseInt(settings.snoozeTime || 5);
-            setTimeout(() => {
-                document.getElementById('alarmModal').classList.add('active');
-            }, minutes * 60000);
-            
-            closeAlarm();
-            alert(`⏰ Alarma pospuesta por ${minutes} minutos`);
         }
 
         function playAlarmSound() {
-            // Intentar usar la API de AudioContext para mejor control
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-                
-                oscillator.start();
-                
-                // Detener después de 30 segundos
-                setTimeout(() => {
-                    oscillator.stop();
-                }, 30000);
-                
-                // Guardar referencia para poder detener
-                window.currentAlarmSound = { audioContext, oscillator, gainNode };
-            } catch (e) {
-                // Fallback a audio HTML simple
-                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-                audio.volume = (settings.volume || 70) / 100;
-                audio.loop = true;
-                audio.play();
-                window.currentAlarmSound = audio;
+            if (!sonidoOn.checked || alarmaOn) return;
+            const audio = $('audio');
+            audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
+            audio.volume = parseFloat(volSlider.value);
+            
+            // Configurar MediaSession para pantalla de bloqueo
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: 'MediClock NEO: ¡Hora de medicación!',
+                    artist: 'Alerta Activa',
+                    artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
+                });
             }
+
+            audio.play().then(() => {
+                alarmaOn = true;
+            }).catch(() => {
+                intervalo = setInterval(() => {
+                    new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3').play();
+                }, 2000);
+            });
         }
 
-        function stopAlarmSound() {
-            if (window.currentAlarmSound) {
-                if (window.currentAlarmSound.audioContext) {
-                    window.currentAlarmSound.oscillator.stop();
-                    window.currentAlarmSound.audioContext.close();
-                } else if (window.currentAlarmSound.pause) {
-                    window.currentAlarmSound.pause();
-                    window.currentAlarmSound.currentTime = 0;
-                }
-                window.currentAlarmSound = null;
-            }
+        function stopAlarm() {
+            alarmaOn = false;
+            if (intervalo) clearInterval(intervalo);
+            $('audio').pause();
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
         }
 
-        function renderMedications() {
-            const container = document.getElementById('medicationsList');
-            const emptyState = document.getElementById('emptyState');
-            const keys = Object.keys(medications);
+        async function playVoiceReminder() {
+            if (!vozOn.checked || !('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
             
-            if (keys.length === 0) {
-                container.innerHTML = '';
-                emptyState.style.display = 'block';
-                return;
-            }
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
+            medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `);
             
-            emptyState.style.display = 'none';
-            container.innerHTML = keys.map(id => {
-                const med = medications[id];
-                return `
-                    <div class="med-item">
-                        <div class="med-header">
-                            <div>
-                                <div class="med-name">${med.name}</div>
-                                <div class="med-patient">${med.patient}</div>
-                            </div>
-                            <button onclick="deleteMedication('${id}')" style="background: none; border: none; color: var(--danger); font-size: 1.2rem; cursor: pointer;">🗑️</button>
-                        </div>
+            const u = new SpeechSynthesisUtterance(msg);
+            u.lang = 'es-ES';
+            u.volume = parseFloat(volSlider.value);
+            speechSynthesis.speak(u);
+        }
+
+        function showAlert() {
+            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
+            $('alertGreeting').textContent = `Hola ${pacientes.join(' y ')}`;
+            $('alertTimeDisplay').textContent = horaActual;
+            $('alertMedicationsList').innerHTML = medsActuales.map(m => `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`).join('');
+            
+            alertModal.classList.add('open');
+            playAlarmSound();
+            playVoiceReminder();
+            
+            if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+        }
+
+        function render() {
+            lista.innerHTML = '';
+            const keys = Object.keys(meds);
+            empty.style.display = keys.length ? 'none' : 'block';
+
+            keys.forEach(id => {
+                const m = meds[id];
+                const colorClass = getMedColor(m.nombre);
+                const li = document.createElement('li');
+                li.className = 'med-item';
+                li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
+
+                li.innerHTML = `
+                    <div class="med-name-row">
+                        <div class="med-name">${upper(m.nombre)}</div>
+                        <div class="med-patient">${upper(m.paciente)}</div>
+                    </div>
+                    ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
+                    <div class="med-info">
                         <div class="med-times">
-                            ${med.times.map(t => `
-                                <span class="time-chip">
-                                    🕒 ${t.time} - ${t.dose}u
-                                </span>
-                            `).join('')}
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.8rem; color: #aaa;">
-                            Agregado: ${new Date(med.createdAt).toLocaleDateString()}
+                            ${m.horas.map(h => `<span class="time-chip" onclick="event.stopPropagation(); openEditTimeModal('${id}', '${h.h}', '${h.cant}')">${h.h} · ${h.cant}u</span>`).join('')}
+                            <button class="add-time-btn" onclick="event.stopPropagation(); openAddTimeModal('${id}')">+</button>
                         </div>
                     </div>
+                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
                 `;
-            }).join('');
-        }
-
-        function deleteMedication(id) {
-            if (confirm('¿Estás seguro de que quieres eliminar este medicamento?')) {
-                // Cancelar alarmas para este medicamento
-                const med = medications[id];
-                if (med) {
-                    med.times.forEach(timeObj => {
-                        const alarmKey = `${id}_${timeObj.time}`;
-                        if (alarmTimeouts.has(alarmKey)) {
-                            clearTimeout(alarmTimeouts.get(alarmKey));
-                            alarmTimeouts.delete(alarmKey);
-                            activeAlarms.delete(alarmKey);
-                        }
-                    });
-                }
-                
-                delete medications[id];
-                localStorage.setItem('medications', JSON.stringify(medications));
-                renderMedications();
-                updateAlarmCount();
-            }
-        }
-
-        function updateAlarmCount() {
-            const count = Object.values(medications).reduce((total, med) => total + med.times.length, 0);
-            document.getElementById('alarmCount').textContent = count;
-        }
-
-        function updateAppStatus() {
-            const statusEl = document.getElementById('appStatus');
-            if (document.hidden) {
-                statusEl.textContent = 'En segundo plano';
-                statusEl.style.color = '#ffa502';
-            } else {
-                statusEl.textContent = 'Activo';
-                statusEl.style.color = '#00d2d3';
-            }
-        }
-
-        function showTab(tabName) {
-            // Ocultar todos los tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+                li.onclick = () => showDetail(id);
+                lista.appendChild(li);
             });
-            
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Mostrar tab seleccionado
-            document.getElementById(`content${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
-            document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
-            
-            // Si es la tab de medicamentos, renderizar
-            if (tabName === 'medicamentos') {
-                renderMedications();
+        }
+
+        function getMedColor(n) {
+            if(!medColors[n]) {
+                const c = ['color-1', 'color-2'];
+                medColors[n] = c[Object.keys(medColors).length % 2];
+            }
+            return medColors[n];
+        }
+
+        window.deleteMed = (id) => {
+            if(confirm('¿Eliminar medicamento?')) {
+                delete meds[id];
+                save();
+                render();
             }
         }
 
-        function loadSettings() {
-            settings = JSON.parse(localStorage.getItem('settings') || '{}');
-            
-            document.getElementById('soundEnabled').checked = settings.soundEnabled !== false;
-            document.getElementById('vibrationEnabled').checked = settings.vibrationEnabled !== false;
-            document.getElementById('volume').value = settings.volume || 70;
-            document.getElementById('volumeValue').textContent = (settings.volume || 70) + '%';
-            document.getElementById('snoozeTime').value = settings.snoozeTime || '5';
+        function openAddTimeModal(id) {
+            currentMedForAddTime = id;
+            addTimeModal.classList.add('open');
         }
 
-        function saveSettings() {
-            settings = {
-                soundEnabled: document.getElementById('soundEnabled').checked,
-                vibrationEnabled: document.getElementById('vibrationEnabled').checked,
-                volume: parseInt(document.getElementById('volume').value),
-                snoozeTime: document.getElementById('snoozeTime').value
-            };
-            
-            localStorage.setItem('settings', JSON.stringify(settings));
-            alert('✅ Configuración guardada');
+        function openEditTimeModal(id, h, c) {
+            editingTimeData = {id, oldH: h};
+            $('editHora').value = h;
+            $('editCant').value = c;
+            editTimeModal.classList.add('open');
         }
 
-        function showInstallInstructions() {
-            document.getElementById('instructionsModal').classList.add('active');
+        function showDetail(id) {
+            const m = meds[id];
+            $('detailName').textContent = upper(m.nombre);
+            $('detailPatient').textContent = upper(m.paciente);
+            $('detailMainImg').src = m.foto || '';
+            $('detailMainImg').style.display = m.foto ? 'block' : 'none';
+            $('detailTimes').innerHTML = m.horas.map(h => `<div style="padding:10px; background:rgba(0,0,0,0.3); margin-bottom:5px; border-radius:8px;">${h.h} - ${h.cant}u</div>`).join('');
+            detailModal.classList.add('open');
         }
 
-        function showHistory() {
-            const container = document.getElementById('historyList');
-            
-            if (history.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #aaa; padding: 20px;">No hay historial todavía</p>';
-            } else {
-                container.innerHTML = history.slice().reverse().map(item => `
-                    <div style="background: rgba(0,0,0,0.2); padding: 10px; margin-bottom: 10px; border-radius: 8px;">
-                        <div style="font-weight: bold;">${item.medication}</div>
-                        <div style="color: var(--primary); font-size: 0.9rem;">${item.patient}</div>
-                        <div style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">
-                            ${new Date(item.date).toLocaleString()} - ${item.dose} unidad(es)
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            document.getElementById('historyModal').classList.add('active');
-        }
+        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
 
-        function clearHistory() {
-            if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
-                history = [];
-                localStorage.setItem('medHistory', JSON.stringify(history));
-                showHistory();
-            }
-        }
+        // Handlers
+        $('addBtn').onclick = () => {
+            const n = upper(nombre.value), p = upper(paciente.value), h = hora.value, c = parseFloat(cant.value);
+            if(!n || !h) return alert('Faltan datos');
+            const id = Date.now().toString();
+            meds[id] = { nombre: n, paciente: p, foto, horas: [{h, cant: c}] };
+            save(); render();
+            nombre.value = ''; paciente.value = ''; foto = ''; photoPreview.classList.remove('active');
+            cambiarTab('medicamentos');
+        };
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function testAlarm() {
-            showAlarmModal([{
-                id: 'test',
-                name: 'Medicamento de Prueba',
-                patient: 'Usuario',
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                dose: 1
-            }]);
-        }
-
-        function addAnotherTime() {
-            const container = document.getElementById('extraTimes');
+        photoZone.onclick = () => {
             const input = document.createElement('input');
-            input.type = 'time';
-            input.className = 'extra-time';
-            input.style.marginTop = '10px';
-            input.style.width = '100%';
-            container.appendChild(input);
+            input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = 600; canvas.height = (img.height * 600) / img.width;
+                        ctx.drawImage(img, 0, 0, 600, canvas.height);
+                        foto = canvas.toDataURL('image/jpeg', 0.6);
+                        photoPreview.src = foto; photoPreview.classList.add('active');
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+
+        $('saveAddTime').onclick = () => {
+            const h = $('newHora').value, c = parseFloat($('newCant').value);
+            if(!h) return;
+            meds[currentMedForAddTime].horas.push({h, cant: c});
+            meds[currentMedForAddTime].horas.sort((a,b) => a.h.localeCompare(b.h));
+            save(); render(); addTimeModal.classList.remove('open');
+        };
+
+        $('saveEditTime').onclick = () => {
+            const m = meds[editingTimeData.id];
+            const idx = m.horas.findIndex(x => x.h === editingTimeData.oldH);
+            m.horas[idx] = {h: $('editHora').value, cant: parseFloat($('editCant').value)};
+            m.horas.sort((a,b) => a.h.localeCompare(b.h));
+            save(); render(); editTimeModal.classList.remove('open');
+        };
+
+        $('deleteTime').onclick = () => {
+            const m = meds[editingTimeData.id];
+            m.horas = m.horas.filter(x => x.h !== editingTimeData.oldH);
+            if(m.horas.length === 0) delete meds[editingTimeData.id];
+            save(); render(); editTimeModal.classList.remove('open');
+        };
+
+        $('alertTake').onclick = () => {
+            const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+            medsActuales.forEach(m => hist.push({fecha: new Date().toISOString(), nombre: m.nombre, paciente: m.paciente, hora: horaActual}));
+            localStorage.setItem('tomasMC', JSON.stringify(hist));
+            alertModal.classList.remove('open'); stopAlarm();
+        };
+
+        $('calBtn').onclick = () => {
+            const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
+            $('calBody').innerHTML = hist.reverse().map(t => `
+                <div style="padding:10px; border-bottom:1px solid #222;">
+                    <b>${upper(t.nombre)}</b> - ${upper(t.paciente)}<br>
+                    <small>${new Date(t.fecha).toLocaleString()}</small>
+                </div>
+            `).join('') || 'Sin registros';
+            calModal.classList.add('open');
+        };
+
+        $('testBtn').onclick = () => {
+            medsActuales = [{nombre: 'MEDICAMENTO TEST', paciente: 'ISRAEL', cantidad: 1, foto: ''}];
+            horaActual = 'TEST';
+            showAlert();
+        };
+
+        $('menos').onclick = () => { cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2); };
+        $('mas').onclick = () => { cant.value = (parseFloat(cant.value) + 0.25).toFixed(2); };
+        
+        $('settingsToggle').onclick = () => {
+            const p = $('settingsPanel');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+            $('settingsArrow').textContent = p.style.display === 'none' ? '▼' : '▲';
+        };
+
+        volSlider.oninput = function() { $('volValue').textContent = Math.round(this.value * 100) + '%'; };
+
+        function cambiarTab(t) {
+            document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+            $(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
+            $(`tabContent${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
+            if(t === 'medicamentos') render();
         }
 
-        // Detectar cuando la app está en segundo plano
-        document.addEventListener('visibilitychange', updateAppStatus);
-        
-        // Solicitar permisos de notificación al cargar
-        if ('Notification' in window && Notification.permission === 'default') {
-            setTimeout(() => {
-                Notification.requestPermission();
-            }, 1000);
-        }
+        $('tabNuevo').onclick = () => cambiarTab('nuevo');
+        $('tabMedicamentos').onclick = () => cambiarTab('medicamentos');
+        $('alertClose').onclick = () => { alertModal.classList.remove('open'); stopAlarm(); };
+        $('detailClose').onclick = () => detailModal.classList.remove('open');
+        $('calClose').onclick = () => calModal.classList.remove('open');
+        $('cancelAddTime').onclick = () => addTimeModal.classList.remove('open');
+        $('cancelEditTime').onclick = () => editTimeModal.classList.remove('open');
+
+        window.onload = () => { render(); initializeAlarmSystem(); };
     </script>
 </body>
 </html>
