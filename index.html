@@ -5,11 +5,12 @@
     <title>MediClock Neo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes"> <!-- Mejor práctica -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#00f5ff">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -245,7 +246,6 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Corrección para iPhone: input time */
         .form-input[type="time"] {
             -webkit-appearance: none;
             appearance: none;
@@ -502,7 +502,6 @@
     </style>
 </head>
 <body>
-    <!-- Audio silencioso para iOS background -->
     <audio id="iosWakeAudio" loop playsinline muted preload="auto" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
 
     <div class="bg-animation"></div>
@@ -586,13 +585,11 @@
                 </div>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
                     <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
-                    <!-- ❌ Botón "Probar alarma" ELIMINADO -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modales -->
     <div class="modal-bg" id="alertModal">
         <div class="modal" style="padding:2rem; text-align:center;">
             <div class="alert-clock-icon">⏰</div>
@@ -652,25 +649,9 @@
     <audio id="audio" preload="auto" loop playsinline></audio>
 
     <script>
-        // Función $ para simplificar document.getElementById
         const $ = id => document.getElementById(id);
+        const upper = t => t ? t.toString().toUpperCase().trim() : '';
 
-        // Audio hack para iOS background
-        function initAudioHack() {
-            const silentAudio = document.getElementById('iosWakeAudio');
-            if (silentAudio) {
-                silentAudio.muted = false;
-                silentAudio.play().then(() => {
-                    console.log("🔊 Audio background activado para iOS");
-                    window.removeEventListener('touchstart', initAudioHack);
-                    window.removeEventListener('click', initAudioHack);
-                }).catch(err => console.warn("🔇 Audio background bloqueado:", err));
-            }
-        }
-        window.addEventListener('touchstart', initAudioHack, { once: true });
-        window.addEventListener('click', initAudioHack, { once: true });
-
-        // Variables
         let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
         let foto = '';
         let alarmaOn = false;
@@ -683,15 +664,21 @@
         let checkInterval = null;
         let lastAlertTimestamp = 0;
 
-        const upper = t => t ? t.toString().toUpperCase().trim() : '';
+        function initAudioHack() {
+            const silentAudio = $('iosWakeAudio');
+            if (silentAudio) {
+                silentAudio.muted = false;
+                silentAudio.play().catch(() => {});
+            }
+        }
+        window.addEventListener('touchstart', initAudioHack, { once: true });
+        window.addEventListener('click', initAudioHack, { once: true });
 
-        // Sistema de alarmas
         function initializeAlarmSystem() {
             if ('Notification' in window) Notification.requestPermission();
             checkAlarms();
             if (checkInterval) clearInterval(checkInterval);
             checkInterval = setInterval(checkAlarms, 15000);
-
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) checkAlarms();
             });
@@ -701,12 +688,9 @@
             const now = new Date();
             const timeKey = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             const currentMinuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0).getTime();
-
             if (lastAlertTimestamp >= currentMinuteStart) return;
-
             medsActuales = [];
             let trigger = false;
-
             Object.keys(meds).forEach(id => {
                 const m = meds[id];
                 m.horas.forEach(h => {
@@ -716,7 +700,6 @@
                     }
                 });
             });
-
             if (trigger && medsActuales.length > 0) {
                 lastAlertTimestamp = currentMinuteStart;
                 horaActual = timeKey;
@@ -726,18 +709,15 @@
 
         async function playVoiceReminder() {
             if (!vozOn.checked || !('speechSynthesis' in window)) return true;
-
             return new Promise((resolve) => {
                 speechSynthesis.cancel();
                 const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
                 let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
                 medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `;
-
                 const u = new SpeechSynthesisUtterance(msg);
                 u.lang = 'es-ES';
                 u.volume = parseFloat(volSlider.value);
                 u.rate = 0.85;
-
                 u.onend = u.onerror = () => resolve();
                 speechSynthesis.speak(u);
                 setTimeout(resolve, 12000);
@@ -750,7 +730,6 @@
             audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
             audio.loop = true;
             audio.volume = parseFloat(volSlider.value);
-            
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: 'MediClock NEO: ¡Hora de medicación!',
@@ -758,10 +737,7 @@
                     artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
                 });
             }
-
-            audio.play().then(() => {
-                alarmaOn = true;
-            }).catch(() => {
+            audio.play().then(() => alarmaOn = true).catch(() => {
                 intervalo = setInterval(() => {
                     const fallback = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
                     fallback.volume = parseFloat(volSlider.value);
@@ -777,12 +753,9 @@
             $('alertMedicationsList').innerHTML = medsActuales.map(m => 
                 `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`
             ).join('');
-
             alertModal.classList.add('open');
-
             await playVoiceReminder();
             playAlarmSound();
-
             if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
         }
 
@@ -798,13 +771,11 @@
             lista.innerHTML = '';
             const keys = Object.keys(meds);
             empty.style.display = keys.length ? 'none' : 'block';
-
             keys.forEach(id => {
                 const m = meds[id];
                 const colorClass = getMedColor(m.nombre);
                 const li = document.createElement('li');
                 li.className = 'med-item';
-
                 li.innerHTML = `
                     <div class="med-header">
                         <div class="med-name-row">
@@ -844,17 +815,8 @@
             }
         }
 
-        function openAddTimeModal(id) {
-            currentMedForAddTime = id;
-            addTimeModal.classList.add('open');
-        }
-
-        function openEditTimeModal(id, h, c) {
-            editingTimeData = {id, oldH: h};
-            $('editHora').value = h;
-            $('editCant').value = c;
-            editTimeModal.classList.add('open');
-        }
+        function openAddTimeModal(id) { currentMedForAddTime = id; addTimeModal.classList.add('open'); }
+        function openEditTimeModal(id, h, c) { editingTimeData = {id, oldH: h}; $('editHora').value = h; $('editCant').value = c; editTimeModal.classList.add('open'); }
 
         function showDetail(id) {
             const m = meds[id];
@@ -868,9 +830,7 @@
             detailModal.classList.add('open');
         }
 
-        function save() {
-            localStorage.setItem('medsMC2', JSON.stringify(meds));
-        }
+        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
 
         // Handlers
         $('addBtn').onclick = () => {
@@ -991,10 +951,7 @@
         $('cancelAddTime').onclick = () => addTimeModal.classList.remove('open');
         $('cancelEditTime').onclick = () => editTimeModal.classList.remove('open');
 
-        window.onload = () => { 
-            render(); 
-            initializeAlarmSystem(); 
-        };
+        window.onload = () => { render(); initializeAlarmSystem(); };
     </script>
 </body>
 </html>
