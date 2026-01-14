@@ -1,319 +1,154 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>MediClock Neo</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registrado:', registration.scope);
-                }).catch(err => {
-                    console.log('ServiceWorker error:', err);
-                });
-            });
-        }
-    </script>
-    
-    <style>
-        :root {
-            --bg-dark: #050508;
-            --bg-card: rgba(15, 15, 25, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.02);
-            
-            --neon-cyan: #00f5ff;
-            --neon-magenta: #ff00ea;
-            --neon-violet: #8b5cf6;
-            --neon-blue: #3b82f6;
-            --neon-green: #00ff88;
-            --neon-orange: #ff6b35;
-            --neon-yellow: #ffd700;
-            --neon-pink: #ff1493;
-            --neon-teal: #00ced1;
-            
-            --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
-            --glow-magenta: 0 0 30px rgba(255, 0, 234, 0.4);
-            --glow-violet: 0 0 30px rgba(139, 92, 246, 0.4);
-            
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.6);
-            --text-muted: rgba(255, 255, 255, 0.3);
-            
-            --border-glow: rgba(0, 245, 255, 0.2);
-            
-            --radius-sm: 12px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    <script src="js/sw-register.js"></script>
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
-            animation: bgPulse 15s ease-in-out infinite;
-        }
-
-        @keyframes bgPulse {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-5%, -5%) scale(1.1); }
-            66% { transform: translate(5%, 5%) scale(0.95); }
-        }
-
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            animation: float 20s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .orb-1 { width: 400px; height: 400px; background: var(--neon-cyan); top: -100px; right: -100px; }
-        .orb-2 { width: 300px; height: 300px; background: var(--neon-magenta); bottom: -50px; left: -50px; animation-delay: -7s; }
-        .orb-3 { width: 250px; height: 250px; background: var(--neon-violet); top: 50%; left: 50%; animation-delay: -14s; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(50px, -50px) rotate(90deg); }
-            50% { transform: translate(-30px, 30px) rotate(180deg); }
-            75% { transform: translate(20px, 50px) rotate(270deg); }
-        }
-
-        .grid-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .app {
-            position: relative;
-            z-index: 1;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            min-height: 100vh;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
-            border-radius: var(--radius-md);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.75rem; box-shadow: var(--glow-cyan), var(--glow-magenta);
-            animation: iconPulse 3s ease-in-out infinite;
-            position: relative;
-        }
-
-        .logo-text {
-            font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-
-        .tabs {
-            display: flex; background: rgba(10, 10, 20, 0.8); border-radius: var(--radius-lg);
-            padding: 0.25rem; margin-bottom: 1.5rem; border: 1px solid rgba(0, 245, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .tab {
-            flex: 1; text-align: center; padding: 0.75rem 1rem; font-size: 0.9rem;
-            font-weight: 600; color: var(--text-secondary); background: transparent;
-            border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s;
-        }
-
-        .tab.active { background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(139, 92, 246, 0.15)); color: var(--neon-cyan); }
-
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-
-        .card {
-            background: var(--bg-card); backdrop-filter: blur(40px);
-            border: 1px solid var(--border-glow); border-radius: var(--radius-xl);
-            padding: 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 0.6rem; }
-        .form-input { width: 100%; padding: 1rem 1.25rem; color: var(--text-primary); background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); outline: none; }
-        
-        .qty-row { display: flex; gap: 0.75rem; }
-        .qty-btn { width: 52px; height: 52px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); color: var(--neon-cyan); font-size: 1.5rem; cursor: pointer; }
-
-        /* FIX VISUAL: .med-item Reestructurado */
-        .med-item {
-            display: flex;
-            flex-wrap: wrap; /* Fix: permite que los elementos salten de fila */
-            align-items: center;
-            gap: 1rem;
-            padding: 1.25rem;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-lg);
-            margin-bottom: 0.875rem;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            min-height: auto;
-        }
-
-        /* Nombre y paciente arriba al 100% */
-        .med-name-row {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 0.5rem;
-            width: 100%;
-            padding-right: 40px; /* Espacio para botón delete */
-        }
-
-        .med-name {
-            font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
-            text-transform: uppercase; letter-spacing: 0.02em; display: block;
-            width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .med-patient { font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600; }
-
-        .med-avatar, .med-placeholder {
-            width: 60px; height: 60px; border-radius: var(--radius-md);
-            object-fit: cover; border: 2px solid rgba(0, 245, 255, 0.3);
-            flex-shrink: 0; margin-top: 0;
-        }
-
-        .med-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-        .med-times { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
-
-        .med-actions { position: absolute; top: 1.25rem; right: 1.25rem; }
-
-        .med-delete {
-            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-            background: transparent; border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px; color: var(--text-muted); cursor: pointer;
-        }
-
-        .time-chip { display: inline-flex; align-items: center; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 600; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 20px; }
-
-        .photo-zone { border: 2px dashed rgba(0, 245, 255, 0.3); border-radius: var(--radius-lg); padding: 2rem; text-align: center; cursor: pointer; }
-        .photo-preview { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-lg); border: 2px solid var(--neon-cyan); display: none; }
-        .photo-preview.active { display: block; }
-
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.75rem; font-size: 0.95rem; font-weight: 600; border-radius: var(--radius-md); border: none; cursor: pointer; transition: 0.4s; }
-        .btn-primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: var(--bg-dark); width: 100%; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-danger { background: #ff4757; color: white; }
-        .btn-success { background: var(--neon-green); color: var(--bg-dark); }
-
-        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 1.25rem; }
-        .modal-bg.open { display: flex; }
-        .modal { background: linear-gradient(180deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 18, 0.98)); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: var(--radius-xl); width: 100%; max-width: 420px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .alert-clock-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-
-        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); opacity: 0.3; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        .color-1 { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); }
-        .color-2 { background: linear-gradient(135deg, var(--neon-magenta), var(--neon-violet)); }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <!-- FIX Background: Tag de audio silencioso -->
-    <audio id="iosWakeAudio" loop playsinline src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"></audio>
 
+<body>
     <div class="bg-animation"></div>
     <div class="grid-pattern"></div>
-    <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
     <div class="scanline"></div>
 
     <div class="app">
         <header class="header">
-            <div class="logo"><div class="logo-icon">💊</div><span class="logo-text">MediClock</span><span class="logo-badge">NEO</span></div>
+            <div class="logo">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">MediClock</span>
+                <span class="logo-badge">NEO</span>
+            </div>
+            <p class="tagline">Sistema inteligente de medicación</p>
         </header>
 
         <div class="tabs">
-            <button class="tab active" id="tabNuevo" data-tab="nuevo">✨ Nuevo</button>
-            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">💊 Mis Medicamentos</button>
+            <button class="tab active" id="tabNuevo" data-tab="nuevo">
+                <span>✨</span>
+                <span>Nuevo</span>
+            </button>
+            <button class="tab" id="tabMedicamentos" data-tab="medicamentos">
+                <span>💊</span>
+                <span>Mis Medicamentos</span>
+            </button>
         </div>
 
         <div class="tab-content active" id="tabContentNuevo">
             <div class="card">
-                <div class="form-group"><label class="form-label">Medicamento</label><input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol"></div>
-                <div class="form-group"><label class="form-label">Paciente</label><input type="text" id="paciente" class="form-input" placeholder="Ej: Israel"></div>
-                <div class="form-group"><label class="form-label">Cantidad</label>
-                    <div class="qty-row"><button class="qty-btn" id="menos">−</button><input type="number" id="cant" class="form-input" value="1" step="0.25" style="text-align:center"><button class="qty-btn" id="mas">+</button></div>
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <h2 class="card-title">Nueva medicación</h2>
                 </div>
-                <div class="form-group"><label class="form-label">Hora</label><input type="time" id="hora" class="form-input"></div>
-                <div class="form-group"><div class="photo-zone" id="photoZone">📷 Capturar Foto</div><img id="photoPreview" class="photo-preview"></div>
-                <button class="btn btn-primary" id="addBtn">⚡ AGREGAR</button>
-                
-                <div class="settings" style="margin-top:2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
-                    <div id="settingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary);"><span>⚙️ AJUSTES DE ALERTA</span><span id="settingsArrow">▼</span></div>
-                    <div id="settingsPanel" style="display:none; padding-top:1rem;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Sonido</span><input type="checkbox" id="sonidoOn" checked></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;"><span>Voz</span><input type="checkbox" id="vozOn" checked></div>
-                        <div style="margin-bottom:1rem;"><span>Volumen</span><input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width:100%"><span id="volValue" style="font-size:0.7rem">70%</span></div>
+
+                <div class="form-group">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" id="nombre" class="form-input" placeholder="Ej: Paracetamol" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Paciente</label>
+                    <input type="text" id="paciente" class="form-input" placeholder="Ej: María García"
+                        autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="menos">−</button>
+                        <input type="number" id="cant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="mas">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="hora" class="form-input-time">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto (opcional)</label>
+                    <div class="photo-zone" id="photoZone">
+                        <div class="photo-zone-icon">📷</div>
+                        <div class="photo-zone-text">Toca para capturar</div>
+                        <div class="photo-zone-hint">Ayuda a identificar el medicamento</div>
+                    </div>
+                    <img class="photo-preview" id="photoPreview" src="" alt="Preview">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-full" id="addBtn">
+                        <span>⚡</span>
+                        <span>Agregar</span>
+                    </button>
+                </div>
+
+                <div class="settings">
+                    <div class="settings-toggle" id="settingsToggle">
+                        <div class="settings-label">
+                            <span>⚙️</span>
+                            <span>Configuración de alertas</span>
+                        </div>
+                        <span class="settings-arrow" id="settingsArrow">▼</span>
+                    </div>
+
+                    <div class="settings-panel" id="settingsPanel">
+                        <div class="switch-row">
+                            <span class="switch-text">Sonido de alarma</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sonidoOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span class="switch-text">Recordatorio por voz</span>
+                            <label class="switch">
+                                <input type="checkbox" id="vozOn" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row"
+                            style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; margin-top: 0.5rem;">
+                            <div style="flex: 1;">
+                                <span class="switch-text" style="display: block; color: var(--neon-cyan);">Modo
+                                    Bloqueo/2do Plano</span>
+                                <small
+                                    style="font-size: 0.65rem; color: var(--text-secondary); display: block; line-height: 1.2;">Mantiene
+                                    la app activa si el celular se bloquea</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="bgModeOn">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="volume-row">
+                            <div class="volume-header">
+                                <span class="volume-label">Volumen</span>
+                                <span class="volume-value" id="volValue">70%</span>
+                            </div>
+                            <input type="range" class="volume-slider" id="volSlider" min="0" max="1" step="0.1"
+                                value="0.7">
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" id="testSound">🔔 Probar</button>
+                            <button class="btn btn-secondary" id="testVoice">🗣️ Voz</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -321,385 +156,175 @@
 
         <div class="tab-content" id="tabContentMedicamentos">
             <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💊</div>
+                    <h2 class="card-title">Mis medicamentos</h2>
+                </div>
+
                 <ul class="med-list" id="lista"></ul>
-                <div class="empty" id="empty" style="text-align:center; padding:2rem;"><h3>Sin medicamentos</h3></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button class="btn btn-secondary" id="calBtn" style="flex:1">📅 Historial</button>
-                    <button class="btn btn-secondary" id="testBtn" style="flex:1">🧪 Probar</button>
+
+                <div class="empty" id="empty">
+                    <div class="empty-icon">💊</div>
+                    <h3 class="empty-title">Sin medicamentos</h3>
+                    <p class="empty-text">Agrega tu primera medicación en la pestaña "Nuevo"</p>
+                </div>
+
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" id="calBtn">
+                        <span>📅</span>
+                        <span>Historial</span>
+                    </button>
+                    <button class="btn btn-secondary" id="testBtn">
+                        <span>🧪</span>
+                        <span>Probar Alarma</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modales -->
     <div class="modal-bg" id="alertModal">
-        <div class="modal" style="padding:2rem; text-align:center;">
-            <div class="alert-clock-icon">⏰</div>
-            <h2 id="alertGreeting">Hola</h2>
-            <div id="alertTimeDisplay" style="font-size:2rem; color:var(--neon-cyan); margin:1rem 0;">00:00</div>
-            <div id="alertMedicationsList" style="margin-bottom:2rem;"></div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-danger" id="alertClose" style="flex:1">Cerrar</button>
-                <button class="btn btn-success" id="alertTake" style="flex:1">✓ Tomado</button>
+        <div class="modal">
+            <div class="modal-body">
+                <div class="alert-modal-content">
+                    <div class="alert-header">
+                        <div class="alert-clock-icon">⏰</div>
+                        <div class="alert-greeting">
+                            <div class="alert-greeting-text" id="alertGreeting">Hora de medicación</div>
+                            <div class="alert-time-display" id="alertTimeDisplay">00:00</div>
+                        </div>
+                    </div>
+
+                    <h2 class="alert-title">Es hora de tu medicación</h2>
+
+                    <div class="alert-medications-list" id="alertMedicationsList">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <p class="modal-total" id="alertTotal">Total: 0 medicamentos (0 unidades)</p>
+                <div class="btn-group">
+                    <button class="btn btn-danger" id="alertClose">Cerrar</button>
+                    <button class="btn btn-success" id="alertTake">✓ Tomado</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-bg" id="detailModal">
-        <div class="modal" style="padding:2rem;">
-            <img id="detailMainImg" class="photo-preview active" style="margin-bottom:1rem;">
-            <h2 id="detailName"></h2>
-            <p id="detailPatient" style="color:var(--neon-cyan); margin-bottom:1rem;"></p>
-            <div id="detailTimes"></div>
-            <button class="btn btn-secondary" id="detailClose" style="margin-top:1rem; width:100%;">Cerrar</button>
-        </div>
-    </div>
+        <div class="modal">
+            <div class="modal-body">
+                <div class="detail-header-with-photo">
+                    <img class="detail-main-img" id="detailMainImg" src="" alt="Medicamento">
+                    <div class="detail-info">
+                        <p class="modal-subtitle" id="detailPatient">PACIENTE</p>
+                        <h2 class="modal-title" id="detailName">MEDICAMENTO</h2>
+                    </div>
+                </div>
+                <div class="detail-times-title">Horarios programados</div>
+                <div id="detailTimes"></div>
+            </div>
 
-    <div class="modal-bg" id="addTimeModal">
-        <div class="modal" style="padding:2rem;">
-            <h3>Añadir horario</h3>
-            <input type="time" id="newHora" class="form-input" style="margin:1rem 0;">
-            <input type="number" id="newCant" class="form-input" value="1" step="0.25">
-            <div style="display:flex; gap:10px; margin-top:1rem;">
-                <button class="btn btn-secondary" id="cancelAddTime" style="flex:1">Cancelar</button>
-                <button class="btn btn-primary" id="saveAddTime" style="flex:1">Guardar</button>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="detailClose">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="modal-bg" id="editTimeModal">
-        <div class="modal" style="padding:2rem;">
-            <h3>Editar horario</h3>
-            <input type="time" id="editHora" class="form-input" style="margin:1rem 0;">
-            <input type="number" id="editCant" class="form-input" step="0.25">
-            <div style="display:flex; gap:10px; margin-top:1rem;">
-                <button class="btn btn-danger" id="deleteTime" style="flex:1">Eliminar</button>
-                <button class="btn btn-primary" id="saveEditTime" style="flex:1">Guardar</button>
+    <div class="modal-bg edit-time-modal" id="editTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">✏️</div>
+                <h2 class="modal-title">Editar horario</h2>
+                <p class="modal-subtitle" id="editTimeMedName"></p>
             </div>
-            <button class="btn btn-secondary" id="cancelEditTime" style="width:100%; margin-top:10px;">Cancelar</button>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="editHora" class="form-input-time" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="editMenos">−</button>
+                        <input type="number" id="editCant" class="form-input qty-input" value="1" step="0.25"
+                            min="0.25">
+                        <button class="qty-btn" id="editMas">+</button>
+                    </div>
+                </div>
+
+                <div class="edit-time-actions">
+                    <button class="btn btn-danger" id="deleteTime">🗑️ Eliminar</button>
+                    <button class="btn btn-success" id="saveEditTime">💾 Guardar</button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="cancelEditTime">Cancelar</button>
+            </div>
         </div>
     </div>
 
     <div class="modal-bg" id="calModal">
-        <div class="modal" style="padding:2rem;">
-            <h2>Historial de tomas</h2>
-            <div id="calBody" style="max-height:300px; overflow-y:auto; margin:1rem 0; font-size:0.8rem;"></div>
-            <button class="btn btn-secondary" id="calClose" style="width:100%;">Cerrar</button>
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">📅</div>
+                <h2 class="modal-title">Historial de tomas</h2>
+            </div>
+
+            <div class="modal-body" id="calBody"></div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-full" id="calClose">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="addTimeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">➕</div>
+                <h2 class="modal-title">Agregar nueva hora</h2>
+                <p class="modal-subtitle" id="addTimeMedName"></p>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Hora</label>
+                    <input type="time" id="newHora" class="form-input-time" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="qty-row">
+                        <button class="qty-btn" id="newMenos">−</button>
+                        <input type="number" id="newCant" class="form-input qty-input" value="1" step="0.25" min="0.25">
+                        <button class="qty-btn" id="newMas">+</button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Ej: 1.25 para 1¼ pastillas
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="cancelAddTime">Cancelar</button>
+                    <button class="btn btn-success" id="saveAddTime">✓ Agregar Hora</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <audio id="audio" preload="auto" loop></audio>
+    <audio id="silentAudio" preload="auto" loop muted></audio>
 
-    <script>
-        // Lógica de Heartbeat para evitar que iOS suspenda la app
-        function initAudioHack() {
-            const silentAudio = document.getElementById('iosWakeAudio');
-            if (silentAudio) {
-                silentAudio.play().then(() => {
-                    console.log("🚀 Latido de audio iniciado para segundo plano");
-                    // Una vez activado, eliminamos los listeners para evitar repeticiones
-                    window.removeEventListener('touchstart', initAudioHack);
-                    window.removeEventListener('click', initAudioHack);
-                }).catch(err => console.log("Audio bloqueado:", err));
-            }
-        }
-        window.addEventListener('touchstart', initAudioHack, { once: true });
-        window.addEventListener('click', initAudioHack, { once: true });
-
-        // Variables globales
-        let meds = JSON.parse(localStorage.getItem('medsMC2') || '{}');
-        let foto = '';
-        let alarmaOn = false;
-        let medsActuales = [];
-        let horaActual = '';
-        let intervalo = null;
-        let medColors = {};
-        let currentMedForAddTime = null;
-        let editingTimeData = null;
-        let checkInterval = null;
-
-        const $ = id => document.getElementById(id);
-        const upper = t => t ? t.toString().toUpperCase().trim() : '';
-
-        // Sistema de alarmas mejorado
-        function initializeAlarmSystem() {
-            if ('Notification' in window) Notification.requestPermission();
-            
-            checkAlarms();
-            if (checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(checkAlarms, 20000); // Revisar cada 20 segundos
-
-            // Al volver del segundo plano, revisar inmediatamente
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) checkAlarms();
-            });
-        }
-
-        function checkAlarms() {
-            const now = new Date();
-            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            const today = now.toISOString().slice(0, 10);
-            
-            medsActuales = [];
-            let trigger = false;
-
-            Object.keys(meds).forEach(id => {
-                const m = meds[id];
-                m.horas.forEach(h => {
-                    if (h.h === time) {
-                        medsActuales.push({id, paciente: m.paciente, nombre: m.nombre, cantidad: h.cant, foto: m.foto});
-                        trigger = true;
-                    }
-                });
-            });
-
-            if (trigger && medsActuales.length > 0) {
-                const fireKey = `fired_${today}_${time}_${medsActuales.map(x=>x.id).join('')}`;
-                if (!localStorage.getItem(fireKey)) {
-                    horaActual = time;
-                    showAlert();
-                    localStorage.setItem(fireKey, 'true');
-                }
-            }
-        }
-
-        function playAlarmSound() {
-            if (!sonidoOn.checked || alarmaOn) return;
-            const audio = $('audio');
-            audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
-            audio.volume = parseFloat(volSlider.value);
-            
-            // Configurar MediaSession para pantalla de bloqueo
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: 'MediClock NEO: ¡Hora de medicación!',
-                    artist: 'Alerta Activa',
-                    artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
-                });
-            }
-
-            audio.play().then(() => {
-                alarmaOn = true;
-            }).catch(() => {
-                intervalo = setInterval(() => {
-                    new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3').play();
-                }, 2000);
-            });
-        }
-
-        function stopAlarm() {
-            alarmaOn = false;
-            if (intervalo) clearInterval(intervalo);
-            $('audio').pause();
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-        }
-
-        async function playVoiceReminder() {
-            if (!vozOn.checked || !('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-            let msg = `Hola ${pacientes.join(' y ')}. Es hora de tu medicación. `;
-            medsActuales.forEach(m => msg += `Toma ${m.cantidad} unidades de ${m.nombre}. `);
-            
-            const u = new SpeechSynthesisUtterance(msg);
-            u.lang = 'es-ES';
-            u.volume = parseFloat(volSlider.value);
-            speechSynthesis.speak(u);
-        }
-
-        function showAlert() {
-            const pacientes = [...new Set(medsActuales.map(m => m.paciente))];
-            $('alertGreeting').textContent = `Hola ${pacientes.join(' y ')}`;
-            $('alertTimeDisplay').textContent = horaActual;
-            $('alertMedicationsList').innerHTML = medsActuales.map(m => `<div style="padding:10px; border-bottom:1px solid #333;"><b>${upper(m.nombre)}</b>: ${m.cantidad} unidades</div>`).join('');
-            
-            alertModal.classList.add('open');
-            playAlarmSound();
-            playVoiceReminder();
-            
-            if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
-        }
-
-        function render() {
-            lista.innerHTML = '';
-            const keys = Object.keys(meds);
-            empty.style.display = keys.length ? 'none' : 'block';
-
-            keys.forEach(id => {
-                const m = meds[id];
-                const colorClass = getMedColor(m.nombre);
-                const li = document.createElement('li');
-                li.className = 'med-item';
-                li.style.borderLeft = `3px solid var(--${colorClass.split('-')[1]})`;
-
-                li.innerHTML = `
-                    <div class="med-name-row">
-                        <div class="med-name">${upper(m.nombre)}</div>
-                        <div class="med-patient">${upper(m.paciente)}</div>
-                    </div>
-                    ${m.foto ? `<img src="${m.foto}" class="med-avatar">` : `<div class="med-placeholder ${colorClass}">💊</div>`}
-                    <div class="med-info">
-                        <div class="med-times">
-                            ${m.horas.map(h => `<span class="time-chip" onclick="event.stopPropagation(); openEditTimeModal('${id}', '${h.h}', '${h.cant}')">${h.h} · ${h.cant}u</span>`).join('')}
-                            <button class="add-time-btn" onclick="event.stopPropagation(); openAddTimeModal('${id}')">+</button>
-                        </div>
-                    </div>
-                    <div class="med-actions"><button class="med-delete" onclick="event.stopPropagation(); deleteMed('${id}')">🗑️</button></div>
-                `;
-                li.onclick = () => showDetail(id);
-                lista.appendChild(li);
-            });
-        }
-
-        function getMedColor(n) {
-            if(!medColors[n]) {
-                const c = ['color-1', 'color-2'];
-                medColors[n] = c[Object.keys(medColors).length % 2];
-            }
-            return medColors[n];
-        }
-
-        window.deleteMed = (id) => {
-            if(confirm('¿Eliminar medicamento?')) {
-                delete meds[id];
-                save();
-                render();
-            }
-        }
-
-        function openAddTimeModal(id) {
-            currentMedForAddTime = id;
-            addTimeModal.classList.add('open');
-        }
-
-        function openEditTimeModal(id, h, c) {
-            editingTimeData = {id, oldH: h};
-            $('editHora').value = h;
-            $('editCant').value = c;
-            editTimeModal.classList.add('open');
-        }
-
-        function showDetail(id) {
-            const m = meds[id];
-            $('detailName').textContent = upper(m.nombre);
-            $('detailPatient').textContent = upper(m.paciente);
-            $('detailMainImg').src = m.foto || '';
-            $('detailMainImg').style.display = m.foto ? 'block' : 'none';
-            $('detailTimes').innerHTML = m.horas.map(h => `<div style="padding:10px; background:rgba(0,0,0,0.3); margin-bottom:5px; border-radius:8px;">${h.h} - ${h.cant}u</div>`).join('');
-            detailModal.classList.add('open');
-        }
-
-        function save() { localStorage.setItem('medsMC2', JSON.stringify(meds)); }
-
-        // Handlers
-        $('addBtn').onclick = () => {
-            const n = upper(nombre.value), p = upper(paciente.value), h = hora.value, c = parseFloat(cant.value);
-            if(!n || !h) return alert('Faltan datos');
-            const id = Date.now().toString();
-            meds[id] = { nombre: n, paciente: p, foto, horas: [{h, cant: c}] };
-            save(); render();
-            nombre.value = ''; paciente.value = ''; foto = ''; photoPreview.classList.remove('active');
-            cambiarTab('medicamentos');
-        };
-
-        photoZone.onclick = () => {
-            const input = document.createElement('input');
-            input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = 600; canvas.height = (img.height * 600) / img.width;
-                        ctx.drawImage(img, 0, 0, 600, canvas.height);
-                        foto = canvas.toDataURL('image/jpeg', 0.6);
-                        photoPreview.src = foto; photoPreview.classList.add('active');
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-            input.click();
-        };
-
-        $('saveAddTime').onclick = () => {
-            const h = $('newHora').value, c = parseFloat($('newCant').value);
-            if(!h) return;
-            meds[currentMedForAddTime].horas.push({h, cant: c});
-            meds[currentMedForAddTime].horas.sort((a,b) => a.h.localeCompare(b.h));
-            save(); render(); addTimeModal.classList.remove('open');
-        };
-
-        $('saveEditTime').onclick = () => {
-            const m = meds[editingTimeData.id];
-            const idx = m.horas.findIndex(x => x.h === editingTimeData.oldH);
-            m.horas[idx] = {h: $('editHora').value, cant: parseFloat($('editCant').value)};
-            m.horas.sort((a,b) => a.h.localeCompare(b.h));
-            save(); render(); editTimeModal.classList.remove('open');
-        };
-
-        $('deleteTime').onclick = () => {
-            const m = meds[editingTimeData.id];
-            m.horas = m.horas.filter(x => x.h !== editingTimeData.oldH);
-            if(m.horas.length === 0) delete meds[editingTimeData.id];
-            save(); render(); editTimeModal.classList.remove('open');
-        };
-
-        $('alertTake').onclick = () => {
-            const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            medsActuales.forEach(m => hist.push({fecha: new Date().toISOString(), nombre: m.nombre, paciente: m.paciente, hora: horaActual}));
-            localStorage.setItem('tomasMC', JSON.stringify(hist));
-            alertModal.classList.remove('open'); stopAlarm();
-        };
-
-        $('calBtn').onclick = () => {
-            const hist = JSON.parse(localStorage.getItem('tomasMC') || '[]');
-            $('calBody').innerHTML = hist.reverse().map(t => `
-                <div style="padding:10px; border-bottom:1px solid #222;">
-                    <b>${upper(t.nombre)}</b> - ${upper(t.paciente)}<br>
-                    <small>${new Date(t.fecha).toLocaleString()}</small>
-                </div>
-            `).join('') || 'Sin registros';
-            calModal.classList.add('open');
-        };
-
-        $('testBtn').onclick = () => {
-            medsActuales = [{nombre: 'MEDICAMENTO TEST', paciente: 'ISRAEL', cantidad: 1, foto: ''}];
-            horaActual = 'TEST';
-            showAlert();
-        };
-
-        $('menos').onclick = () => { cant.value = Math.max(0.25, parseFloat(cant.value) - 0.25).toFixed(2); };
-        $('mas').onclick = () => { cant.value = (parseFloat(cant.value) + 0.25).toFixed(2); };
-        
-        $('settingsToggle').onclick = () => {
-            const p = $('settingsPanel');
-            p.style.display = p.style.display === 'none' ? 'block' : 'none';
-            $('settingsArrow').textContent = p.style.display === 'none' ? '▼' : '▲';
-        };
-
-        volSlider.oninput = function() { $('volValue').textContent = Math.round(this.value * 100) + '%'; };
-
-        function cambiarTab(t) {
-            document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-            $(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
-            $(`tabContent${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('active');
-            if(t === 'medicamentos') render();
-        }
-
-        $('tabNuevo').onclick = () => cambiarTab('nuevo');
-        $('tabMedicamentos').onclick = () => cambiarTab('medicamentos');
-        $('alertClose').onclick = () => { alertModal.classList.remove('open'); stopAlarm(); };
-        $('detailClose').onclick = () => detailModal.classList.remove('open');
-        $('calClose').onclick = () => calModal.classList.remove('open');
-        $('cancelAddTime').onclick = () => addTimeModal.classList.remove('open');
-        $('cancelEditTime').onclick = () => editTimeModal.classList.remove('open');
-
-        window.onload = () => { render(); initializeAlarmSystem(); };
-    </script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
