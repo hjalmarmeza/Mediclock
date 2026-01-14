@@ -47,11 +47,12 @@ async function startSilentAudio() {
     const silent = $('silentAudio');
     if (!silent) return;
 
-    silent.src = SILENCE_URL;
+    // Usar un audio real de 10s para evitar que el sistema lo suspenda
+    silent.src = 'https://raw.githubusercontent.com/anars/blank-audio/master/10-seconds-of-silence.mp3';
     silent.loop = true;
     try {
         await silent.play();
-        console.log('🎧 Modo segundo plano: Audio de silencio activado');
+        console.log('🎧 Protección de segundo plano: Activada');
 
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
@@ -532,30 +533,29 @@ function showAlert() {
 }
 
 async function activateAlarm() {
-    console.log('🔔 Activando alarma completa...');
+    console.log('🔔 Activando sistema de alerta dual...');
+    alarmaOn = true;
 
-    // Primero voz si está activada
+    // Ejecutar voz y sonido de forma inteligente
     if (vozOn.checked) {
-        console.log('🗣️ Iniciando voz...');
-        await playVoiceReminder();
-    } else {
-        // Si la voz no está activada, iniciar sonido inmediatamente
-        console.log('🔊 Iniciando sonido directamente...');
-        playAlarmSound();
+        playVoiceReminder();
     }
 
-    // Forzar foco en la ventana
-    window.focus();
+    // Si el sonido está activo, lanzarlo tras un pequeño delay 
+    // Esto asegura que suene aunque la voz falle o se bloquee
+    if (sonidoOn.checked) {
+        setTimeout(() => {
+            if (alarmaOn) playAlarmSound();
+        }, vozOn.checked ? 2000 : 0);
+    }
 
-    // Intentar vibración si está disponible
     if ('vibrate' in navigator) {
-        try {
-            navigator.vibrate([200, 100, 200, 100, 200, 100, 200]);
-        } catch (e) {
-            console.log('Vibración no disponible');
-        }
+        navigator.vibrate([500, 200, 500, 200, 500, 200, 1000]);
     }
+
+    window.focus();
 }
+
 
 function setupTimeChipListeners(li, id, m) {
     li.querySelectorAll('.time-chip').forEach(chip => {
