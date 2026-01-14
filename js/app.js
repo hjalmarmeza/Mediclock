@@ -109,20 +109,21 @@ function handleVisibilityChange() {
 }
 
 function handleUserInteraction() {
-    // Esta función se ejecuta cuando el usuario interactúa
-    // Ayuda a desbloquear el audio
+    // PRE-CARGA de audios: Vital para que el navegador permita sonar luego
+    const audio = $('audio');
+    const silent = $('silentAudio');
+    if (audio) {
+        audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => { });
+    }
+    if (silent && silent.paused && $('bgModeOn').checked) {
+        startSilentAudio();
+    }
+
     if (medsActuales.length > 0 && alarmaOn) {
         playAlarmSound();
     }
-
-    // También intentar iniciar el audio de silencio si estaba pendiente
-    if ($('bgModeOn').checked) {
-        const silent = $('silentAudio');
-        if (silent && silent.paused) {
-            startSilentAudio();
-        }
-    }
 }
+
 
 function requestNotificationPermissions() {
     if ('Notification' in window) {
@@ -262,9 +263,9 @@ function playAlarmSoundForced() {
 
 // CORRECCIÓN 2: Sonido de alarma mejorado
 function playAlarmSound() {
-    if (!sonidoOn.checked || alarmaOn) return;
+    if (!sonidoOn.checked) return; // Solo verificar si el sonido está activado
 
-    console.log('🔊 Reproduciendo sonido de alarma mejorado...');
+    console.log('🔊 Iniciando audio de alarma...');
 
     stopAlarm();
 
