@@ -142,27 +142,20 @@ function requestNotificationPermissions() {
 
 function checkAlarms() {
     const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const currentTime = `${hours}:${minutes}`;
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-    console.log(`🔍 [${currentTime}] Verificando alarmas... (${Object.keys(meds).length} meds configurados)`);
+    // Log visible para depuración
+    console.log("⏱️ Verificando:", currentTime);
 
     medsActuales = [];
     let alarmTriggered = false;
-    // Usar fecha local para evitar desfases de zona horaria (UTC)
-    const today = now.toLocaleDateString('en-CA');
 
     Object.keys(meds).forEach(id => {
         const m = meds[id];
         if (!m || !m.horas) return;
 
         m.horas.forEach(h => {
-            const alarmTime = h.h;
-            // Usar diferencia de minutos para ser más flexibles (margen de 1 min)
-            const diff = getMinutesDifference(currentTime, alarmTime);
-
-            if (Math.abs(diff) === 0) {
+            if (currentTime === h.h) {
                 const yaAgregado = medsActuales.some(med => med.id === id);
                 if (!yaAgregado) {
                     medsActuales.push({
@@ -179,27 +172,26 @@ function checkAlarms() {
     });
 
     if (alarmTriggered && medsActuales.length > 0) {
-        const ids = medsActuales.map(m => m.id).sort();
-        const key = `${today}-${currentTime}-${ids.join('-')}`;
-        const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
+        // Evitar que suene varias veces en el mismo minuto
+        const key = 'alarm_' + currentTime;
+        if (sessionStorage.getItem(key)) return;
 
-        if (!fired[key]) {
-            console.log(`🚨 ALARMA ACTIVADA: ${currentTime} - ${medsActuales.length} medicamento(s)`);
-            horaActual = currentTime;
+        sessionStorage.setItem(key, 'true');
+        horaActual = currentTime;
 
-            // Notificar inmediatamente incluso si el dispositivo está bloqueado
-            showLockScreenNotification();
+        console.log("🚨 ACTIVANDO ALARMA:", currentTime);
 
-            // Mostrar alerta si la app está visible
-            if (!document.hidden) {
-                setTimeout(() => showAlert(), 500);
-            }
+        // Notificar al sistema
+        showLockScreenNotification();
 
-            fired[key] = true;
-            localStorage.setItem('alarmsToday', JSON.stringify(fired));
+        // Mostrar visualmente
+        if (alertModal) {
+            alertModal.classList.add('open');
+            showAlert();
         }
     }
 }
+
 
 function getMinutesDifference(time1, time2) {
     const [h1, m1] = time1.split(':').map(Number);
