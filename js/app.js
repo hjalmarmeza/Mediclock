@@ -47,12 +47,14 @@ async function startSilentAudio() {
     const silent = $('silentAudio');
     if (!silent) return;
 
-    // Usar un audio real de 10s para evitar que el sistema lo suspenda
+    // Cargamos un audio real. Volumen bajo pero existente para que iOS lo respete.
     silent.src = 'https://raw.githubusercontent.com/anars/blank-audio/master/10-seconds-of-silence.mp3';
     silent.loop = true;
+    silent.volume = 0.1;
+
     try {
         await silent.play();
-        console.log('🎧 Protección de segundo plano: Activada');
+        console.log('🎧 Canal de protección iniciado');
 
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
@@ -263,95 +265,35 @@ function playAlarmSoundForced() {
 
 // CORRECCIÓN 2: Sonido de alarma mejorado
 function playAlarmSound() {
-    if (!sonidoOn.checked) return; // Solo verificar si el sonido está activado
+    if (!sonidoOn.checked) return;
 
-    console.log('🔊 Iniciando audio de alarma...');
+    console.log('🔊 Swapping audio a modo ALARMA...');
 
-    stopAlarm();
+    // USAMOS EL MISMO CANAL que ya está sonando (el de silencio)
+    // Al solo cambiar el "src" y no parar la reproducción, saltamos el bloqueo de iOS/Android
+    const audio = $('silentAudio');
+    const alarmSrc = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
 
-    try {
-        // Usar el elemento audio existente
-        const audio = $('audio');
-        if (audio) {
-            // Cambiar la fuente a un sonido más confiable
-            audio.src = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
-            audio.volume = parseFloat(volSlider.value);
-            audio.loop = true;
+    if (audio) {
+        audio.pause();
+        audio.src = alarmSrc;
+        audio.volume = parseFloat(volSlider.value);
+        audio.loop = true;
 
-            // Configurar metadatos para reproducción en segundo plano
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: 'Alarma MediClock',
-                    artist: 'Sistema de medicación',
-                    artwork: [
-                        { src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }
-                    ]
-                });
-            }
-
-            // Intentar reproducir con manejo de promesa mejorado
-            const playAudio = () => {
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        console.log('✅ Sonido de alarma iniciado');
-                        alarmaOn = true;
-                    }).catch(error => {
-                        console.log('⚠️ Audio necesita interacción del usuario:', error);
-                        // No agregar listener aquí para evitar duplicados
-                    });
-                }
-            };
-
-            // Intentar inmediatamente
-            playAudio();
-
-            // También intentar con un pequeño retraso
-            setTimeout(playAudio, 100);
-            return;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('✅ Alarma sonando con éxito por bypass de canal');
+                alarmaOn = true;
+            }).catch(e => {
+                console.error('❌ Error incluso con bypass:', e);
+                // Fallback final: Vibrar como locos
+                if ('vibrate' in navigator) navigator.vibrate([1000, 500, 1000, 500, 1000]);
+            });
         }
-
-        // Fallback a Web Audio API
-        if (window.AudioContext || window.webkitAudioContext) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            function playBeep() {
-                if (!alarmaOn || !audioCtx) return;
-
-                try {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.2);
-
-                    gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.5);
-                } catch (e) {
-                    console.error('Error en beep:', e);
-                }
-            }
-
-            alarmaOn = true;
-            playBeep();
-
-            if (intervalo) clearInterval(intervalo);
-            intervalo = setInterval(playBeep, 1000); // Sonido cada segundo
-        }
-    } catch (error) {
-        console.error('❌ Error reproduciendo sonido:', error);
-        // Intentar método alternativo
-        tryPlayAlternativeSound();
     }
 }
+
 
 function tryPlayAlternativeSound() {
     console.log('🔄 Intentando método alternativo de sonido...');
