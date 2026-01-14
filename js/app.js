@@ -11,10 +11,16 @@ let medColors = {};
 let editingTimeData = null;
 let checkInterval = null;
 let wakeLock = null;
-const SILENCE_URL = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAARKwAARKwAAAEAAABkYXRhAgAAAAAA';
+const SILENCE_URL = 'data:audio/wav;base64,UGRyZkFhQUFBQVdRVkVFZm10IBIAAAABAAARKwAARKwAAAEAAABkYXRhAgAAAAAA';
 
 const $ = id => document.getElementById(id);
 const upper = t => t ? t.toString().toUpperCase().trim() : '';
+
+// Definiciones explícitas de UI para evitar ReferenceErrors
+const nombre = $('nombre'), paciente = $('paciente'), cant = $('cant'), hora = $('hora'), lista = $('lista'), empty = $('empty');
+const sonidoOn = $('sonidoOn'), vozOn = $('vozOn'), volSlider = $('volSlider'), volValue = $('volValue');
+const alertModal = $('alertModal'), detailModal = $('detailModal'), editTimeModal = $('editTimeModal'), calModal = $('calModal'), addTimeModal = $('addTimeModal');
+const photoZone = $('photoZone'), photoPreview = $('photoPreview');
 
 // CORRECCIÓN 1: Sistema de alarmas mejorado
 function initializeAlarmSystem() {
@@ -161,9 +167,9 @@ function checkAlarms() {
         if (!m || !m.horas) return;
 
         m.horas.forEach(h => {
-            // Permitir margen de 1 minuto para alarmas
             const alarmTime = h.h;
-            if (Math.abs(getMinutesDifference(currentTime, alarmTime)) <= 1) {
+            // Comparación exacta de minuto para evitar que suene múltiples veces o antes de tiempo
+            if (currentTime === alarmTime) {
                 medsActuales.push({
                     id: id,
                     paciente: m.paciente,
