@@ -8,6 +8,13 @@ self.addEventListener('activate', event => {
   console.log('Service Worker activado');
 });
 
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});
+
+
 // Background Sync para verificación de alarmas
 self.addEventListener('sync', event => {
   if (event.tag === 'alarm-check') {
