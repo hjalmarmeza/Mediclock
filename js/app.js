@@ -150,6 +150,8 @@ function checkAlarms() {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const currentTime = `${hours}:${minutes}`;
 
+    console.log(`🔍 [${currentTime}] Verificando alarmas... (${Object.keys(meds).length} meds configurados)`);
+
     medsActuales = [];
     let alarmTriggered = false;
     const today = now.toISOString().slice(0, 10);
@@ -1170,6 +1172,7 @@ $('cancelEditTime').onclick = () => {
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', event => {
+        console.log('✉️ Mensaje del SW:', event.data.type);
         if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
             if (event.data.action === 'take') {
                 medsActuales.forEach(med => {
@@ -1186,6 +1189,8 @@ if ('serviceWorker' in navigator) {
                 stopAlarm();
                 showToast('✓ Toma registrada', 'Desde notificación', 'success');
             }
+        } else if (event.data && event.data.type === 'CHECK_ALARMS') {
+            checkAlarms();
         }
     });
 }
