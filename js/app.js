@@ -25,33 +25,23 @@ const photoZone = $('photoZone'), photoPreview = $('photoPreview');
 // CORRECCIÓN 1: Sistema de alarmas mejorado
 function initializeAlarmSystem() {
     console.log('🔔 Inicializando sistema de alarmas mejorado...');
+    showToast('🚀 Sistema Activo', 'Vigilando tus medicamentos cada 10s', 'info');
 
-    // Solicitar permisos de notificación inmediatamente
     requestNotificationPermissions();
-
-    // Configurar Background Sync si está disponible
     setupBackgroundSync();
 
-    // Iniciar modo segundo plano si está activo
     if ($('bgModeOn').checked) {
         startSilentAudio();
     }
 
-    // Verificar alarmas inmediatamente
     checkAlarms();
-
-    // Configurar verificación periódica más agresiva
     if (checkInterval) clearInterval(checkInterval);
-    checkInterval = setInterval(checkAlarms, 20000); // Cada 20 segundos
+    checkInterval = setInterval(checkAlarms, 10000); // Más frecuente: cada 10 segundos
 
-    // Configurar visibilidad para detección de bloqueo
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Configurar eventos de sonido
     document.addEventListener('click', handleUserInteraction);
-
-    console.log('✅ Sistema de alarmas mejorado inicializado');
 }
+
 
 async function startSilentAudio() {
     const silent = $('silentAudio');
@@ -169,9 +159,11 @@ function checkAlarms() {
 
         m.horas.forEach(h => {
             const alarmTime = h.h;
-            // Comparación exacta y manejo de duplicados en el mismo minuto
-            if (currentTime === alarmTime) {
-                const yaAgregado = medsActuales.some(med => med.id === id && med.nombre === m.nombre);
+            // Usar diferencia de minutos para ser más flexibles (margen de 1 min)
+            const diff = getMinutesDifference(currentTime, alarmTime);
+
+            if (Math.abs(diff) === 0) {
+                const yaAgregado = medsActuales.some(med => med.id === id);
                 if (!yaAgregado) {
                     medsActuales.push({
                         id: id,
