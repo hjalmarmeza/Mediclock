@@ -111,13 +111,28 @@ function handleVisibilityChange() {
 }
 
 function handleUserInteraction() {
-    // PRE-CARGA de audios: Vital para que el navegador permita sonar luego
+    // LLAVE MAESTRA: Desbloqueamos el audio del sistema con el primer toque del usuario
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    } catch (e) {
+        console.error('Error inicializando audio:', e);
+    }
+
     const audio = $('audio');
     const silent = $('silentAudio');
+
+    // Intento de pre-reproducción para ganar permisos en iOS
     if (audio) {
-        audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => { });
+        audio.volume = 0.01;
+        audio.play().then(() => { audio.pause(); }).catch(() => { });
     }
-    if (silent && silent.paused && $('bgModeOn').checked) {
+
+    if ($('bgModeOn').checked && silent && silent.paused) {
         startSilentAudio();
     }
 
@@ -125,6 +140,7 @@ function handleUserInteraction() {
         playAlarmSound();
     }
 }
+
 
 
 function requestNotificationPermissions() {
@@ -267,53 +283,54 @@ function playAlarmSoundForced() {
 function playAlarmSound() {
     if (!sonidoOn.checked) return;
 
-    console.log('🔊 Iniciando SIRENA SINTÉTICA (Anti-Bloqueo)...');
+    console.log('� DISPARANDO SIRENA DE ALTA PRIORIDAD');
     alarmaOn = true;
 
     try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-
-        const sonarSirena = () => {
+        const sonarBeep = () => {
             if (!alarmaOn) return;
 
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
 
+            // Frecuencia alternante (tipo sirena de ambulancia) para llamar la atención
+            const freq = (Math.floor(Date.now() / 500) % 2 === 0) ? 880 : 660;
+
             osc.type = 'square';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5);
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
             gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.9);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
             osc.start();
-            osc.stop(audioCtx.currentTime + 1);
+            osc.stop(audioCtx.currentTime + 0.5);
+
+            if ('vibrate' in navigator) navigator.vibrate(200);
         };
 
         if (intervalo) clearInterval(intervalo);
-        sonarSirena();
-        intervalo = setInterval(sonarSirena, 1500);
+        sonarBeep();
+        intervalo = setInterval(sonarBeep, 500);
 
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: '🚨 ¡TOMA MEDICACIÓN! 🚨',
-                artist: 'MediClock Neo Alarma',
+                title: '🚨 ¡TOCA TOMAR MEDICINA! 🚨',
+                artist: 'MediClock Activo',
                 artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
             });
+            navigator.mediaSession.playbackState = 'playing';
         }
     } catch (e) {
-        console.error('Error en sirena:', e);
+        console.error('Fallo en sirena:', e);
     }
 }
+
 
 
 
