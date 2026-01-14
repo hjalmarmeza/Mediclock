@@ -102,32 +102,32 @@ self.addEventListener('notificationclick', event => {
 
 // Manejo de mensajes desde la app
 self.addEventListener('message', event => {
-  console.log('Mensaje recibido en SW:', event.data);
-
   if (event.data && event.data.type === 'TRIGGER_ALARM') {
     const meds = event.data.meds || [];
     const count = meds.length;
-
     let body = event.data.body || 'Hora de medicación';
     if (count > 0) {
-      const names = meds.map(m => m.nombre).join(', ');
-      body = `Tomar: ${names}`;
+      body = `Tomar: ${meds.map(m => m.nombre).join(', ')}`;
     }
 
-    // Mostrar notificación con alta prioridad
-    self.registration.showNotification(event.data.title || '🚨 Recordatorio MediClock', {
-      body: body,
-      icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-      badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
-      vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 170, 40, 450, 110, 200, 110, 170, 40],
-      tag: 'mediclock-alarm-' + (event.data.time || Date.now()),
-      requireInteraction: true,
-      renotify: true,
-      data: event.data,
-      actions: [
-        { action: 'take', title: '✓ Marcar como Tomado' },
-        { action: 'close', title: 'Cerrar' }
-      ]
-    });
+    const vibrationPattern = [500, 100, 500, 100, 500, 100, 1000, 200, 1000, 200, 500, 100, 500, 100, 500];
+
+    event.waitUntil(
+      self.registration.showNotification(event.data.title || '🚨 ALARMA MEDICLOCK', {
+        body: body,
+        icon: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+        badge: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png',
+        vibrate: vibrationPattern,
+        tag: 'mediclock-alarm-urgent',
+        requireInteraction: true,
+        renotify: true,
+        data: event.data,
+        actions: [
+          { action: 'take', title: '✓ MARCAR COMO TOMADO' },
+          { action: 'close', title: 'Cerrar Alerta' }
+        ]
+      })
+    );
   }
 });
+
