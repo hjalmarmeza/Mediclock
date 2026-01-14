@@ -11,7 +11,7 @@ let medColors = {};
 let editingTimeData = null;
 let checkInterval = null;
 let wakeLock = null;
-const SILENCE_URL = 'data:audio/wav;base64,UGRyZkFhQUFBQVdRVkVFZm10IBIAAAABAAARKwAARKwAAAEAAABkYXRhAgAAAAAA';
+const SILENCE_URL = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAARKwAARKwAAAEAAABkYXRhAgAAAAAA';
 
 const $ = id => document.getElementById(id);
 const upper = t => t ? t.toString().toUpperCase().trim() : '';
@@ -160,7 +160,8 @@ function checkAlarms() {
 
     medsActuales = [];
     let alarmTriggered = false;
-    const today = now.toISOString().slice(0, 10);
+    // Usar fecha local para evitar desfases de zona horaria (UTC)
+    const today = now.toLocaleDateString('en-CA');
 
     Object.keys(meds).forEach(id => {
         const m = meds[id];
@@ -168,16 +169,19 @@ function checkAlarms() {
 
         m.horas.forEach(h => {
             const alarmTime = h.h;
-            // Comparación exacta de minuto para evitar que suene múltiples veces o antes de tiempo
+            // Comparación exacta y manejo de duplicados en el mismo minuto
             if (currentTime === alarmTime) {
-                medsActuales.push({
-                    id: id,
-                    paciente: m.paciente,
-                    nombre: m.nombre,
-                    cantidad: h.cant,
-                    foto: m.foto
-                });
-                alarmTriggered = true;
+                const yaAgregado = medsActuales.some(med => med.id === id && med.nombre === m.nombre);
+                if (!yaAgregado) {
+                    medsActuales.push({
+                        id: id,
+                        paciente: m.paciente,
+                        nombre: m.nombre,
+                        cantidad: h.cant,
+                        foto: m.foto
+                    });
+                    alarmTriggered = true;
+                }
             }
         });
     });
@@ -791,7 +795,7 @@ window.onload = function () {
         getMedColor(m.nombre);
     });
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date().toLocaleDateString('en-CA');
     const fired = JSON.parse(localStorage.getItem('alarmsToday') || '{}');
     const filtered = {};
 
