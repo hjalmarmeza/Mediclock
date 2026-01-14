@@ -267,32 +267,54 @@ function playAlarmSoundForced() {
 function playAlarmSound() {
     if (!sonidoOn.checked) return;
 
-    console.log('🔊 Swapping audio a modo ALARMA...');
+    console.log('🔊 Iniciando SIRENA SINTÉTICA (Anti-Bloqueo)...');
+    alarmaOn = true;
 
-    // USAMOS EL MISMO CANAL que ya está sonando (el de silencio)
-    // Al solo cambiar el "src" y no parar la reproducción, saltamos el bloqueo de iOS/Android
-    const audio = $('silentAudio');
-    const alarmSrc = 'https://assets.mixkit.co/sfx/download/mixkit-digital-alarm-buzzer-992.wav';
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
 
-    if (audio) {
-        audio.pause();
-        audio.src = alarmSrc;
-        audio.volume = parseFloat(volSlider.value);
-        audio.loop = true;
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
 
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log('✅ Alarma sonando con éxito por bypass de canal');
-                alarmaOn = true;
-            }).catch(e => {
-                console.error('❌ Error incluso con bypass:', e);
-                // Fallback final: Vibrar como locos
-                if ('vibrate' in navigator) navigator.vibrate([1000, 500, 1000, 500, 1000]);
+        const sonarSirena = () => {
+            if (!alarmaOn) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5);
+
+            gain.gain.setValueAtTime(parseFloat(volSlider.value), audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.9);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1);
+        };
+
+        if (intervalo) clearInterval(intervalo);
+        sonarSirena();
+        intervalo = setInterval(sonarSirena, 1500);
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: '🚨 ¡TOMA MEDICACIÓN! 🚨',
+                artist: 'MediClock Neo Alarma',
+                artwork: [{ src: 'https://cdn-icons-png.flaticon.com/512/1237/1237460.png', sizes: '512x512', type: 'image/png' }]
             });
         }
+    } catch (e) {
+        console.error('Error en sirena:', e);
     }
 }
+
 
 
 function tryPlayAlternativeSound() {
